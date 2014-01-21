@@ -10,10 +10,9 @@ README
 Introduction
 ------------
 
-This extension gathers three functionalities:
-    * a logging function
-    * a function to synchronize two folders
-    * a function to generate a copy of a module, converting doxygen documentation in rst format
+The module was started to grab emails using IMAP and to store them on a local disk.
+The module is available on `pypi/pymyinstall <https://pypi.python.org/pypi/pymmails/>`_ and
+on `GitHub/pymyinstall <https://github.com/sdpython/pymmails>`_.
     
 The documentation is available at 
 `pymmails documentation <http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html>`_.

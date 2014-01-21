@@ -13,7 +13,7 @@ Welcome to pymmails documentation
 Description
 -----------
 
-The module was started to grab emails using IMAP.
+The module was started to grab emails using IMAP and to store them on a local disk.
 The module is available on `pypi/pymyinstall <https://pypi.python.org/pypi/pymmails/>`_ and
 on `GitHub/pymyinstall <https://github.com/sdpython/pymmails>`_.
 
