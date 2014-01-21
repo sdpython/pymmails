@@ -14,8 +14,8 @@ Description
 -----------
 
 The module was started to grab emails using IMAP and to store them on a local disk.
-The module is available on `pypi/pymyinstall <https://pypi.python.org/pypi/pymmails/>`_ and
-on `GitHub/pymyinstall <https://github.com/sdpython/pymmails>`_.
+The module is available on `pypi/pymmails <https://pypi.python.org/pypi/pymmails/>`_ and
+on `GitHub/pymmails <https://github.com/sdpython/pymmails>`_.
 
 About this documentation
 ------------------------
