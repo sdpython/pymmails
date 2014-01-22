@@ -203,9 +203,48 @@ class EmailMessage (email.message.Message) :
         
         filename = os.path.abspath(os.path.join(folder,filename))
         if os.path.exists(filename) :
-            fLOG("skip file {0} already exists".format(filename))
             return True
         return False
+        
+    def produce_table_html(self, toshow, tohighlight, folder, atts = [ ]):
+        """
+        produces a table with the values of some fields of the message
+        
+        @param      toshow          list of fields to show, if None, it considers all fields
+        @param      tohighlight     list of fields to highlights
+        @param      atts            list of files to append at the end of the table
+        @param      folder          folder where this page will be saved
+        @return                     html string
+        """
+        rows = []
+        rows.append('<div class="dataframe100l">')
+        rows.append('<table border="1">')
+        rows.append("<thead><tr><th>key</th><th>value</th></tr></thead>")
+        for tu in sorted(self.items()) :
+            if toshow != None and tu[0] not in toshow : 
+                continue
+            
+            tu = (tu[0], self.decode_header(tu[0], tu[1]))
+            
+            if tu[0] in tohighlight :
+                rows.append('<tr><th style="background-color: yellow;">{0}</th><td style="background-color: yellow;">{1}</td></tr>'.format(
+                            tu[0].replace("<","&lt;").replace(">","&gt;"),
+                            tu[1].replace("<","&lt;").replace(">","&gt;")))
+            else :
+                rows.append("<tr><th>{0}</th><td>{1}</td></tr>".format(
+                            tu[0].replace("<","&lt;").replace(">","&gt;"),
+                            tu[1].replace("<","&lt;").replace(">","&gt;")))
+                            
+        for i,a in enumerate(atts) :
+            rows.append('<tr><td>{0}</td><td><a href="{1}">{2}</a> (size: {3} bytes)</td></tr>'.format(
+                        "attachment %d" %i, 
+                        os.path.relpath(a, folder), 
+                        os.path.split(a)[-1],
+                        os.stat(a).st_size))
+            
+        rows.append("</table>")
+        rows.append("</div><br />")
+        return "\n".join(rows)
         
     def dump_html(self, folder=".", attachfolder=".", filename = None, fLOG = print):
         """
@@ -245,7 +284,6 @@ class EmailMessage (email.message.Message) :
                 f.write(att[1])
                 
             atts.append(to)
-            
         
         subj = self["Subject"]
         if subj == None : subj = self["subject"]
@@ -253,37 +291,20 @@ class EmailMessage (email.message.Message) :
         subj = self.decode_header("subject",subj)
             
         rows = [ EmailMessage.html_header.replace("__TITLE__",subj) ]
-        rows.append('<div class="dataframe100l">')
-        rows.append('<table border="1">')
-        rows.append("<thead><tr><th>key</th><th>value</th></tr></thead>")
-        for tu in sorted(self.items()) :
-            
-            tu = (tu[0], self.decode_header(tu[0], tu[1]))
-            
-            if tu[0] in EmailMessage.avoid :
-                continue
-            if tu[0] in EmailMessage.subset :
-                rows.append('<tr><th style="background-color: yellow;">{0}</th><td style="background-color: yellow;">{1}</td></tr>'.format(
-                            tu[0].replace("<","&lt;").replace(">","&gt;"),
-                            tu[1].replace("<","&lt;").replace(">","&gt;")))
-            else :
-                rows.append("<tr><th>{0}</th><td>{1}</td></tr>".format(
-                            tu[0].replace("<","&lt;").replace(">","&gt;"),
-                            tu[1].replace("<","&lt;").replace(">","&gt;")))
-        for i,a in enumerate(atts) :
-            rows.append('<tr><td>{0}</td><td><a href="{1}">{2}</a> (size: {3} bytes)</td></tr>'.format(
-                        "attachment %d" %i, 
-                        os.path.relpath(a, folder), 
-                        os.path.split(a)[-1],
-                        os.stat(a).st_size))
-            
-        rows.append("</table>")
-            
-        rows.append("</div><br />")
+        
+        table1 = self.produce_table_html(EmailMessage.subset, [], folder, atts)
+        rows.append(table1)
+
         rows.append('<div class="bodymail">')
         rows.append(self.body_html)
         
-        rows.append ( "</div></body>\n</html>" )
+        rows.append ( "</div>")
+        
+        table2 = self.produce_table_html(None, EmailMessage.subset, folder)
+        rows.append(table2)
+        
+        rows.append ("</body>\n</html>" )
+        
         body = "\n".join(rows)
         
         fLOG("dump mail:", filename)
