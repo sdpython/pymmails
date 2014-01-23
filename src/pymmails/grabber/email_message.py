@@ -111,12 +111,10 @@ class EmailMessage (email.message.Message) :
                 fileName = fileName.strip("=?").split("=")[-1]
                 
             if fileName == None or "?" in fileName :
-                fLOG ("w, ** issue with type", part.get_content_maintype(), " fileName",fileName)
                 fileName = "unknown_type"
                 cont = part.get_payload(decode=True)
                 ext = mimetypes.guess_extension(part.get_content_type())
                 if ext != None :
-                    fLOG("w, ** mime ", part.get_content_type(), " ** ", ext)
                     fileName += ext
                 elif cont != None :
                     if cont.startswith(b"%PDF") :
