@@ -4,11 +4,11 @@
 @brief define an Email grabbed from a server.
 """
 
-import sys, os, imaplib, re, email, email.message, datetime, dateutil.parser, mimetypes
+import sys, os, imaplib, re, email, email.message, datetime, dateutil.parser, mimetypes, hashlib
 
 from .email_message_style import html_header_style
 from .mail_exception import MailException
-
+from .additional_mime_type import additional_mime_type_ext_type
 
 class EmailMessage (email.message.Message) :
     """
@@ -24,6 +24,7 @@ class EmailMessage (email.message.Message) :
     avoid   = [ "X-me-spamcause", "X-YMail-OSG" ]
     
     html_header = html_header_style
+    additionnalMimeType = additional_mime_type_ext_type
     
     
     @property
@@ -68,9 +69,22 @@ class EmailMessage (email.message.Message) :
                 if b != None :
                     chs = list(self.get_all_charsets(part))
                     if len(chs) > 0 :
-                        ht = b.decode(chs[0])
+                        try :
+                            ht = b.decode(chs[0])
+                        except UnicodeDecodeError as e :
+                            try :
+                                ht = b.decode("utf-8")
+                            except UnicodeDecodeError as e :
+                                try :
+                                    ht = b.decode("latin-1")
+                                except UnicodeDecodeError as e :
+                                    raise Exception("unable to decode (" + str(chs[0]) + "):" + str(b))
                     else :
-                        ht = b.decode("utf_8")
+                        try :
+                            ht = b.decode("utf-8")
+                        except UnicodeDecodeError as e :
+                            ht = b.decode("utf-8", errors='ignore')
+                            #raise MailException("unable to decode: " + str(b)) from e
                     htl = ht.lower()
                     pos = htl.find("<body")
                     pos2 = htl.find("</body>")
@@ -85,14 +99,6 @@ class EmailMessage (email.message.Message) :
                     messages.append(ht)
         return "<hr />".join(messages)
     
-    def set_id(self,num):
-        """
-        defines an id for the message
-        
-        @param  num id of the message
-        """
-        self._myid = num
-            
     def enumerate_attachments(self):
         """
         enumerate the attachments as 
@@ -113,7 +119,10 @@ class EmailMessage (email.message.Message) :
             if fileName == None or "?" in fileName :
                 fileName = "unknown_type"
                 cont = part.get_payload(decode=True)
-                ext = mimetypes.guess_extension(part.get_content_type())
+                ext = EmailMessage.additionnalMimeType.get(part.get_content_subtype(),None)
+                if ext == None :
+                    ext = mimetypes.guess_extension(part.get_content_type())
+                    
                 if ext != None :
                     fileName += ext
                 elif cont != None :
@@ -125,7 +134,7 @@ class EmailMessage (email.message.Message) :
                         else :
                             fileName + ".txt"
                     else :
-                        raise MailException("unable to guess type: " + part.get_content_maintype() + "\nsubtype: " + str(part.get_content_subtype()) + "\n" + str([cont]))
+                        raise MailException("unable to guess type: " + part.get_content_maintype() + "\nsubtype: " + str(part.get_content_subtype()) + " ext: " + str(ext) + " def: " + EmailMessage.additionnalMimeType.get(part.get_content_subtype(),"-") +"\n" + str([cont]))
             else :
                 cont = part.get_payload(decode=True)
             yield fileName, cont
@@ -134,21 +143,73 @@ class EmailMessage (email.message.Message) :
         """
         returns a tuple (label, email address)
         """
-        cp = EmailMessage.expMail1.search(self["from"])
+        st = self["from"]
+        if isinstance(st, email.header.Header):
+            text, encoding = email.header.decode_header(st)[0]
+            try :
+                res = text.decode(encoding) 
+            except LookupError :
+                res = text.decode("ascii", errors="ignore")
+            text = res
+            if res == None :
+                raise MailException("unable to parse: " + str(res) + "\n" + str(st))
+        else : 
+            text = st
+        
+        cp = EmailMessage.expMail1.search(text)
         if not cp :
-            cp = EmailMessage.expMail2.search(self["from"])
+            cp = EmailMessage.expMail2.search(text)
             if not cp :
-                cp = EmailMessage.expMail3.search(self["from"])
+                cp = EmailMessage.expMail3.search(text)
                 if not cp :
-                    raise MailException("unable to interpret: " + self["from"])
+                    raise MailException("unable to interpret: " + text)
         gr = cp.groups()
         return gr[1],gr[2]
         
     def get_date(self):
         """
-        return a datetime object
+        return a datetime object for the field Date
         """
-        return dateutil.parser.parse(self["Date"])
+        st = self["Date"]
+        if isinstance(st, email.header.Header):
+            text, encoding = email.header.decode_header(st)[0]
+            try :
+                res = text.decode(encoding) 
+            except LookupError :
+                res = text.decode("ascii", errors="ignore")
+            text = res
+            if res == None :
+                raise MailException("unable to parse: " + str(res) + "\n" + str(st))
+        else : 
+            text = st
+        
+        res = text
+        
+        if res == None :
+            #raise MailException("unable to parse: " + str(res) + "\n" + str(st))
+            #we retrun a kake date
+            return datetime.datetime(1980,1,1)
+            
+        try :
+            p = dateutil.parser.parse(res)
+        except Exception as e :
+            # it can fail because of dates such as: Wed, 7 Oct 2009 11:43:56 +0200 (Paris, Madrid (heure d'\ufffdt\ufffd))
+            if "(" in res :
+                res = res[:res.find("(")]
+                p = dateutil.parser.parse(res)
+                return p
+            else :
+                if "," in res :
+                    a,b = res.split(",")
+                    try :
+                        p = dateutil.parser.parse(b)
+                    except Exception as e :
+                        raise MailException("unable to parse: " + str(res) + "\n" + str(st)) from e
+                else :
+                    raise MailException("unable to parse: " + str(res) + "\n" + str(st)) from e
+        if p == None :
+            raise MailException("unable to parse: " + str(res) + "\n" + str(st))
+        return p
             
     def default_filename(self):
         """
@@ -162,8 +223,23 @@ class EmailMessage (email.message.Message) :
         b = b.replace("@","-").replace(".","_")
         date = self.get_date()
         d = "%04d-%02d-%02d"%(date.year, date.month, date.day)
-        f = "d_{0}_i_{1}_f_{2}".format(d, self._myid, b)
-        return f
+        f = "d_{0}_p_{1}_ii_{2}".format(d, b, self.UniqueID)
+        return f.replace("\\","-").replace("\r","").replace("\n","-").replace("%","-").replace("/","-")
+        
+    @property
+    def UniqueID(self):
+        """
+        builds a unique ID 
+        """
+        md5 = hashlib.md5()
+        t = self["Message-ID"]
+        if t != None :
+            md5.update(t.encode('utf-8'))
+        else :
+            for f in ["Subject", "To", "From", "Date"] :
+                if self[f] != None : 
+                    md5.update(self[f].encode('utf-8'))
+        return md5.hexdigest()
 
     def decode_header(self, field, st):
         """
@@ -175,17 +251,25 @@ class EmailMessage (email.message.Message) :
         """
         if st == None :
             return ""
-        elif st.startswith("Tr:") and field.lower() == "subject":
-            pos = st.find("=?")
-            return st[:pos] + self.decode_header(field, st[pos:])
-        elif isinstance(st,bytes):
+        elif isinstance(st, str) :
+            if st.startswith("Tr:") and field.lower() == "subject":
+                pos = st.find("=?")
+                return st[:pos] + self.decode_header(field, st[pos:])
+            elif isinstance(st,bytes):
+                text, encoding = email.header.decode_header(st)[0]
+                return text.decode(encoding) if encoding != None else st
+            else :
+                text, encoding = email.header.decode_header(st)[0]
+                return text.decode(encoding) if encoding != None else st
+        elif isinstance(st, email.header.Header):
             text, encoding = email.header.decode_header(st)[0]
-            return text.decode(encoding) if encoding != None else st
-        elif isinstance(st,str):
-            text, encoding = email.header.decode_header(st)[0]
-            return text.decode(encoding) if encoding != None else st
+            try :
+                return text.decode(encoding) 
+            except LookupError :
+                return text.decode("ascii", errors="ignore")
+                
         else :
-            raise MailException("unable to process type " + str(type(st)))
+            raise MailException("unable to process type " + str(type(st)) + "\n" + str(st))
 
     def isDumped(self, folder=".", attachfolder=".", filename = None):
         """
@@ -204,7 +288,7 @@ class EmailMessage (email.message.Message) :
             return True
         return False
         
-    def produce_table_html(self, toshow, tohighlight, folder, atts = [ ]):
+    def produce_table_html(self, toshow, tohighlight, folder, atts = [ ], avoid = []):
         """
         produces a table with the values of some fields of the message
         
@@ -212,6 +296,7 @@ class EmailMessage (email.message.Message) :
         @param      tohighlight     list of fields to highlights
         @param      atts            list of files to append at the end of the table
         @param      folder          folder where this page will be saved
+        @param      avoid           fields to avoid
         @return                     html string
         """
         rows = []
@@ -220,6 +305,8 @@ class EmailMessage (email.message.Message) :
         rows.append("<thead><tr><th>key</th><th>value</th></tr></thead>")
         for tu in sorted(self.items()) :
             if toshow != None and tu[0] not in toshow : 
+                continue
+            if tu[0] in avoid :
                 continue
             
             tu = (tu[0], self.decode_header(tu[0], tu[1]))
@@ -241,7 +328,7 @@ class EmailMessage (email.message.Message) :
                         os.stat(a).st_size))
             
         rows.append("</table>")
-        rows.append("</div><br />")
+        rows.append("<br /></div>")
         return "\n".join(rows)
         
     def dump_html(self, folder=".", attachfolder=".", filename = None, fLOG = print):
@@ -267,13 +354,15 @@ class EmailMessage (email.message.Message) :
         atts = [ ]
         for att in self.enumerate_attachments():
             if att[1] == None : continue
-            to = os.path.join(attachfolder, att[0].replace(":","_"))
+            to = os.path.split(att[0].replace(":","_"))[-1]
+            to = os.path.join(attachfolder, to)
             spl = os.path.splitext(to)
             i = 1
             while os.path.exists(to) :
                 to = spl[0] + (".%d" % i) + spl[1]
                 i += 1
         
+            to = to.replace("\n","_").replace("\r","")
             to = os.path.abspath(to)
             if "?" in to :
                 raise MailException("issue with " + filename + " \n + "  +to + "\n" + str(att))
@@ -290,7 +379,7 @@ class EmailMessage (email.message.Message) :
             
         rows = [ EmailMessage.html_header.replace("__TITLE__",subj) ]
         
-        table1 = self.produce_table_html(EmailMessage.subset, [], folder, atts)
+        table1 = self.produce_table_html(EmailMessage.subset, [], folder, atts, avoid = EmailMessage.avoid)
         rows.append(table1)
 
         rows.append('<div class="bodymail">')
@@ -298,14 +387,14 @@ class EmailMessage (email.message.Message) :
         
         rows.append ( "</div>")
         
-        table2 = self.produce_table_html(None, EmailMessage.subset, folder)
+        table2 = self.produce_table_html(None, EmailMessage.subset, folder, avoid = EmailMessage.avoid)
         rows.append(table2)
         
         rows.append ("</body>\n</html>" )
         
         body = "\n".join(rows)
         
-        fLOG("dump mail:", filename)
+        fLOG("dump mail:", filename, "(", self.default_filename(),")")
         with open(filename,"w",encoding="utf8") as f :
             f.write(body)
             

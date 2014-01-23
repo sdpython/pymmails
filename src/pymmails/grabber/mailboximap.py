@@ -82,12 +82,30 @@ class MailBoxImap :
             pattern='TO "student" (FLAGGED)'
             pattern='(UNSEEN)'
         @endcode
-
+        
+        If the function generates an error such as::
+        
+            imaplib.error: command: SEARCH => got more than 10000 bytes
+            
+        The keyword RECENT will be added to the search pattern
+        in order to retreive the newest mails.
         """
         qfold = self.M._quote(folder)
         self.fLOG("MailBoxImap [folder={0}]".format(qfold))
         self.M.select(qfold, readonly=True) 
-        typ, data = self.M.search(None, pattern)
+        
+        try :
+            typ, data = self.M.search(None, pattern)
+        except Exception as e :
+            if "SEARCH => got more " in str(e) :
+                if pattern == "ALL" : pattern = "RECENT"
+                else : pattern += " RECENT"
+                pattern = pattern.strip()
+                self.fLOG("limit email search for folder", folder, " to recent emails with pattern", pattern)
+                typ, data = self.M.search(None, pattern)
+            else :
+                raise e
+            
         spl = data[0].split()
         self.fLOG("MailBoxImap [folder={0} nbm={1}]".format(folder, len(spl)))
         
@@ -96,14 +114,12 @@ class MailBoxImap :
                 typ, data = self.M.fetch(num, '(BODY[HEADER])')
                 emailBody = data[0][1]
                 mail = email.message_from_bytes(emailBody, _class=EmailMessage)
-                mail.set_id(num.decode("utf8"))
                 if skip_function(mail) :
                     continue
             
             typ, data = self.M.fetch(num, '(RFC822)')
             emailBody = data[0][1]
             mail = email.message_from_bytes(emailBody, _class=EmailMessage)
-            mail.set_id(num.decode("utf8"))
             yield mail
             
         self.M.close()
@@ -126,6 +142,9 @@ class MailBoxImap :
         folders = self.folders()
         self.fLOG("MailBoxImap [folders={0}]".format(",".join(folders)))
         for fold in folders :
+            if fold == "INBOX/OUTBOX" :
+                # we skip that folder, does not seem to be one
+                continue
             self.fLOG("MailBoxImap: dumping folder ", fold)
             subfold = os.path.join(folder,fold)
             attach = os.path.join(subfold, "_attachments")

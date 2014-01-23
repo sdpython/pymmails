@@ -12,20 +12,24 @@ html_header_style = """<?xml version="1.0" encoding="utf-8"?>
         <style>
         
         .bodymail {
+            // __MORE_STYLE1__
             margin-top:1%;
-            margin-left:5%;
+            margin-left:20%;
+            margin-right:5%;
             padding: 0;
-            width=80%
+            width=75%
             font-family: Calibri;
             font-size: 100%;
             cursor: pointer;
         }             
 
         .dataframe100l {
+            // __MORE_STYLE2__
             margin-top:1%;
-            margin-left:5%;
+            margin-left:20%;
+            margin-right:5%;
             padding: 0;
-            width=80%
+            width=75%
             font-family: Calibri;
             font-size: 100%;
             cursor: pointer;
