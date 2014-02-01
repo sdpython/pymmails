@@ -7,17 +7,3 @@ Use case
    :depth: 3
     
     
-    
-First category
-==============
-
-First use case
-++++++++++++++
-
-::
-
-    from project_template.subproject.myexample import myclass
-    c = myclass(0)
-    
-
-

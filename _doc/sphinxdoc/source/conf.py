@@ -32,6 +32,7 @@ extensions = [  'sphinx.ext.autodoc',
                 'sphinx.ext.ifconfig', 
                 'sphinx.ext.viewcode',
                 'sphinxcontrib.fancybox',
+                'sphinxjp.themes.sphinxjp',
                 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -48,13 +49,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = project_var_name + ' documentation'
-copyright = '2013, ' + author
+copyright = '2014, ' + author
 
-# The version info for the project you're documenting, acts as replacement for
-# |version| and |release|, also used in various other places throughout the
-# built documents.
-#
-# The short X.Y version.
 # The full version, including alpha/beta/rc tags.
 version_file = os.path.abspath(os.path.join(os.path.split(__file__)[0], "..", "..", "..", "version.txt"))
 try :
@@ -107,7 +103,8 @@ modindex_common_prefix = [
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #html_theme = 'default'
-html_theme = 'sphinxdoc'
+import sphinxjp.themes.sphinxjp
+html_theme = 'sphinxjp'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

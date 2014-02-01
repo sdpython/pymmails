@@ -25,7 +25,7 @@
 #     "This product includes software developed by
 #      Xavier Dupré <xavier.dupre AT gmail.com>."
 # 
-#  THIS SOFTWARE IS PROVIDED BY --------------- ``AS IS'' AND ANY
+#  THIS SOFTWARE IS PROVIDED BY Xavier Dupré ``AS IS'' AND ANY
 #  EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 #  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
 #  PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL Roman V. Kiseliov OR
@@ -61,7 +61,7 @@ KEYWORDS = \
 project_var_name + ', synchronization, files, Xavier, Dupré'
 
 DESCRIPTION = \
-"""Three functionalities: folder synchronization, a logging function, helpers to generate documentatino with sphinx"""
+"""A module to download emails from an IMAP4 server"""
 
 CLASSIFIERS = \
 [
@@ -120,8 +120,8 @@ setup(
     version                 = 'py%s-v%s.%d' % (versionPython, sversion, subversion),
     author                  = 'Xavier Dupré',
     author_email            = 'xavier.dupre AT gmail.com',
-    url                     = "http://www.xavierdupre.fr/site2013/index_code.html",
-    download_url            = "https://github.com/sdpython/pymmails",
+    url                     = "http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html",
+    download_url            = "https://github.com/sdpython/pymmails/",
     description             = DESCRIPTION,
     long_description        = long_description,
     keywords                = KEYWORDS,
@@ -129,8 +129,8 @@ setup(
     packages                = packages,
     package_dir             = package_dir,
     package_data            = package_data,
+    requires                = [  "pyquickhelper" ],
     ext_modules             = EXT_MODULES,
-	requires				= ["pyquickhelper"],
     )
 
     

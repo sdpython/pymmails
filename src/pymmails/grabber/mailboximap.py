@@ -129,9 +129,10 @@ class MailBoxImap :
         Dumps all emails to a folder,
         it creates a subfolder for all inbox folders.
         
-        @param      pattern     search pattern, @see meth enumerate_mails_in_folder
+        @param      pattern     search pattern, @see me enumerate_mails_in_folder
         @param      folder      folder where to dump
         @return                 list of dumped files
+        
         """        
         res = [ ]
         

@@ -3,23 +3,21 @@
 README
 ======
 
-.. contents::
-   :depth: 3
+   
+**Links:**
+    * `pypi/pymmails <https://pypi.python.org/pypi/pymmails/>`_
+    * `GitHub/pymmails <https://github.com/sdpython/pymmails/>`_
+    * `documentation <http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html>`_
+    * `Windows Setup <http://www.xavierdupre.fr/site2013/index_code.html#pymmails>`_
 
 
-Introduction
-------------
+Description
+-----------
 
 The module was started to grab emails using IMAP and to store them on a local disk.
-The documentation is available at 
-`pymmails documentation <http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html>`_.
-You can download the setup  `here <http://www.xavierdupre.fr/site2013/index_code.html>`_.
-The module is available on `pypi/pymmails <https://pypi.python.org/pypi/pymmails/>`_ and
-on `GitHub/pymmails <https://github.com/sdpython/pymmails>`_.
-It requires module `pyensae <https://github.com/sdpython/pyensae>`_ and
-`pyquickhelper <https://github.com/sdpython/pyquickhelper>`_. 
-The main functionality is the ability to download your email
-from your inbox and to store them in a local folder with their attachements::
+I now use it to download to material sent by my students before an oral presentation.
+I receive many of them and it is usually annoying to download them one by one.
+Here is the code I use::
 
     from pyquickhelper import fLOG
     from pymmails import MailBoxImap
@@ -50,7 +48,7 @@ Below, some examples of patterns::
     pattern='SUBJECT "programmation"'
     pattern='TO "student" FLAGGED'
     pattern='UNSEEN'
-
+    
 
 Design
 ------
