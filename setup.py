@@ -129,7 +129,7 @@ setup(
     packages                = packages,
     package_dir             = package_dir,
     package_data            = package_data,
-    requires                = [  "pyquickhelper" ],
+    install_requires        = [  "pyquickhelper" ],
     ext_modules             = EXT_MODULES,
     )
 
