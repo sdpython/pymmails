@@ -28,7 +28,7 @@ class TestGrab (unittest.TestCase):
     def test_exception(self) :
         fLOG (__file__, self._testMethodName, OutputPrint = __name__ == "__main__")
         try :
-            box = MailBoxImap("nobody","nopwd", server="nowhere")
+            MailBoxImap("nobody","nopwd", server="nowhere")
         except socket.gaierror:
             pass
         

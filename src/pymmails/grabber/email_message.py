@@ -82,7 +82,7 @@ class EmailMessage (email.message.Message) :
                     else :
                         try :
                             ht = b.decode("utf-8")
-                        except UnicodeDecodeError as e :
+                        except UnicodeDecodeError :
                             ht = b.decode("utf-8", errors='ignore')
                             #raise MailException("unable to decode: " + str(b)) from e
                     htl = ht.lower()

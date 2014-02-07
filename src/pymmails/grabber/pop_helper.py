@@ -4,7 +4,7 @@
 @brief Helper around POP server
 """
 
-import poplib, sys, os
+import poplib
 
 def retrieve_mails_pop(user, password, server, begin = 0, end = -1) :
     """

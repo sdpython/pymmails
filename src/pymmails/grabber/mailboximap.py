@@ -4,7 +4,7 @@
 @brief Defines a mailbox using IMAP
 """
 
-import sys, os, imaplib, re, email, email.message, datetime, dateutil.parser, mimetypes
+import os, imaplib, re, email, email.message
 
 from .mail_exception import MailException
 from .email_message import EmailMessage
@@ -49,7 +49,7 @@ class MailBoxImap :
         """
         folders = self.M.list()
         if folders[0] != "OK" :
-            raise MailException("unable to retrieve the folder list for " + user)
+            raise MailException("unable to retrieve the folder list for " + self.user)
         res = []
         for f in folders[1] :
             s = f.decode("utf8")
@@ -134,8 +134,6 @@ class MailBoxImap :
         @return                 list of dumped files
         
         """        
-        res = [ ]
-        
         def skip_function (mail) :
             if mail.isDumped(subfold, attach) :
                 return True
@@ -160,6 +158,3 @@ class MailBoxImap :
                     skip2 = False
                 mail.dump_html(subfold, attach, fLOG = self.fLOG)
             
-        
-
-
