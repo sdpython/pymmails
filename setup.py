@@ -47,10 +47,10 @@ if os.path.exists("version.txt") :
     with open("version.txt", "r") as f : lines = f.readlines()
     subversion = lines[0].strip("\r\n ")
 else :
-    subversion = 1   
+    subversion = 1
 
 project_var_name    = "pymmails"
-sversion            = "0.1"
+sversion            = "0.2"
 versionPython       = "%s.%s" % (sys.version_info.major, sys.version_info.minor)
 path                = "Lib/site-packages/" + project_var_name
 readme              = 'README.rst'
