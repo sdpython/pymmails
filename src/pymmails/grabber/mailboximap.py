@@ -70,7 +70,8 @@ class MailBoxImap :
         
         The search pattern can be used to look for a subset of email.
         It follows these `specifications <http://tools.ietf.org/html/rfc3501#page-49>`_.
-        Some examples:
+        
+        @example(Search pattern)
         @code
             pattern='FROM "xavier" SINCE 1-Feb-2013'
             pattern='FROM "xavier" SINCE 1-Feb-2013 BEFORE 5-May-2013'
@@ -82,6 +83,7 @@ class MailBoxImap :
             pattern='TO "student" (FLAGGED)'
             pattern='(UNSEEN)'
         @endcode
+        @endexample
         
         If the function generates an error such as::
         
