@@ -162,7 +162,22 @@ class EmailMessage (email.message.Message) :
             if not cp :
                 cp = EmailMessage.expMail3.search(text)
                 if not cp :
-                    raise MailException("unable to interpret: " + text)
+                    if text.startswith('"=?utf-8?'):
+                        text = text.strip('"')
+                        text, encoding = email.header.decode_header(text)[0]
+                        if encoding is None : encoding = "utf8"
+                        try :
+                            res = text.decode(encoding) 
+                            if isinstance(res, bytes):
+                                res = str(res, encoding)
+                            cp = EmailMessage.expMail1.search(res)
+                            if not cp :
+                                if "@" not in res :
+                                    return "", res
+                                else :
+                                    raise MailException("unable to interpret: " + res) 
+                        except LookupError as e :
+                            raise MailException("unable to interpret: " + text) from e
         gr = cp.groups()
         return gr[1],gr[2]
         
