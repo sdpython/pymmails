@@ -61,4 +61,9 @@ This project contains various helper about logging functions, unit tests and hel
    * a file ``make_help.py`` to build the sphinx documentation
     
 
+Versions
+--------
+
+* **v0.3 - 2014/??/??**
+    * **change:** add a version parameter
 
