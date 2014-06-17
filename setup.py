@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-
 #  Copyright (C) 2014 ---------------
 #  All rights reserved.
 # 
@@ -95,7 +96,7 @@ if "--verbose" in sys.argv :
 
 setup(
     name                    = project_var_name,
-    version                 = '%s.%s' %(sversion, subversion) if "register" in sys.argv else 'py%s-v%s.%s' % (versionPython, sversion, subversion),
+    version                 = '%s.%s' %(sversion, subversion) if "register" in sys.argv or "bdist_msi" in sys.argv else 'py%s-v%s.%s' % (versionPython, sversion, subversion),
     author                  = 'Xavier Dupré',
     author_email            = 'xavier.dupre AT gmail.com',
     url                     = "http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html",
