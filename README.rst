@@ -64,6 +64,6 @@ This project contains various helper about logging functions, unit tests and hel
 Versions
 --------
 
-* **v0.3 - 2014/??/??**
+* **0.3 - 2014/??/??**
     * **change:** add a version parameter
 
