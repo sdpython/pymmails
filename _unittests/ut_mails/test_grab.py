@@ -1,4 +1,3 @@
-# coding: latin-1
 """
 @brief      test log(time=1s)
 """
@@ -29,8 +28,10 @@ class TestGrab (unittest.TestCase):
         fLOG (__file__, self._testMethodName, OutputPrint = __name__ == "__main__")
         try :
             MailBoxImap("nobody","nopwd", server="nowhere")
+        except TimeoutError:
+            fLOG("TimeoutError")
         except socket.gaierror:
-            pass
+            fLOG("gaierror")
         
 
 
