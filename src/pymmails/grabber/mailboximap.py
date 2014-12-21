@@ -23,6 +23,8 @@ class MailBoxImap :
         @param  pwd         password
         @param  server      server something like ``imap.domain.ext``
         @param  ssl         select ``IMPA_SSL`` or ``IMAP``
+        
+        For gmail, it is ``imap.gmail.com`` and ssl must be true
         """
         self.M = imaplib.IMAP4_SSL(server) if ssl else imaplib.IMAP4(server)
         self._user = user
@@ -60,6 +62,37 @@ class MailBoxImap :
             res.append(name)
         return res
         
+    def dump_html(self, iterator, folder="."):
+        """
+        Dumps all emails to a folder,
+        it creates a subfolder for all inbox folders.
+        
+        @param      iterator    iterator on emails or tuples (mail, subfolder)
+        @param      folder      folder where to dump
+        @return                 list of dumped files
+        
+        """        
+        dumped = [ ]
+        skip1,skip2 = True,True
+        for mail in iterator:
+            if isinstance(mail, tuple):
+                mail,subfold = mail
+                subfold = os.path.join(folder,subfold)
+                attach = os.path.join(subfold, "_attachments")
+            else:
+                subfold = folder
+                attach = os.path.join(subfold, "_attachments")
+                
+            if skip1 and not os.path.exists (subfold) :
+                os.makedirs(subfold)
+                skip1 = False
+            if skip2 and not os.path.exists(attach) :
+                os.makedirs(attach)
+                skip2 = False
+            f = mail.dump_html(subfold, attach, fLOG = self.fLOG)
+            dumped.append(f)
+        return dumped
+            
     def enumerate_mails_in_folder (self, folder, skip_function = None, pattern = "ALL") :
         """
         enumerates all mails in folder folder
@@ -126,37 +159,34 @@ class MailBoxImap :
             
         self.M.close()
         
-    def dump_html(self, pattern="ALL", folder="."):
+    def enumerate_search_person(self, person, folder, skip_function = None, date = None):
         """
-        Dumps all emails to a folder,
-        it creates a subfolder for all inbox folders.
+        enumerates all mails in folder folder from a user or sent to a user
         
-        @param      pattern     search pattern, @see me enumerate_mails_in_folder
-        @param      folder      folder where to dump
-        @return                 list of dumped files
+        @param      person          person to look for
+        @param      folder          folder name
+        @param      skip_function   if not None, use this function on the header/body to avoid loading the entire message (and skip it)
+        @param      pattern         search pattern (see below)
+        @return                     iterator on (message)
         
-        """        
-        def skip_function (mail) :
-            if mail.isDumped(subfold, attach) :
-                return True
-        
-        folders = self.folders()
-        self.fLOG("MailBoxImap [folders={0}]".format(",".join(folders)))
-        for fold in folders :
-            if fold == "INBOX/OUTBOX" :
-                # we skip that folder, does not seem to be one
-                continue
-            self.fLOG("MailBoxImap: dumping folder ", fold)
-            subfold = os.path.join(folder,fold)
-            attach = os.path.join(subfold, "_attachments")
-
-            skip1,skip2 = True,True
-            for mail in self.enumerate_mails_in_folder(fold, skip_function = skip_function, pattern = pattern) :
-                if skip1 and not os.path.exists (subfold) :
-                    os.makedirs(subfold)
-                    skip1 = False
-                if skip2 and not os.path.exists(attach) :
-                    os.makedirs(attach)
-                    skip2 = False
-                mail.dump_html(subfold, attach, fLOG = self.fLOG)
-            
+        @exemple(Grab all emails received or sent to a user from gmail)
+        @code
+        import pymmails
+        imap = pymmails.MailBoxImap("alias", "pwd", "imap.gmail.com", True)
+        imap.login()
+        print("inbox folders", imap.folders())
+        iter = imap.enumerate_search_person("user", "folder", date="1-Oct-2014")
+        fs = imap.dump_html(iter, "destination", index=True)
+        imap.logout()
+        print("list of stored files", fs)        
+        @endcode
+        @endexample
+        """
+        pat1 = 'FROM "{0}"'.format(person)
+        if date is not None: pat1 += ' SINCE {0}'.format(date)
+        for mail in self.enumerate_mails_in_folder(folder, skip_function = skip_function, pattern= pat1):
+            yield mail
+        pat2 = 'TO "{0}"'.format(person)
+        if date is not None: pat2 += ' SINCE {0}'.format(date)
+        for mail in self.enumerate_mails_in_folder(folder, skip_function = skip_function, pattern= pat2):
+            yield mail

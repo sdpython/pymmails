@@ -32,6 +32,9 @@ class TestGrab (unittest.TestCase):
             fLOG("TimeoutError")
         except socket.gaierror:
             fLOG("gaierror")
+        except ConnectionRefusedError:
+            fLOG("ConnectionRefusedError")
+            
         
 
 
