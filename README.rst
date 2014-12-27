@@ -67,4 +67,6 @@ Versions
 * **0.3 - 2014/??/??**
     * **change:** add a version parameter
     * **fix:** the setup does not need the file ``README.rst`` anymore
+    * **add:** method :meth:`get_to <pymmails.grabber.email_message.EmailMessage.get_to>`
+    * **add:** method :meth:`enumerate_search_person <pymmails.grabber.mailboximap.MailBoxImap.enumerate_search_person>` to grap all emails received from or send to a person
 

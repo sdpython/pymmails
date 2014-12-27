@@ -159,7 +159,12 @@ class MailBoxImap :
             
         self.M.close()
         
-    def enumerate_search_person(self, person, folder, skip_function = None, date = None):
+    def enumerate_search_person(self, 
+                        person, 
+                        folder, 
+                        skip_function = None, 
+                        date = None,
+                        max_dest = 5):
         """
         enumerates all mails in folder folder from a user or sent to a user
         
@@ -167,6 +172,7 @@ class MailBoxImap :
         @param      folder          folder name
         @param      skip_function   if not None, use this function on the header/body to avoid loading the entire message (and skip it)
         @param      pattern         search pattern (see below)
+        @param      max_dest        maximum number of receivers
         @return                     iterator on (message)
         
         @exemple(Grab all emails received or sent to a user from gmail)
@@ -189,4 +195,10 @@ class MailBoxImap :
         pat2 = 'TO "{0}"'.format(person)
         if date is not None: pat2 += ' SINCE {0}'.format(date)
         for mail in self.enumerate_mails_in_folder(folder, skip_function = skip_function, pattern= pat2):
-            yield mail
+            if max_dest > 0:
+                tos = mail.get_to()
+                l = len(tos)
+                if l <= max_dest:
+                    yield mail
+            else:
+                yield mail

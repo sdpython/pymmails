@@ -16,9 +16,9 @@ class EmailMessage (email.message.Message) :
     functionalities such as a display using HTML
     """
     
-    expMail1 = re.compile('(\\"(.*?)\\" )?<(.+?@.+?)>')
-    expMail2 = re.compile('((.*?) )?<(.+?@.+?)>')
-    expMail3 = re.compile('(\\"(.*?)\\" )?(.+?@.+?)')
+    expMail1 = re.compile('(\\"([^;,]*?)\\" )?<([^;,]+?@[^;,]+?)>')
+    expMail2 = re.compile('(([^;,]*?) )?<([^;,]+?@[^;,]+?)>')
+    expMail3 = re.compile('(\\"([^;,]*?)\\" )?([^;,]+?@[^;,]+?)')
     
     subset  = [ "Date", "From", "Subject", "To", "X-bcc" ]
     avoid   = [ "X-me-spamcause", "X-YMail-OSG" ]
@@ -142,6 +142,8 @@ class EmailMessage (email.message.Message) :
     def get_from(self):
         """
         returns a tuple (label, email address)
+        
+        @return     tuple ( label, email address) 
         """
         st = self["from"]
         if isinstance(st, email.header.Header):
@@ -180,6 +182,49 @@ class EmailMessage (email.message.Message) :
                             raise MailException("unable to interpret: " + text) from e
         gr = cp.groups()
         return gr[1],gr[2]
+        
+    def get_to(self):
+        """
+        @return     list of tuple [ ( label, email address) ]
+        """
+        st = self["to"]
+        if isinstance(st, email.header.Header):
+            text, encoding = email.header.decode_header(st)[0]
+            try :
+                res = text.decode(encoding) 
+            except LookupError :
+                res = text.decode("ascii", errors="ignore")
+            text = res
+            if res == None :
+                raise MailException("unable to parse: " + str(res) + "\n" + str(st))
+        else : 
+            text = st
+        
+        cp = EmailMessage.expMail1.finditer(text)
+        if not cp :
+            cp = EmailMessage.expMail2.finditer(text)
+            if not cp :
+                cp = EmailMessage.expMail3.finditer(text)
+                if not cp :
+                    if text.startswith('"=?utf-8?'):
+                        text = text.strip('"')
+                        text, encoding = email.header.decode_header(text)[0]
+                        if encoding is None : encoding = "utf8"
+                        try :
+                            res = text.decode(encoding) 
+                            if isinstance(res, bytes):
+                                res = str(res, encoding)
+                            cp = EmailMessage.expMail1.finditer(res)
+                            if not cp :
+                                if "@" not in res :
+                                    return "", res
+                                else :
+                                    raise MailException("unable to interpret: " + res) 
+                        except LookupError as e :
+                            raise MailException("unable to interpret: " + text) from e
+                    
+        gr = list(  _.groups() for _ in cp )
+        return [ _[1:] for _ in gr ]
         
     def get_date(self):
         """
