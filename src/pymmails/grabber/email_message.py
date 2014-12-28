@@ -1,10 +1,10 @@
-# coding: latin-1
+# -*- coding: utf-8 -*-
 """
 @file
 @brief define an Email grabbed from a server.
 """
 
-import sys, os, imaplib, re, email, email.message, datetime, dateutil.parser, mimetypes, hashlib
+import sys, os, imaplib, re, email, email.header, email.message, datetime, dateutil.parser, mimetypes, hashlib, warnings
 
 from .email_message_style import html_header_style
 from .mail_exception import MailException
@@ -16,9 +16,10 @@ class EmailMessage (email.message.Message) :
     functionalities such as a display using HTML
     """
     
-    expMail1 = re.compile('(\\"([^;,]*?)\\" )?<([^;,]+?@[^;,]+?)>')
-    expMail2 = re.compile('(([^;,]*?) )?<([^;,]+?@[^;,]+?)>')
-    expMail3 = re.compile('(\\"([^;,]*?)\\" )?([^;,]+?@[^;,]+?)')
+    expMail1 = re.compile('(\\"([^;,]*?)\\" )?<([^;, ]+?@[^;, ]+)>')
+    expMail2 = re.compile('(([^;,]*?) )?<([^;, ]+?@[^;, ]+)>')
+    expMail3 = re.compile('(\\"([^;,]*?)\\" )?([^;, ]+?@[^;, ]+)')
+    expMailA = re.compile('({0})|({1})|({2})'.format(expMail1.pattern,expMail2.pattern,expMail3.pattern))
     
     subset  = [ "Date", "From", "Subject", "To", "X-bcc" ]
     avoid   = [ "X-me-spamcause", "X-YMail-OSG" ]
@@ -30,14 +31,23 @@ class EmailMessage (email.message.Message) :
     @property
     def body(self):
         """
-        return the body of the messag
+        return the body of the message
         """
         messages = []
         for part in self.walk():
             if part.get_content_type() == "text/html":
                 b =  part.get_payload(decode=1)
                 if b != None :
-                    messages.append(b.decode("utf8"))
+                    encs = [ part.get_content_charset(), "utf8" ]
+                    s = None
+                    for enc in encs:
+                        try:
+                            s = b.decode(enc)
+                        except UnicodeDecodeError:
+                            continue
+                    if s is None:
+                        raise UnicodeDecodeError("unable to decode: {0}".format(b))
+                    messages.append(s)
         return "\n------------------------------------------\n\n".join(messages)
         
     def get_all_charsets(self, part = None):
@@ -97,12 +107,15 @@ class EmailMessage (email.message.Message) :
                     else :
                         ht = '<div>' + ht + "</div>"
                     messages.append(ht)
-        return "<hr />".join(messages)
+        text = "<hr />".join(messages)
+        return text
     
     def enumerate_attachments(self):
         """
         enumerate the attachments as 
-        2-uple (filename, content)
+        3-uple (filename, content, content_id)
+        
+        @return         iterator on tuple (filename, content, content_id)
         """
         for part in self.walk():
             if part.get_content_maintype() == 'multipart':
@@ -113,12 +126,13 @@ class EmailMessage (email.message.Message) :
             fileName = part.get_filename()
             fileName = self.decode_header("file",fileName)
             
-            if fileName != None and fileName.startswith("=?") and fileName.startswith("?=") :
+            if fileName is not None and fileName.startswith("=?") and fileName.startswith("?=") :
                 fileName = fileName.strip("=?").split("=")[-1]
                 
-            if fileName == None or "?" in fileName :
+            if fileName is None or "?" in fileName :
                 fileName = "unknown_type"
                 cont = part.get_payload(decode=True)
+                cont_id = part["Message-ID"]
                 ext = EmailMessage.additionnalMimeType.get(part.get_content_subtype(),None)
                 if ext == None :
                     ext = mimetypes.guess_extension(part.get_content_type())
@@ -137,13 +151,14 @@ class EmailMessage (email.message.Message) :
                         raise MailException("unable to guess type: " + part.get_content_maintype() + "\nsubtype: " + str(part.get_content_subtype()) + " ext: " + str(ext) + " def: " + EmailMessage.additionnalMimeType.get(part.get_content_subtype(),"-") +"\n" + str([cont]))
             else :
                 cont = part.get_payload(decode=True)
-            yield fileName, cont
+                cont_id = part["Message-ID"]
+            yield fileName, cont, cont_id
             
     def __sortkey__(self):
         """
         usual
         """
-        return "-".join( [ str(self.get_date()), str(self.get_from()), str(self.get_to()), self["subject"] ] )
+        return "-".join( [ str(self.get_date()), str(self.get_from()), str(self.get_to()), self.UniqueID, self["subject"] ] )
             
     def __lt__(self, at):
         """
@@ -151,40 +166,35 @@ class EmailMessage (email.message.Message) :
         """
         return self.__sortkey__() < at.__sortkey__()
             
-    def get_field(self, field):
+    @staticmethod
+    def call_decode_header(st):
         """
-        get a field and cleans it
+        call `email.header.decode_header <https://docs.python.org/3.4/library/email.header.html#email.header.decode_header>`_
         
-        @param      field       subject or ...
-        @return                 text
+        @param      st      string or `email.header.Header <https://docs.python.org/3.4/library/email.header.html#email.header.Header>`_
+        @return             text, encoding
         """
-        st = self[field]
         if isinstance(st, email.header.Header):
             text, encoding = email.header.decode_header(st)[0]
-            try :
-                res = text.decode(encoding) 
-            except LookupError :
-                res = text.decode("ascii", errors="ignore")
-            text = res
-            if res == None :
-                raise MailException("unable to parse: " + str(res) + "\n" + str(st))
-        else : 
-            text = st
-            
-        if '=?utf-8?' in text.lower():
-            text = text.strip('"')
-            text, encoding = email.header.decode_header(text)[0]
-            if encoding is None : encoding = "utf8"
-            try :
-                res = text.decode(encoding) 
-                if isinstance(res, bytes):
-                    res = str(res, encoding)
-                text = res
-            except LookupError as e :
-                raise MailException("unable to interpret: " + text) from e
-            
-        return text
-            
+            if isinstance(text, bytes):
+                if encoding is None:
+                    raise ValueError("encoding cannot be None if the returned string is bytes")
+                return text.decode(encoding), encoding
+            else:
+                return text, encoding
+        elif isinstance(st, str):
+            text, encoding = email.header.decode_header(st)[0]
+            if isinstance(text, bytes):
+                if encoding is None:
+                    warnings.warn ('   File "{0}", line {1}, unable to decode string {2}'.format(__file__, 189, st.replace("\r"," ").replace("\n", " ")))
+                    return st, None
+                else:
+                    return text.decode(encoding), encoding
+            else:
+                return text, encoding
+        else:
+            raise TypeError("cannot decode type: {0}".format(type(st)))
+        
     def get_from(self):
         """
         returns a tuple (label, email address)
@@ -193,13 +203,8 @@ class EmailMessage (email.message.Message) :
         """
         st = self["from"]
         if isinstance(st, email.header.Header):
-            text, encoding = email.header.decode_header(st)[0]
-            try :
-                res = text.decode(encoding) 
-            except LookupError :
-                res = text.decode("ascii", errors="ignore")
-            text = res
-            if res == None :
+            text, encoding = EmailMessage.call_decode_header(st)
+            if res is None :
                 raise MailException("unable to parse: " + str(res) + "\n" + str(st))
         else : 
             text = st
@@ -212,90 +217,58 @@ class EmailMessage (email.message.Message) :
                 if not cp :
                     if text.startswith('"=?utf-8?'):
                         text = text.strip('"')
-                        text, encoding = email.header.decode_header(text)[0]
-                        if encoding is None : encoding = "utf8"
-                        try :
-                            res = text.decode(encoding) 
-                            if isinstance(res, bytes):
-                                res = str(res, encoding)
-                            cp = EmailMessage.expMail1.search(res)
-                            if not cp :
-                                if "@" not in res :
-                                    return "", res
-                                else :
-                                    raise MailException("unable to interpret: " + res) 
-                        except LookupError as e :
-                            raise MailException("unable to interpret: " + text) from e
+                        text, encoding = EmailMessage.call_decode_header(text)
         gr = cp.groups()
         return gr[1],gr[2]
         
-    def get_to(self):
+    def get_to(self, cc=False):
         """
-        @return     list of tuple [ ( label, email address) ]
-        """
-        st = self["to"]
-        if isinstance(st, email.header.Header):
-            text, encoding = email.header.decode_header(st)[0]
-            try :
-                res = text.decode(encoding) 
-            except LookupError :
-                res = text.decode("ascii", errors="ignore")
-            text = res
-            if res == None :
-                raise MailException("unable to parse: " + str(res) + "\n" + str(st))
-        else : 
-            text = st
+        return the receivers
         
-        cp = EmailMessage.expMail1.finditer(text)
-        if not cp :
-            cp = EmailMessage.expMail2.finditer(text)
-            if not cp :
-                cp = EmailMessage.expMail3.finditer(text)
-                if not cp :
-                    if text.startswith('"=?utf-8?'):
-                        text = text.strip('"')
-                        text, encoding = email.header.decode_header(text)[0]
-                        if encoding is None : encoding = "utf8"
-                        try :
-                            res = text.decode(encoding) 
-                            if isinstance(res, bytes):
-                                res = str(res, encoding)
-                            cp = EmailMessage.expMail1.finditer(res)
-                            if not cp :
-                                if "@" not in res :
-                                    return "", res
-                                else :
-                                    raise MailException("unable to interpret: " + res) 
-                        except LookupError as e :
-                            raise MailException("unable to interpret: " + text) from e
+        @param      cc      get receivers or second receivers
+        @return             list of tuple [ ( label, email address) ]
+        """
+        st = self["to" if not cc else "Delivered-To"]
+        text, encoding = EmailMessage.call_decode_header(st)
+        if text is None :
+            raise MailException("unable to parse: " + str(st))
+            
+        def find_unnone(ens):
+            for c in ens:
+                if c is not None:
+                    return c
+            return None
+        
+        text = text.replace("\r"," ").replace("\n"," ").replace("\t", " ")
+        cp = [ ]
+        for st in EmailMessage.expMailA.finditer(text) :
+            gr = st.groups()
+            if len(gr)!=12:
+                raise Exception("unexpected error due to a change in regular expressions")
+            values = gr[2],gr[3],gr[6],gr[7],gr[10],gr[11]
+            label = find_unnone(values[::2])
+            add   = find_unnone(values[1::2])
+            if label is not None:
+                label = label.strip(" \r\n\t")
+                text, encoding = EmailMessage.call_decode_header(label)
+                if text.startswith('"=?utf-8?'):
+                    text = text.strip('"')
+                    text, encoding = EmailMessage.call_decode_header(text)
+                cp.append((text,add))
+            else:
+                cp.append((None,add))
                     
-        gr = list(  _.groups() for _ in cp )
-        return [ _[1:] for _ in gr ]
+        return cp
         
     def get_date(self):
         """
         return a datetime object for the field Date
         """
         st = self["Date"]
-        if isinstance(st, email.header.Header):
-            text, encoding = email.header.decode_header(st)[0]
-            try :
-                res = text.decode(encoding) 
-            except LookupError :
-                res = text.decode("ascii", errors="ignore")
-            text = res
-            if res == None :
-                raise MailException("unable to parse: " + str(res) + "\n" + str(st))
-        else : 
-            text = st
+        res, encoding = EmailMessage.call_decode_header(st)
+        if res is None :
+            raise MailException("unable to parse: " + str(st))
         
-        res = text
-        
-        if res == None :
-            #raise MailException("unable to parse: " + str(res) + "\n" + str(st))
-            #we retrun a kake date
-            return datetime.datetime(1980,1,1)
-            
         try :
             p = dateutil.parser.parse(res)
         except Exception as e :
@@ -346,37 +319,59 @@ class EmailMessage (email.message.Message) :
                 if self[f] != None : 
                     md5.update(self[f].encode('utf-8'))
         return md5.hexdigest()
-
+        
     def decode_header(self, field, st):
         """
         decode a string encoded in the header
         
         @param      field   field
         @param      st      string
-        @return             string
+        @return             string (it never return None)
         """
-        if st == None :
+        if st is None :
             return ""
         elif isinstance(st, str) :
             if st.startswith("Tr:") and field.lower() == "subject":
                 pos = st.find("=?")
                 return st[:pos] + self.decode_header(field, st[pos:])
-            elif isinstance(st,bytes):
-                text, encoding = email.header.decode_header(st)[0]
-                return text.decode(encoding) if encoding != None else st
-            else :
-                text, encoding = email.header.decode_header(st)[0]
-                return text.decode(encoding) if encoding != None else st
+            else:
+                text, encoding = EmailMessage.call_decode_header(st)
+                return text if text is not None else ""
+        elif isinstance(st,bytes):
+            text, encoding = EmailMessage.call_decode_header(st)
+            return self.decode_header(field, text) if text is not None else ""
         elif isinstance(st, email.header.Header):
-            text, encoding = email.header.decode_header(st)[0]
-            try :
-                return text.decode(encoding) 
-            except LookupError :
-                return text.decode("ascii", errors="ignore")
-                
+            text, encoding = EmailMessage.call_decode_header(st)
+            return self.decode_header(field, text) if text is not None else ""
         else :
             raise MailException("unable to process type " + str(type(st)) + "\n" + str(st))
 
+    def get_field(self, field):
+        """
+        get a field and cleans it
+        
+        @param      field       subject or ...
+        @return                 text
+        """
+        subj = self[field]
+        if subj == None : subj = self[field]
+        if subj is not None:
+            subj = self.decode_header(field,subj)
+        return subj
+        
+    @property
+    def Fields(self):
+        """
+        @return  list of available fields
+        """
+        return list(self.keys())
+        
+    def is_dumped(self, folder=".", attachfolder=".", filename = None):
+        """
+        @see me isDumped
+        """
+        return self.isDumped(folder=folder, attachfolder=attachfolder, filename=filename)
+            
     def isDumped(self, folder=".", attachfolder=".", filename = None):
         """
         checks if the email was already dumped
@@ -460,6 +455,7 @@ class EmailMessage (email.message.Message) :
         atts = [ ]
         for att in self.enumerate_attachments():
             if att[1] == None : continue
+            att_id = att[2]
             to = os.path.split(att[0].replace(":","_"))[-1]
             to = os.path.join(attachfolder, to)
             spl = os.path.splitext(to)
@@ -478,14 +474,15 @@ class EmailMessage (email.message.Message) :
                 
             atts.append(to)
         
-        subj = self["Subject"]
+        subj = self["subject"]
         if subj == None : subj = self["subject"]
         if subj == None : subj = "none"
         subj = self.decode_header("subject",subj)
             
         rows = [ EmailMessage.html_header.replace("__TITLE__",subj) ]
         
-        table1 = self.produce_table_html(EmailMessage.subset, [], folder, atts, avoid = EmailMessage.avoid)
+        table1 = self.produce_table_html(EmailMessage.subset, [], folder, 
+                                    atts, avoid = EmailMessage.avoid)
         rows.append(table1)
 
         rows.append('<div class="bodymail">')
@@ -493,7 +490,8 @@ class EmailMessage (email.message.Message) :
         
         rows.append ( "</div>")
         
-        table2 = self.produce_table_html(None, EmailMessage.subset, folder, avoid = EmailMessage.avoid)
+        table2 = self.produce_table_html(None, EmailMessage.subset, folder, 
+                                    avoid = EmailMessage.avoid)
         rows.append(table2)
         
         rows.append ("</body>\n</html>" )

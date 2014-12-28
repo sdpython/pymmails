@@ -175,7 +175,7 @@ class MailBoxImap :
         @param      max_dest        maximum number of receivers
         @return                     iterator on (message)
         
-        @exemple(Grab all emails received or sent to a user from gmail)
+        @example(Grab all emails received or sent to a user from gmail)
         @code
         import pymmails
         imap = pymmails.MailBoxImap("alias", "pwd", "imap.gmail.com", True)
