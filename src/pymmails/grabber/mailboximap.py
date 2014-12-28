@@ -69,7 +69,7 @@ class MailBoxImap :
         
         @param      iterator    iterator on emails or tuples (mail, subfolder)
         @param      folder      folder where to dump
-        @return                 list of dumped files
+        @return                 list of tuple (mail,dumped files)
         
         """        
         dumped = [ ]
@@ -90,7 +90,7 @@ class MailBoxImap :
                 os.makedirs(attach)
                 skip2 = False
             f = mail.dump_html(subfold, attach, fLOG = self.fLOG)
-            dumped.append(f)
+            dumped.append((mail,f))
         return dumped
             
     def enumerate_mails_in_folder (self, folder, skip_function = None, pattern = "ALL") :

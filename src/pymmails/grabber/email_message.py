@@ -139,6 +139,52 @@ class EmailMessage (email.message.Message) :
                 cont = part.get_payload(decode=True)
             yield fileName, cont
             
+    def __sortkey__(self):
+        """
+        usual
+        """
+        return "-".join( [ str(self.get_date()), str(self.get_from()), str(self.get_to()), self["subject"] ] )
+            
+    def __lt__(self, at):
+        """
+        usual
+        """
+        return self.__sortkey__() < at.__sortkey__()
+            
+    def get_field(self, field):
+        """
+        get a field and cleans it
+        
+        @param      field       subject or ...
+        @return                 text
+        """
+        st = self[field]
+        if isinstance(st, email.header.Header):
+            text, encoding = email.header.decode_header(st)[0]
+            try :
+                res = text.decode(encoding) 
+            except LookupError :
+                res = text.decode("ascii", errors="ignore")
+            text = res
+            if res == None :
+                raise MailException("unable to parse: " + str(res) + "\n" + str(st))
+        else : 
+            text = st
+            
+        if '=?utf-8?' in text.lower():
+            text = text.strip('"')
+            text, encoding = email.header.decode_header(text)[0]
+            if encoding is None : encoding = "utf8"
+            try :
+                res = text.decode(encoding) 
+                if isinstance(res, bytes):
+                    res = str(res, encoding)
+                text = res
+            except LookupError as e :
+                raise MailException("unable to interpret: " + text) from e
+            
+        return text
+            
     def get_from(self):
         """
         returns a tuple (label, email address)
