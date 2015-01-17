@@ -9,7 +9,7 @@ import poplib
 def retrieve_mails_pop(user, password, server, begin = 0, end = -1) :
     """
     retrieves all emails using POP service
-    
+
     @param      user        user
     @param      password    password
     @param      server      something like ``pop.domain.ext``
