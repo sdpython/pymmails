@@ -34,6 +34,14 @@ Here is the code I use::
     box.dump_html(folder=os.path.abspath(r"folder_destination"))
     box.logout()
     
+You can also send an email::
+
+    server = create_smtp_server("gmail", "somebody", "pwd")
+    send_email(server, "somebody@gmail.com", "somebody@else.com", 
+                    "subject", attachements = [ os.path.abspath(__file__) ])
+    server.quit()
+    
+    
 A parameter ``pattern`` can be added to look for a subset of emails::    
 
     ...
@@ -59,6 +67,10 @@ Functionalities
 
 * download email and attchments from an server IMAP4 (gmail for example)
 * search for recent emails
+
+By default, IMAP functionalities are not enabled on gmail (if you have
+a gmail account), it can be enabled from the settings page
+(see `Enable POP and IMAP for Google Apps <https://support.google.com/a/answer/105694>`_).
 
 
     

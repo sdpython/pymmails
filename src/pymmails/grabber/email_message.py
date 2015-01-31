@@ -457,6 +457,7 @@ class EmailMessage (email.message.Message) :
         @return                 modified body html
         """
         for filename, mid, cid in atts:
+            if cid is None: continue
             pattern = 'src="cid:{0}"'.format(cid.strip("<>"))
             exp  = re.compile('({0})'.format(pattern))
             fall = exp.findall(body)

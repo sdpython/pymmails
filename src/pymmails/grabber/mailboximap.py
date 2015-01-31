@@ -182,7 +182,7 @@ class MailBoxImap :
         imap.login()
         print("inbox folders", imap.folders())
         iter = imap.enumerate_search_person("user", "folder", date="1-Oct-2014")
-        fs = imap.dump_html(iter, "destination", index=True)
+        fs = imap.dump_html(iter, "destination")
         imap.logout()
         print("list of stored files", fs)
         @endcode
@@ -202,3 +202,36 @@ class MailBoxImap :
                     yield mail
             else:
                 yield mail
+
+    def enumerate_search_subject(self,
+                        subject,
+                        folder,
+                        skip_function = None,
+                        date = None,
+                        max_dest = 5):
+        """
+        enumerates all mails in folder folder with a subject verifying a regular expression
+
+        @param      subject         subject to look for
+        @param      folder          folder name
+        @param      skip_function   if not None, use this function on the header/body to avoid loading the entire message (and skip it)
+        @param      pattern         search pattern (see below)
+        @param      max_dest        maximum number of receivers
+        @return                     iterator on (message)
+
+        @example(Grab all emails with a specific subject)
+        @code
+        import pymmails
+        imap = pymmails.MailBoxImap("alias", "pwd", "imap.gmail.com", True)
+        imap.login()
+        print("inbox folders", imap.folders())
+        iter = imap.enumerate_search_subject("user", "folder", subject="something")
+        fs = imap.dump_html(iter, "destination")
+        imap.logout()
+        print("list of stored files", fs)
+        @endcode
+        @endexample
+        """
+        pat1 = 'SUBJECT "{0}"'.format(subject)
+        for mail in self.enumerate_mails_in_folder(folder, skip_function = skip_function, pattern= pat1):
+            yield mail
