@@ -226,3 +226,4 @@ version.txt
 */sphinxdoc/source/pymmails/*
 */sphinxdoc/source/all*.rst
 */sphinxdoc/source/coverage/*
+*/sphinxdoc/source/notebooks/*
