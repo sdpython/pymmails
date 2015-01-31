@@ -8,6 +8,7 @@ import os, imaplib, re, email, email.message
 
 from .mail_exception import MailException
 from .email_message import EmailMessage
+from pyquickhelper import noLOG
 
 class MailBoxImap :
     """
@@ -16,21 +17,20 @@ class MailBoxImap :
 
     expFolderName = re.compile('\\"(.*?)\\"')
 
-    def __init__ (self, user, pwd, server, ssl = False) :
+    def __init__ (self, user, pwd, server, ssl = False, fLOG = noLOG) :
         """
         constructor
         @param  user        user
         @param  pwd         password
         @param  server      server something like ``imap.domain.ext``
         @param  ssl         select ``IMPA_SSL`` or ``IMAP``
+        @param  fLOG        logging function
 
         For gmail, it is ``imap.gmail.com`` and ssl must be true
         """
         self.M = imaplib.IMAP4_SSL(server) if ssl else imaplib.IMAP4(server)
         self._user = user
         self._password = pwd
-
-        from pyquickhelper import fLOG
         self.fLOG = fLOG
 
     def login(self):

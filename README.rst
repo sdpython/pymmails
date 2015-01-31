@@ -70,4 +70,5 @@ Versions
     * **fix:** the setup does not need the file ``README.rst`` anymore
     * **add:** method :meth:`get_to <pymmails.grabber.email_message.EmailMessage.get_to>`
     * **add:** method :meth:`enumerate_search_person <pymmails.grabber.mailboximap.MailBoxImap.enumerate_search_person>` to grap all emails received from or send to a person
+    * **fix:** fix paths of embedded images in emails when dumping them on disk
 

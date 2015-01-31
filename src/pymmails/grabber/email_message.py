@@ -5,10 +5,12 @@
 """
 
 import sys, os, imaplib, re, email, email.header, email.message, datetime, dateutil.parser, mimetypes, hashlib, warnings
+from pyquickhelper import noLOG
 
 from .email_message_style import html_header_style
 from .mail_exception import MailException
 from .additional_mime_type import additional_mime_type_ext_type
+
 
 class EmailMessage (email.message.Message) :
     """
@@ -113,9 +115,9 @@ class EmailMessage (email.message.Message) :
     def enumerate_attachments(self):
         """
         enumerate the attachments as
-        3-uple (filename, content, content_id)
+        4-uple (filename, content, message_id, content_id)
 
-        @return         iterator on tuple (filename, content, content_id)
+        @return         iterator on tuple (filename, content, message_id, content_id)
         """
         for part in self.walk():
             if part.get_content_maintype() == 'multipart':
@@ -133,6 +135,7 @@ class EmailMessage (email.message.Message) :
                 fileName = "unknown_type"
                 cont = part.get_payload(decode=True)
                 cont_id = part["Message-ID"]
+                cont_id2 = part["Content-ID"]
                 ext = EmailMessage.additionnalMimeType.get(part.get_content_subtype(),None)
                 if ext == None :
                     ext = mimetypes.guess_extension(part.get_content_type())
@@ -152,7 +155,9 @@ class EmailMessage (email.message.Message) :
             else :
                 cont = part.get_payload(decode=True)
                 cont_id = part["Message-ID"]
-            yield fileName, cont, cont_id
+                cont_id2 = part["Content-ID"]
+
+            yield fileName, cont, cont_id, cont_id2
 
     def __sortkey__(self):
         """
@@ -395,7 +400,8 @@ class EmailMessage (email.message.Message) :
 
         @param      toshow          list of fields to show, if None, it considers all fields
         @param      tohighlight     list of fields to highlights
-        @param      atts            list of files to append at the end of the table
+        @param      atts            list of files to append at the end of the table,
+                                    list of tuple ((filename,message_id,content_id))
         @param      folder          folder where this page will be saved
         @param      avoid           fields to avoid
         @return                     html string
@@ -422,17 +428,45 @@ class EmailMessage (email.message.Message) :
                             tu[1].replace("<","&lt;").replace(">","&gt;")))
 
         for i,a in enumerate(atts) :
-            rows.append('<tr><td>{0}</td><td><a href="{1}">{2}</a> (size: {3} bytes)</td></tr>'.format(
+            filename, mid, cid = a
+            rows.append('<tr><td>{0}</td><td><a href="{1}">{2}</a> (size: {3} bytes, cid: {4})</td></tr>'.format(
                         "attachment %d" %i,
-                        os.path.relpath(a, folder),
-                        os.path.split(a)[-1],
-                        os.stat(a).st_size))
+                        os.path.relpath(filename, folder),
+                        os.path.split(filename)[-1],
+                        os.stat(filename).st_size,
+                        cid))
 
         rows.append("</table>")
         rows.append("<br /></div>")
         return "\n".join(rows)
 
-    def dump_html(self, folder=".", attachfolder=".", filename = None, fLOG = print):
+    @staticmethod
+    def process_body_html(body_root, body, atts):
+        """
+        replaces link to images included in the mail body::
+
+            <img name="14a318e16161c62a_14a31789f7a34aae_null"
+                 title="pastedImage.png"
+                 src="cid:1146aa0a-244a-440e-8ea5-7b272c94f89a"
+                 height="153.02644466209597"
+                 width="560">
+
+        @param      body_root   location where the HTML body will be saved
+        @param      body        html body
+        @param      atts        attachements (filename, message id, content id)
+        @return                 modified body html
+        """
+        for filename, mid, cid in atts:
+            pattern = 'src="cid:{0}"'.format(cid.strip("<>"))
+            exp  = re.compile('({0})'.format(pattern))
+            fall = exp.findall(body)
+            if len(fall) > 0 :
+                relf = os.path.relpath(filename, body_root)
+                link = 'src="{0}"'.format(relf)
+                body = body.replace(pattern, link)
+        return body
+
+    def dump_html(self, folder=".", attachfolder=".", filename = None, fLOG = noLOG):
         """
         Dumps the mail into a folder using HTML format.
         If the destination files already exists, it skips it.
@@ -448,6 +482,8 @@ class EmailMessage (email.message.Message) :
             filename = self.default_filename() + ".html"
 
         filename = os.path.abspath(os.path.join(folder,filename))
+        filefold = os.path.dirname(filename)
+
         if os.path.exists(filename) :
             fLOG("skip file {0} already exists".format(filename))
             return filename
@@ -456,6 +492,7 @@ class EmailMessage (email.message.Message) :
         for att in self.enumerate_attachments():
             if att[1] == None : continue
             att_id = att[2]
+            cont_id = att[3]
             to = os.path.split(att[0].replace(":","_"))[-1]
             to = os.path.join(attachfolder, to)
             spl = os.path.splitext(to)
@@ -469,10 +506,11 @@ class EmailMessage (email.message.Message) :
             if "?" in to :
                 raise MailException("issue with " + filename + " \n + "  +to + "\n" + str(att))
             fLOG("dump attachment:", to)
+
             with open(to, "wb") as f :
                 f.write(att[1])
 
-            atts.append(to)
+            atts.append( (to,att_id,cont_id) )
 
         subj = self["subject"]
         if subj == None : subj = self["subject"]
@@ -486,7 +524,9 @@ class EmailMessage (email.message.Message) :
         rows.append(table1)
 
         rows.append('<div class="bodymail">')
-        rows.append(self.body_html)
+
+        body_mod = EmailMessage.process_body_html(filefold, self.body_html, atts)
+        rows.append(body_mod)
 
         rows.append ( "</div>")
 
