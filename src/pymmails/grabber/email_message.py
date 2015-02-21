@@ -191,7 +191,7 @@ class EmailMessage (email.message.Message) :
             text, encoding = email.header.decode_header(st)[0]
             if isinstance(text, bytes):
                 if encoding is None:
-                    warnings.warn ('   File "{0}", line {1}, unable to decode string {2}'.format(__file__, 189, st.replace("\r"," ").replace("\n", " ")))
+                    warnings.warn ('   File "{0}", line {1}, unable to decode string:\n{2}'.format(__file__, 189, st.replace("\r"," ").replace("\n", " ")))
                     return st, None
                 else:
                     return text.decode(encoding), encoding
