@@ -139,7 +139,7 @@ class MailBoxImap :
                 self.fLOG("limit email search for folder", folder, " to recent emails with pattern", pattern)
                 typ, data = self.M.search(None, pattern)
             else :
-                raise e
+                raise Exception("unable to search for pattern: " + pattern) from e
 
         spl = data[0].split()
         self.fLOG("MailBoxImap [folder={0} nbm={1}]".format(folder, len(spl)))
