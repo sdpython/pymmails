@@ -10,7 +10,8 @@ __url__ = "http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html"
 __downloadUrl__ = "http://www.xavierdupre.fr/site2013/index_code.html#pymmails"
 __license__ = "BSD License"
 
-def check( log = False):
+
+def check(log=False):
     """
     Checks the library is working.
     It raises an exception.

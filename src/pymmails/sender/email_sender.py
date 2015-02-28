@@ -2,7 +2,8 @@
 @file
 @brief Functions to send emails
 """
-import smtplib, os
+import smtplib
+import os
 
 import mimetypes
 from email import encoders
@@ -15,12 +16,13 @@ from email.mime.text import MIMEText
 
 COMMASPACE = ', '
 
+
 def compose_email(
-                fr,
-                to,
-                subject,
-                body=None,
-                attachements = None):
+        fr,
+        to,
+        subject,
+        body=None,
+        attachements=None):
     """
     compose an email as a string
 
@@ -33,9 +35,12 @@ def compose_email(
 
     If the file is a text file, the filename can be replaced by (filename, encoding).
     """
-    if isinstance(to, str): to = [ to ]
-    if body is None: body = ""
-    if attachements is None : attachements = [ ]
+    if isinstance(to, str):
+        to = [to]
+    if body is None:
+        body = ""
+    if attachements is None:
+        attachements = []
 
     global COMMASPACE
     outer = MIMEMultipart()
@@ -45,7 +50,7 @@ def compose_email(
     outer.preamble = 'prepared by pymmails.\n'
 
     for filename in attachements:
-        if isinstance(filename,tuple):
+        if isinstance(filename, tuple):
             path = filename[0]
             encoding = filename[1]
         else:
@@ -84,6 +89,7 @@ def compose_email(
     composed = outer.as_string()
     return composed
 
+
 def create_smtp_server(host, username, password):
     """
     creates a SMTP server and log into it.
@@ -96,18 +102,19 @@ def create_smtp_server(host, username, password):
     You should call server.quit() when the server is not used anymore.
     """
     if host == "gmail":
-        host ='smtp.gmail.com:587'
+        host = 'smtp.gmail.com:587'
 
     server = smtplib.SMTP(host)
     server.starttls()
-    server.login(username,password)
+    server.login(username, password)
     return server
 
+
 def send_email(server, fr,
-                to,
-                subject,
-                body=None,
-                attachements = None):
+               to,
+               subject,
+               body=None,
+               attachements=None):
     """
     compose an email as a string
 
@@ -128,5 +135,10 @@ def send_email(server, fr,
     @endcode
     @endexample
     """
-    astring = compose_email(fr, to, subject, body=body, attachements = attachements)
+    astring = compose_email(
+        fr,
+        to,
+        subject,
+        body=body,
+        attachements=attachements)
     server.sendmail(fr, to, astring)

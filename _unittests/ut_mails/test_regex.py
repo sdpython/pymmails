@@ -2,32 +2,53 @@
 @brief      test log(time=25s)
 """
 
-import sys, os, unittest, socket
+import sys
+import os
+import unittest
+import socket
 
-try :
+try:
     import src
-except ImportError :
-    path = os.path.normpath(os.path.abspath( os.path.join( os.path.split(__file__)[0], "..", "..")))
-    if path not in sys.path : sys.path.append (path)
+except ImportError:
+    path = os.path.normpath(
+        os.path.abspath(
+            os.path.join(
+                os.path.split(__file__)[0],
+                "..",
+                "..")))
+    if path not in sys.path:
+        sys.path.append(path)
     import src
 
-try :
+try:
     import pyquickhelper
-except ImportError :
-    path = os.path.normpath(os.path.abspath( os.path.join( os.path.split(__file__)[0], "..", "..", "..","pyquickhelper", "src")))
-    if path not in sys.path : sys.path.append (path)
+except ImportError:
+    path = os.path.normpath(
+        os.path.abspath(
+            os.path.join(
+                os.path.split(__file__)[0],
+                "..",
+                "..",
+                "..",
+                "pyquickhelper",
+                "src")))
+    if path not in sys.path:
+        sys.path.append(path)
     import pyquickhelper
 
 
 from src.pymmails import EmailMessage
 from pyquickhelper import fLOG
 
+
 class TestRegEx (unittest.TestCase):
 
-    def test_regular_expression(self) :
-        fLOG (__file__, self._testMethodName, OutputPrint = __name__ == "__main__")
+    def test_regular_expression(self):
+        fLOG(
+            __file__,
+            self._testMethodName,
+            OutputPrint=__name__ == "__main__")
         fold = os.path.abspath(os.path.dirname(__file__))
-
 
         body = """
                     </div>
@@ -42,16 +63,20 @@ class TestRegEx (unittest.TestCase):
                     </div>
                     <div><br>
                     ?<sp
-                    """.replace("                    ","")
+                    """.replace("                    ", "")
 
-        atts = [ ( os.path.join( fold, "attachements", "image.png"), None, "1146aa0a-244a-440e-8ea5-7b272c94f89a") ]
+        atts = [
+            (os.path.join(
+                fold,
+                "attachements",
+                "image.png"),
+                None,
+                "1146aa0a-244a-440e-8ea5-7b272c94f89a")]
         em = EmailMessage.process_body_html(fold, body, atts)
         fLOG(em)
         assert "1146aa0a-244a-440e-8ea5-7b272c94f89a" not in em
         assert 'src="attachements\\image.png"' in em
 
 
-
-
-if __name__ == "__main__"  :
-    unittest.main ()
+if __name__ == "__main__":
+    unittest.main()

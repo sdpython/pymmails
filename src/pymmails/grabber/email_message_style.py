@@ -114,4 +114,4 @@ html_header_style = """<?xml version="1.0" encoding="utf-8"?>
         </head>
         <body>
         <!-- NAVIGATION -->
-        """.replace("        ","")
+        """.replace("        ", "")

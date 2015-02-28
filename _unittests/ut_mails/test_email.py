@@ -3,20 +3,38 @@
 @brief      test log(time=1s)
 """
 
-import sys, os, unittest, pickle
+import sys
+import os
+import unittest
+import pickle
 
-try :
+try:
     import src
-except ImportError :
-    path = os.path.normpath(os.path.abspath( os.path.join( os.path.split(__file__)[0], "..", "..")))
-    if path not in sys.path : sys.path.append (path)
+except ImportError:
+    path = os.path.normpath(
+        os.path.abspath(
+            os.path.join(
+                os.path.split(__file__)[0],
+                "..",
+                "..")))
+    if path not in sys.path:
+        sys.path.append(path)
     import src
 
-try :
+try:
     import pyquickhelper
-except ImportError :
-    path = os.path.normpath(os.path.abspath( os.path.join( os.path.split(__file__)[0], "..", "..", "..","pyquickhelper", "src")))
-    if path not in sys.path : sys.path.append (path)
+except ImportError:
+    path = os.path.normpath(
+        os.path.abspath(
+            os.path.join(
+                os.path.split(__file__)[0],
+                "..",
+                "..",
+                "..",
+                "pyquickhelper",
+                "src")))
+    if path not in sys.path:
+        sys.path.append(path)
     import pyquickhelper
 
 
@@ -24,26 +42,39 @@ import src.pymmails as pymmails
 from src.pymmails import MailBoxImap
 from pyquickhelper import fLOG
 
+
 class TestEmail (unittest.TestCase):
 
-    def test_load_email(self) :
-        fLOG (__file__, self._testMethodName, OutputPrint = __name__ == "__main__")
-        data = os.path.abspath(os.path.join( os.path.dirname(__file__), "data"))
+    def test_load_email(self):
+        fLOG(
+            __file__,
+            self._testMethodName,
+            OutputPrint=__name__ == "__main__")
+        data = os.path.abspath(os.path.join(os.path.dirname(__file__), "data"))
         mesf = os.path.join(data, "message.pickle")
-        with open(mesf,"rb") as f :
+        with open(mesf, "rb") as f:
             try:
                 import pymmails
                 obj = pickle.load(f)
             except ImportError:
-                path = os.path.normpath(os.path.abspath( os.path.join( os.path.split(__file__)[0], "..", "..", "..","pymmails", "src")))
-                if path not in sys.path : sys.path.append (path)
+                path = os.path.normpath(
+                    os.path.abspath(
+                        os.path.join(
+                            os.path.split(__file__)[0],
+                            "..",
+                            "..",
+                            "..",
+                            "pymmails",
+                            "src")))
+                if path not in sys.path:
+                    sys.path.append(path)
                 obj = pickle.load(f)
                 del sys.path[-1]
 
         tos = obj.get_to()
-        cc  = obj.get_to(True)
-        fLOG("cc",cc)
-        assert len(cc)==1
+        cc = obj.get_to(True)
+        fLOG("cc", cc)
+        assert len(cc) == 1
         fro = obj.get_from()
         fLOG(tos)
         fLOG(fro)
@@ -52,7 +83,10 @@ class TestEmail (unittest.TestCase):
         assert fro[0] == "matthieuyyyyy ."
         assert fro[1] == "yyyyy.matthieu@xxxxx.xxx"
         if obj.get_field("subject") != "projet 3A - élément logiciel":
-            raise Exception("{0} != {1}".format(obj.get_field("subject"), "projet 3A - élément logiciel"))
+            raise Exception(
+                "{0} != {1}".format(
+                    obj.get_field("subject"),
+                    "projet 3A - élément logiciel"))
         fLOG(obj.Fields)
         assert len(tos) > 10
 
@@ -86,26 +120,41 @@ class TestEmail (unittest.TestCase):
             Xavier zzzzz <xavier.zzzzz@xxxxx.xxx>
             wwwthieu yyyyy <yyyyy.matthieu@xxxxx.xxx>
             wwwwws wwwwout <wwwwwwwwwwwww@xxxxx.xxx>
-            """.replace("            ","").strip("\n\r\t ").split("\n")
+            """.replace("            ", "").strip("\n\r\t ").split("\n")
         fLOG(len(exp), len(tos))
-        end = min(len(exp),len(tos))
-        for i,j in zip(exp[:end],tos[:end]):
+        end = min(len(exp), len(tos))
+        for i, j in zip(exp[:end], tos[:end]):
             if j[1] not in i:
-                raise Exception("issue with {0} and {1} .... {2}".format(i,j[1],[i,j[1]]))
+                raise Exception(
+                    "issue with {0} and {1} .... {2}".format(
+                        i, j[1], [
+                            i, j[1]]))
 
         assert len(exp) == len(tos)
 
-    def test_tohtml(self) :
-        fLOG (__file__, self._testMethodName, OutputPrint = __name__ == "__main__")
-        data = os.path.abspath(os.path.join( os.path.dirname(__file__), "data"))
+    def test_tohtml(self):
+        fLOG(
+            __file__,
+            self._testMethodName,
+            OutputPrint=__name__ == "__main__")
+        data = os.path.abspath(os.path.join(os.path.dirname(__file__), "data"))
         mesf = os.path.join(data, "message.pickle")
-        with open(mesf,"rb") as f :
+        with open(mesf, "rb") as f:
             try:
                 import pymmails
                 obj = pickle.load(f)
             except ImportError:
-                path = os.path.normpath(os.path.abspath( os.path.join( os.path.split(__file__)[0], "..", "..", "..","pymmails", "src")))
-                if path not in sys.path : sys.path.append (path)
+                path = os.path.normpath(
+                    os.path.abspath(
+                        os.path.join(
+                            os.path.split(__file__)[0],
+                            "..",
+                            "..",
+                            "..",
+                            "pymmails",
+                            "src")))
+                if path not in sys.path:
+                    sys.path.append(path)
                 obj = pickle.load(f)
                 del sys.path[-1]
 
@@ -116,10 +165,9 @@ class TestEmail (unittest.TestCase):
             os.mkdir(temp)
 
         ff = obj.dump_html(temp, fLOG=fLOG)
-        fLOG(type(ff),ff)
+        fLOG(type(ff), ff)
         assert "d_2014-12-15_p_yyyyy_matthieu-xxxxx_xxx_ii_48bdbc9f9fd180ab917cec5bed8ca529.html" in ff
 
 
-
-if __name__ == "__main__"  :
-    unittest.main ()
+if __name__ == "__main__":
+    unittest.main()
