@@ -6,13 +6,14 @@
 pymmails documentation
 ======================
 
+.. image:: https://badge.fury.io/py/pymmails.svg
+    :target: http://badge.fury.io/py/pymmails
    
    
-**Links:**
-    * `pypi/pymmails <https://pypi.python.org/pypi/pymmails/>`_
-    * `GitHub/pymmails <https://github.com/sdpython/pymmails/>`_
-    * `documentation <http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html>`_
-    * `Windows Setup <http://www.xavierdupre.fr/site2013/index_code.html#pymmails>`_
+**Links:** `pypi <https://pypi.python.org/pypi/pymmails/>`_,
+`github <https://github.com/sdpython/pymmails/>`_,
+`documentation <http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html>`_,
+`wheel <http://www.xavierdupre.fr/site2013/index_code.html#pymmails>`_
 
 
 Description

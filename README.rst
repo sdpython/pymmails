@@ -4,6 +4,9 @@
 README / Changes
 ================
 
+.. image:: https://badge.fury.io/py/pymmails.svg
+    :target: http://badge.fury.io/py/pymmails
+   
    
 **Links:**
     * `pypi/pymmails <https://pypi.python.org/pypi/pymmails/>`_
