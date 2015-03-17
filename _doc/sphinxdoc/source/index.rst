@@ -9,6 +9,10 @@ pymmails documentation
 .. image:: https://badge.fury.io/py/pymmails.svg
     :target: http://badge.fury.io/py/pymmails
    
+.. image:: http://img.shields.io/pypi/dm/pymmails.png
+    :alt: PYPI Package
+    :target: https://pypi.python.org/pypi/pymmails
+   
    
 **Links:** `pypi <https://pypi.python.org/pypi/pymmails/>`_,
 `github <https://github.com/sdpython/pymmails/>`_,

@@ -7,7 +7,12 @@ README / Changes
 .. image:: https://badge.fury.io/py/pymmails.svg
     :target: http://badge.fury.io/py/pymmails
    
-   
+.. image:: http://img.shields.io/pypi/dm/pymmails.png
+    :alt: PYPI Package
+    :target: https://pypi.python.org/pypi/pymmails
+
+      
+
 **Links:**
     * `pypi/pymmails <https://pypi.python.org/pypi/pymmails/>`_
     * `GitHub/pymmails <https://github.com/sdpython/pymmails/>`_
