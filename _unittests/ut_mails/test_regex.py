@@ -75,7 +75,9 @@ class TestRegEx (unittest.TestCase):
         em = EmailMessage.process_body_html(fold, body, atts)
         fLOG(em)
         assert "1146aa0a-244a-440e-8ea5-7b272c94f89a" not in em
-        assert 'src="attachements\\image.png"' in em
+        exp = 'src="attachements/image.png"'
+        if exp not in em.replace("\\","/"):
+            raise Exception('string "attachements/image.png" not found in\n{0}'.format(em))
 
 
 if __name__ == "__main__":
