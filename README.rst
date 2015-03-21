@@ -4,6 +4,10 @@
 README / Changes
 ================
 
+.. image:: https://travis-ci.org/sdpython/pymmails.svg?branch=master
+    :target: https://travis-ci.org/sdpython/pymmails
+    :alt: Build status
+
 .. image:: https://badge.fury.io/py/pymmails.svg
     :target: http://badge.fury.io/py/pymmails
    

@@ -33,7 +33,7 @@ def retrieve_mails_pop(user, password, server, begin=0, end=-1, fLOG=noLOG):
     for i in range(begin, end):
         mail = M.retr(i + 1)
         size = mail[2]
-        response = mail[0]
+        #response = mail[0]
         allemails.append(mail[1])
         fLOG(
             "retrieve_mails_pop [mail {0}/{1}, size={2}]".format(i, end, size))

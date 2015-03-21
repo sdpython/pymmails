@@ -7,7 +7,6 @@ import os
 
 import mimetypes
 from email import encoders
-from email.message import Message
 from email.mime.audio import MIMEAudio
 from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage

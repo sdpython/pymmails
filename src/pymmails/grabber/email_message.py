@@ -4,14 +4,11 @@
 @brief define an Email grabbed from a server.
 """
 
-import sys
 import os
-import imaplib
 import re
 import email
 import email.header
 import email.message
-import datetime
 import dateutil.parser
 import mimetypes
 import hashlib
@@ -100,13 +97,13 @@ class EmailMessage (email.message.Message):
                     if len(chs) > 0:
                         try:
                             ht = b.decode(chs[0])
-                        except UnicodeDecodeError as e:
+                        except UnicodeDecodeError:
                             try:
                                 ht = b.decode("utf-8")
-                            except UnicodeDecodeError as e:
+                            except UnicodeDecodeError:
                                 try:
                                     ht = b.decode("latin-1")
-                                except UnicodeDecodeError as e:
+                                except UnicodeDecodeError:
                                     raise Exception(
                                         "unable to decode (" + str(chs[0]) + "):" + str(b))
                     else:
@@ -249,10 +246,10 @@ class EmailMessage (email.message.Message):
         st = self["from"]
         if isinstance(st, email.header.Header):
             text, encoding = EmailMessage.call_decode_header(st)
-            if res is None:
+            if text is None:
                 raise MailException(
                     "unable to parse: " +
-                    str(res) +
+                    str(text) +
                     "\n" +
                     str(st))
         else:
@@ -380,7 +377,7 @@ class EmailMessage (email.message.Message):
             md5.update(t.encode('utf-8'))
         else:
             for f in ["Subject", "To", "From", "Date"]:
-                if self[f] != None:
+                if self[f] is not None:
                     md5.update(self[f].encode('utf-8'))
         return md5.hexdigest()
 
@@ -556,7 +553,7 @@ class EmailMessage (email.message.Message):
 
         atts = []
         for att in self.enumerate_attachments():
-            if att[1] == None:
+            if att[1] is None:
                 continue
             att_id = att[2]
             cont_id = att[3]
