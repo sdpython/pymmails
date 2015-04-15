@@ -9,7 +9,7 @@ See `Generating the documention with pyquickhelper <http://www.xavierdupre.fr/ap
 
 Configuration:
 
-.. include:: conf.py
+.. literalinclude:: conf.py
  
  
 Extensions to install
