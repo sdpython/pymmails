@@ -22,7 +22,8 @@ pymmails documentation
 **Links:** `pypi <https://pypi.python.org/pypi/pymmails/>`_,
 `github <https://github.com/sdpython/pymmails/>`_,
 `documentation <http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html>`_,
-`wheel <http://www.xavierdupre.fr/site2013/index_code.html#pymmails>`_
+`wheel <http://www.xavierdupre.fr/site2013/index_code.html#pymmails>`_,
+:ref:`l-README`
 
 
 Description
@@ -70,6 +71,11 @@ Below, some examples of patterns::
     pattern='SUBJECT "programmation"'
     pattern='TO "student" FLAGGED'
     pattern='UNSEEN'
+    
+Installation
+------------
+
+``pip install pymmails``
     
 
 Functionalities
