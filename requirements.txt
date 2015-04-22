@@ -1,3 +1,4 @@
+autopep8
 Cython
 Flask
 Flask-SQLAlchemy
@@ -13,7 +14,6 @@ XlsxWriter
 ansi2html
 ansiconv
 argparse
-autopep8
 brewer2mpl
 cloud-sptheme
 coverage
@@ -56,11 +56,6 @@ wild-sphinx-theme
 xlrd
 xmltodict
 pyquickhelper
-antlr4-python3-runtime
-azure
-dbfread
-goslate
-python-linkedin
 flake8
 pyflakes
 mccabe
