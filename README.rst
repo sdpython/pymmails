@@ -22,6 +22,8 @@ README / Changes
     * `GitHub/pymmails <https://github.com/sdpython/pymmails/>`_
     * `documentation <http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html>`_
     * `Windows Setup <http://www.xavierdupre.fr/site2013/index_code.html#pymmails>`_
+    * `Travis/pyensae <https://travis-ci.org/sdpython/pymmails>`_
+    * `Blog <http://www.xavierdupre.fr/app/pymmails/helpsphinx/blog/main_0000.html#ap-main-0>`_
 
 
 Description
