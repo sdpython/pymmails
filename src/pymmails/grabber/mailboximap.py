@@ -156,8 +156,8 @@ class MailBoxImap:
                 typ, data = self.M.search(None, pattern)
             else:
                 raise Exception(
-                    "unable to search for pattern: " +
-                    pattern) from e
+                    "unable to search for pattern: {0}\nin subfolder {1}\ncheck the folder you search for is right"
+                    .format(pattern, qfold)) from e
 
         spl = data[0].split()
         self.fLOG("MailBoxImap [folder={0} nbm={1}]".format(folder, len(spl)))

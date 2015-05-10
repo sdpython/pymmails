@@ -199,6 +199,9 @@ class EmailMessage (email.message.Message):
         """
         return self.__sortkey__() < at.__sortkey__()
 
+    #: use for method @see me call_decode_header
+    _search_encodings = ["iso-8859-1"]
+
     @staticmethod
     def call_decode_header(st):
         """
@@ -219,17 +222,48 @@ class EmailMessage (email.message.Message):
         elif isinstance(st, str):
             text, encoding = email.header.decode_header(st)[0]
             if isinstance(text, bytes):
+                position = None
                 if encoding is None:
-                    warnings.warn(
-                        '   File "{0}", line {1}, unable to decode string:\n{2}'.format(
-                            __file__,
-                            189,
-                            st.replace(
-                                "\r",
-                                " ").replace(
-                                "\n",
-                                " ")))
-                    return st, None
+                    # maybe the string contrains several encoding
+                    for enc in EmailMessage._search_encodings:
+                        look = "=?%s?" % enc
+                        if look in st:
+                            position = st.find(look)
+
+                    if position == 0:
+                        # otherwise we face an infinite loop
+                        position = None
+
+                    if position is not None:
+                        first = st[:position]
+                        second = st[position:]
+                        dec1, enc1 = EmailMessage.call_decode_header(first)
+                        dec2, enc2 = EmailMessage.call_decode_header(second)
+
+                        if isinstance(dec1, str) and isinstance(dec2, str):
+                            enc = enc2 if enc1 is None else enc1
+                            return dec1 + dec2, enc
+                        else:
+                            warnings.warn(
+                                'decoding issue\n   File "{0}", line {1},\nunable to decode string:\n{2}\neven split into:\n1: {3}\n2: {4}'.format(
+                                    __file__,
+                                    250,
+                                    st.replace("\r", " ").replace("\n", " "),
+                                    first.replace("\r", " ").replace(
+                                        "\n", " "),
+                                    second.replace("\r", " ").replace("\n", " ")))
+                            return st, None
+                    else:
+                        warnings.warn(
+                            'decoding issue\n   File "{0}", line {1},\nunable to decode string:\n{2}'.format(
+                                __file__,
+                                260,
+                                st.replace(
+                                    "\r",
+                                    " ").replace(
+                                    "\n",
+                                    " ")))
+                        return st, None
                 else:
                     return text.decode(encoding), encoding
             else:

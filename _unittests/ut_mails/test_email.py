@@ -39,7 +39,7 @@ except ImportError:
 
 
 import src.pymmails as pymmails
-from src.pymmails import MailBoxImap
+from src.pymmails import MailBoxImap, EmailMessage
 from pyquickhelper import fLOG
 
 
@@ -172,6 +172,17 @@ class TestEmail (unittest.TestCase):
         ff = obj.dump_html(temp, fLOG=fLOG)
         fLOG(type(ff), ff)
         assert "d_2014-12-15_p_yyyyy_matthieu-xxxxx_xxx_ii_48bdbc9f9fd180ab917cec5bed8ca529.html" in ff
+
+    def test_decode_header(self):
+        fLOG(
+            __file__,
+            self._testMethodName,
+            OutputPrint=__name__ == "__main__")
+
+        st = '"dupre [MailContact]" <xavier.dupre@gmail.com>,  	=?iso-8859-1?Q?Emmanuel_Gu=E9rin?= <m@emmanuelguerin.fr>'
+        res, enc = EmailMessage.call_decode_header(st)
+        fLOG(enc)
+        fLOG(res)
 
 
 if __name__ == "__main__":
