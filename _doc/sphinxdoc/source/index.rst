@@ -10,13 +10,20 @@ pymmails documentation
     :target: https://travis-ci.org/sdpython/pymmails
     :alt: Build status
    
-
 .. image:: https://badge.fury.io/py/pymmails.svg
     :target: http://badge.fury.io/py/pymmails
    
 .. image:: http://img.shields.io/pypi/dm/pymmails.png
     :alt: PYPI Package
     :target: https://pypi.python.org/pypi/pymmails
+    
+.. image:: http://img.shields.io/github/issues/sdpython/pymmails.png
+    :alt: GitHub Issues
+    :target: https://github.com/sdpython/pymmails/issues
+    
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+    :alt: MIT License
+    :target: http://opensource.org/licenses/MIT     
    
    
 **Links:** `pypi <https://pypi.python.org/pypi/pymmails/>`_,

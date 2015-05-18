@@ -15,7 +15,13 @@ README / Changes
     :alt: PYPI Package
     :target: https://pypi.python.org/pypi/pymmails
 
-      
+.. image:: http://img.shields.io/github/issues/sdpython/pymmails.png
+    :alt: GitHub Issues
+    :target: https://github.com/sdpython/pymmails/issues
+    
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+    :alt: MIT License
+    :target: http://opensource.org/licenses/MIT      
 
 **Links:**
     * `pypi/pymmails <https://pypi.python.org/pypi/pymmails/>`_
