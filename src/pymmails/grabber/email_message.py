@@ -200,7 +200,7 @@ class EmailMessage (email.message.Message):
         return self.__sortkey__() < at.__sortkey__()
 
     #: use for method @see me call_decode_header
-    _search_encodings = ["iso-8859-1"]
+    _search_encodings = ["iso-8859-1", "windows-1252", "UTF-8", "utf-8"]
 
     @staticmethod
     def call_decode_header(st):
