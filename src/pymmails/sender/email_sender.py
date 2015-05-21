@@ -127,12 +127,21 @@ def send_email(server, fr,
 
     @example(Send an email)
     @code
+    from pymmails import create_smtp_server, send_email
     server = create_smtp_server("gmail", "somebody", "pwd")
-    send_email(server, "somebody@gmail.com", "somebody@else.com",
+    send_email(server, "somebody.like.me@gmail.com", "somebody.like.you@else.com",
                     "subject", attachements = [ os.path.abspath(__file__) ])
     server.quit()
     @endcode
     @endexample
+    
+    @FAQ(Gmail does not allow to send or get emails with Python)
+    By default, a Gmail account does not enable the IMAP access.
+    That explains why it is not possible to send or get messages from Gmail.
+    The following page 
+    `Get started with IMAP and POP3 <https://support.google.com/mail/troubleshooter/1668960?hl=en#ts=1665018>`_
+    explains how to enable that option.
+    @endFAQ
     """
     astring = compose_email(
         fr,
