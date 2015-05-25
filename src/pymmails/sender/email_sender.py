@@ -134,11 +134,11 @@ def send_email(server, fr,
     server.quit()
     @endcode
     @endexample
-    
+
     @FAQ(Gmail does not allow to send or get emails with Python)
     By default, a Gmail account does not enable the IMAP access.
     That explains why it is not possible to send or get messages from Gmail.
-    The following page 
+    The following page
     `Get started with IMAP and POP3 <https://support.google.com/mail/troubleshooter/1668960?hl=en#ts=1665018>`_
     explains how to enable that option.
     @endFAQ

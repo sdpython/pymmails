@@ -52,11 +52,11 @@ class TestEmail (unittest.TestCase):
             OutputPrint=__name__ == "__main__")
         data = os.path.abspath(os.path.join(os.path.dirname(__file__), "data"))
         mesf = os.path.join(data, "message.pickle")
-        
+
         if "anaconda" in sys.executable.lower():
             # issue with Anaconda about import pymmails
             return
-        
+
         with open(mesf, "rb") as f:
             try:
                 import pymmails

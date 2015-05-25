@@ -83,6 +83,21 @@ class EmailMessage (email.message.Message):
                     charsets.update([c])
             return charsets
 
+    def get_nb_attachements(self):
+        """
+        return the number of attachments
+
+        @return     int
+        """
+        r = 0
+        for part in self.walk():
+            if part.get_content_maintype() == 'multipart':
+                continue
+            if part.get('Content-Disposition') is None:
+                continue
+            r += 1
+        return r
+
     @property
     def body_html(self):
         """
@@ -462,6 +477,15 @@ class EmailMessage (email.message.Message):
         @return  list of available fields
         """
         return list(self.keys())
+
+    def to_dict(self):
+        """
+        returns all fields for an emails as a dictionary
+        @return     dictionary { key : value }
+        """
+        res = {k: self.get_field(k) for k in self.Fields}
+        res["attached"] = self.get_nb_attachements()
+        return res
 
     def is_dumped(self, folder=".", attachfolder=".", filename=None):
         """
