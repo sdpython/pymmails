@@ -2,7 +2,7 @@
 
 .. blogpost::
     :title: pymmails for teachings
-    :keywords: 
+    :keywords: about
     :date: 2015-06-06
     :categories: teachings
     
