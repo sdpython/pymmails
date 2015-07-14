@@ -16,7 +16,7 @@ def _setup_hook():
     does nothing
     """
     pass
-    
+
 
 def check(log=False):
     """
