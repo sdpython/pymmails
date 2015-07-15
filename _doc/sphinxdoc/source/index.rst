@@ -85,6 +85,16 @@ Installation
 ``pip install pymmails``
     
 
+Tutorial
+--------
+
+.. toctree::
+    :max_depth: 1
+    
+    all_example
+    all_notebooks
+        
+        
 Functionalities
 ---------------
 
