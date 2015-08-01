@@ -1,4 +1,5 @@
 
+
 .. _l-README:
 
 README / Changes
@@ -75,11 +76,12 @@ Design
 ------
 
 This project contains various helper about logging functions, unit tests and help generation.
-   * a source folder: ``src``
-   * a unit test folder: ``_unittests``, go to this folder and run ``run_unittests.py``
-   * a _doc folder: ``_doc``, it will contains the documentation
-   * a file ``setup.py`` to build and to install the module
-   * a file ``make_help.py`` to build the sphinx documentation
+
+* a source folder: ``src``
+* a unit test folder: ``_unittests``, go to this folder and run ``run_unittests.py``
+* a _doc folder: ``_doc``, it will contains the documentation
+* a file ``setup.py`` to build and to install the module
+* a file ``make_help.py`` to build the sphinx documentation
     
 
 Versions
@@ -88,8 +90,8 @@ Versions
 * **0.3 - 2014/??/??**
     * **change:** add a version parameter
     * **fix:** the setup does not need the file ``README.rst`` anymore
-    * **add:** method :meth:`get_to <pymmails.grabber.email_message.EmailMessage.get_to>`
-    * **add:** method :meth:`enumerate_search_person <pymmails.grabber.mailboximap.MailBoxImap.enumerate_search_person>` to grap all emails received from or send to a person
+    * **add:** method pymmails.grabber.email_message.EmailMessage.get_to
+    * **add:** method pymmails.grabber.mailboximap.MailBoxImap.enumerate_search_person to grap all emails received from or send to a person
     * **fix:** fix paths of embedded images in emails when dumping them on disk
     * **new:** functions to send emails, see :mod:`pymmails.sender.email_sender`
 

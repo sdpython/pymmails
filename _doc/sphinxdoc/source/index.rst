@@ -33,7 +33,7 @@ pymmails documentation
 :ref:`l-README`,
 :ref:`blog <ap-main-0>`
 
-Description
+What is it?
 -----------
 
 The module was started to grab emails using IMAP and to store them on a local disk.
@@ -85,8 +85,8 @@ Installation
 ``pip install pymmails``
     
 
-Tutorial
---------
+Quick start
+-----------
 
 .. toctree::
     :maxdepth: 1
