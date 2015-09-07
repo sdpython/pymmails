@@ -145,7 +145,7 @@ class TestEmail (unittest.TestCase):
         data = os.path.abspath(os.path.join(os.path.dirname(__file__), "data"))
         mesf = os.path.join(data, "message.pickle")
 
-        if "anaconda" in sys.executable.lower():
+        if "anaconda" in sys.executable.lower() or "anaconda" in sys.base_prefix.lower():
             # issue with Anaconda about module pickle
             # pickle has issues when getting a file saved by pickle on another
             # distribution
