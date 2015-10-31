@@ -152,8 +152,9 @@ if is_local():
         unittest_modules=["pyquickhelper"],
         additional_notebook_path=["pyquickhelper"],
         requirements=["pyquickhelper"])
-
-    if not r:
+    if not r and not ({"bdist_msi", "sdist",
+                       "bdist_wheel", "publish", "publish_doc", "register",
+                       "upload_docs", "bdist_wininst"} & set(sys.argv)):
         raise Exception("unable to interpret command line: " + str(sys.argv))
 else:
     r = False
