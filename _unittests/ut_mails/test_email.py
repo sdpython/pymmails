@@ -38,7 +38,6 @@ except ImportError:
     import pyquickhelper
 
 
-import src.pymmails as pymmails
 from src.pymmails import MailBoxImap, EmailMessage
 from pyquickhelper import fLOG
 
