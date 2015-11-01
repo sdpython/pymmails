@@ -72,6 +72,7 @@ class TestEmail (unittest.TestCase):
                             "src")))
                 if path not in sys.path:
                     sys.path.append(path)
+                import pymmails
                 obj = pickle.load(f)
                 del sys.path[-1]
 
