@@ -67,8 +67,6 @@ class TestEmail (unittest.TestCase):
                             os.path.split(__file__)[0],
                             "..",
                             "..",
-                            "..",
-                            "pymmails",
                             "src")))
                 if path not in sys.path:
                     sys.path.append(path)
@@ -162,8 +160,6 @@ class TestEmail (unittest.TestCase):
                             os.path.split(__file__)[0],
                             "..",
                             "..",
-                            "..",
-                            "pymmails",
                             "src")))
                 if path not in sys.path:
                     sys.path.append(path)
