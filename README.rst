@@ -9,6 +9,10 @@ README / Changes
     :target: https://travis-ci.org/sdpython/pymmails
     :alt: Build status
 
+.. image:: https://ci.appveyor.com/api/projects/status/isbawgkh38kmw0lw?svg=true
+    :target: https://ci.appveyor.com/project/sdpython/pymmails
+    :alt: Build Status Windows
+    
 .. image:: https://badge.fury.io/py/pymmails.svg
     :target: http://badge.fury.io/py/pymmails
    
