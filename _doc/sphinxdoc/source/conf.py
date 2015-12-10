@@ -1,8 +1,7 @@
+# -*- coding: utf-8 -*-
 import sys
 import os
-import datetime
 import re
-import sphinxjp.themes.sphinxjp
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.split(__file__)[0])))
 sys.path.insert(
