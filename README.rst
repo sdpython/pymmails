@@ -26,7 +26,12 @@ README / Changes
     
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
     :alt: MIT License
-    :target: http://opensource.org/licenses/MIT      
+    :target: http://opensource.org/licenses/MIT     
+
+.. image:: https://landscape.io/github/sdpython/pymmails/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/sdpython/pymmails/master
+   :alt: Code Health         
+
 
 **Links:**
     * `pypi/pymmails <https://pypi.python.org/pypi/pymmails/>`_

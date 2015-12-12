@@ -29,6 +29,10 @@ pymmails documentation
     :alt: MIT License
     :target: http://opensource.org/licenses/MIT     
    
+.. image:: https://landscape.io/github/sdpython/pymmails/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/sdpython/pymmails/master
+   :alt: Code Health         
+   
    
 **Links:** `pypi <https://pypi.python.org/pypi/pymmails/>`_,
 `github <https://github.com/sdpython/pymmails/>`_,
