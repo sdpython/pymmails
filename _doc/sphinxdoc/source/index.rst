@@ -33,6 +33,11 @@ pymmails documentation
    :target: https://landscape.io/github/sdpython/pymmails/master
    :alt: Code Health         
    
+.. image:: https://requires.io/github/sdpython/pymmails/requirements.svg?branch=master
+     :target: https://requires.io/github/sdpython/pymmails/requirements/?branch=master
+     :alt: Requirements Status   
+    
+   
    
 **Links:** `pypi <https://pypi.python.org/pypi/pymmails/>`_,
 `github <https://github.com/sdpython/pymmails/>`_,
