@@ -13,6 +13,8 @@ import dateutil.parser
 import mimetypes
 import hashlib
 import warnings
+from io import BytesIO, StringIO
+from email.generator import BytesGenerator, Generator
 from pyquickhelper import noLOG
 
 from .email_message_style import html_header_style
@@ -41,6 +43,32 @@ class EmailMessage (email.message.Message):
 
     html_header = html_header_style
     additionnalMimeType = additional_mime_type_ext_type
+
+    def as_bytes(self):
+        """
+        converts the mail into a binary string
+
+        @return     bytes
+
+        See `Message.as_bytes <https://docs.python.org/3/library/email.message.html#email.message.Message.as_bytes>`_
+        """
+        fp = BytesIO()
+        g = BytesGenerator(fp, mangle_from_=True, maxheaderlen=60)
+        g.flatten(self)
+        return fp.getvalue()
+
+    def as_string(self):
+        """
+        converts the mail into a string
+
+        @return     string
+
+        See `Message.as_string <https://docs.python.org/3/library/email.message.html#email.message.Message.as_string>`_
+        """
+        fp = StringIO()
+        g = Generator(fp, mangle_from_=True, maxheaderlen=60)
+        g.flatten(self)
+        return fp.getvalue()
 
     @property
     def body(self):

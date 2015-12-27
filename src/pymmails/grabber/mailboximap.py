@@ -115,7 +115,9 @@ class MailBoxImap:
         It follows these `specifications <http://tools.ietf.org/html/rfc3501#page-49>`_.
 
         @example(Search pattern)
-        @code
+
+        ::
+
             pattern='FROM "xavier" SINCE 1-Feb-2013'
             pattern='FROM "xavier" SINCE 1-Feb-2013 BEFORE 5-May-2013'
             pattern='FROM "xavier" SINCE 1-Feb-2013 BEFORE 5-May-2013 (UNANSWERED)'
@@ -125,7 +127,7 @@ class MailBoxImap:
             pattern='SUBJECT "programmation"'
             pattern='TO "student" (FLAGGED)'
             pattern='(UNSEEN)'
-        @endcode
+
         @endexample
 
         If the function generates an error such as::

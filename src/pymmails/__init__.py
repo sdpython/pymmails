@@ -33,4 +33,5 @@ def check(log=False):
 from .grabber.mail_exception import MailException
 from .grabber.email_message import EmailMessage
 from .grabber.mailboximap import MailBoxImap
+from .grabber.mailbox_mock import MailBoxMock
 from .sender.email_sender import create_smtp_server, send_email, compose_email

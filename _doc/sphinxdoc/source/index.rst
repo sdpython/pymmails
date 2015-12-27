@@ -54,9 +54,7 @@ I now use it to download to material sent by my students before an oral presenta
 I receive many of them and it is usually annoying to download them one by one.
 Here is the code I use::
 
-    from pyquickhelper import fLOG
     from pymmails import MailBoxImap
-    fLOG(OutputPrint=True)
     user = "your.email"
     pwd = "passsword"
     server = "imap.your_provider.ext"
