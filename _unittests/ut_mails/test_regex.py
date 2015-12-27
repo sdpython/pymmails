@@ -37,7 +37,7 @@ except ImportError:
     import pyquickhelper
 
 
-from src.pymmails import EmailMessage
+from src.pymmails import EmailMessage, EmailMessageRenderer
 from pyquickhelper import fLOG
 
 
@@ -72,7 +72,7 @@ class TestRegEx (unittest.TestCase):
                 "image.png"),
                 None,
                 "1146aa0a-244a-440e-8ea5-7b272c94f89a")]
-        em = EmailMessage.process_body_html(fold, body, atts)
+        em = EmailMessageRenderer().process_body_html(fold, body, atts)
         fLOG(em)
         assert "1146aa0a-244a-440e-8ea5-7b272c94f89a" not in em
         exp = 'src="attachements/image.png"'

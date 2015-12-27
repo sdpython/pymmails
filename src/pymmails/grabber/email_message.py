@@ -17,7 +17,6 @@ from io import BytesIO, StringIO
 from email.generator import BytesGenerator, Generator
 from pyquickhelper import noLOG
 
-from .email_message_style import html_header_style
 from .mail_exception import MailException
 from .additional_mime_type import additional_mime_type_ext_type
 
@@ -41,7 +40,6 @@ class EmailMessage (email.message.Message):
     subset = ["Date", "From", "Subject", "To", "X-bcc"]
     avoid = ["X-me-spamcause", "X-YMail-OSG"]
 
-    html_header = html_header_style
     additionnalMimeType = additional_mime_type_ext_type
 
     def as_bytes(self):
@@ -69,6 +67,16 @@ class EmailMessage (email.message.Message):
         g = Generator(fp, mangle_from_=True, maxheaderlen=60)
         g.flatten(self)
         return fp.getvalue()
+
+    def create_from_bytes(b):
+        """
+        creates an instance of @see cl EmailMessage
+        from a binary string (bytes) (see @see me as_bytes)
+
+        @param      b       binary string
+        @return             instance of @see cl EmailMessage
+        """
+        return email.message_from_bytes(b, _class=EmailMessage)
 
     @property
     def body(self):
@@ -538,81 +546,6 @@ class EmailMessage (email.message.Message):
         if os.path.exists(filename):
             return True
         return False
-
-    def produce_table_html(
-            self, toshow, tohighlight, folder, atts=[], avoid=[]):
-        """
-        produces a table with the values of some fields of the message
-
-        @param      toshow          list of fields to show, if None, it considers all fields
-        @param      tohighlight     list of fields to highlights
-        @param      atts            list of files to append at the end of the table,
-                                    list of tuple ((filename,message_id,content_id))
-        @param      folder          folder where this page will be saved
-        @param      avoid           fields to avoid
-        @return                     html string
-        """
-        rows = []
-        rows.append('<div class="dataframe100l">')
-        rows.append('<table border="1">')
-        rows.append("<thead><tr><th>key</th><th>value</th></tr></thead>")
-        for tu in sorted(self.items()):
-            if toshow is not None and tu[0] not in toshow:
-                continue
-            if tu[0] in avoid:
-                continue
-
-            tu = (tu[0], self.decode_header(tu[0], tu[1]))
-
-            if tu[0] in tohighlight:
-                rows.append('<tr><th style="background-color: yellow;">{0}</th><td style="background-color: yellow;">{1}</td></tr>'.format(
-                            tu[0].replace("<", "&lt;").replace(">", "&gt;"),
-                            tu[1].replace("<", "&lt;").replace(">", "&gt;")))
-            else:
-                rows.append("<tr><th>{0}</th><td>{1}</td></tr>".format(
-                            tu[0].replace("<", "&lt;").replace(">", "&gt;"),
-                            tu[1].replace("<", "&lt;").replace(">", "&gt;")))
-
-        for i, a in enumerate(atts):
-            filename, mid, cid = a
-            rows.append('<tr><td>{0}</td><td><a href="{1}">{2}</a> (size: {3} bytes, cid: {4})</td></tr>'.format(
-                        "attachment %d" % i,
-                        os.path.relpath(filename, folder),
-                        os.path.split(filename)[-1],
-                        os.stat(filename).st_size,
-                        cid))
-
-        rows.append("</table>")
-        rows.append("<br /></div>")
-        return "\n".join(rows)
-
-    @staticmethod
-    def process_body_html(body_root, body, atts):
-        """
-        replaces link to images included in the mail body::
-
-            <img name="14a318e16161c62a_14a31789f7a34aae_null"
-                 title="pastedImage.png"
-                 src="cid:1146aa0a-244a-440e-8ea5-7b272c94f89a"
-                 height="153.02644466209597"
-                 width="560">
-
-        @param      body_root   location where the HTML body will be saved
-        @param      body        html body
-        @param      atts        attachements (filename, message id, content id)
-        @return                 modified body html
-        """
-        for filename, mid, cid in atts:
-            if cid is None:
-                continue
-            pattern = 'src="cid:{0}"'.format(cid.strip("<>"))
-            exp = re.compile('({0})'.format(pattern))
-            fall = exp.findall(body)
-            if len(fall) > 0:
-                relf = os.path.relpath(filename, body_root)
-                link = 'src="{0}"'.format(relf)
-                body = body.replace(pattern, link)
-        return body
 
     def dump_html(
             self, folder=".", attachfolder=".", filename=None, fLOG=noLOG):

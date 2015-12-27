@@ -8,7 +8,6 @@ import os
 import email
 import email.message
 
-from .mail_exception import MailException
 from .email_message import EmailMessage
 from .mailboximap import MailBoxImap
 from pyquickhelper import noLOG
@@ -90,3 +89,39 @@ class MailBoxMock(MailBoxImap):
                 if skip_function is not None and skip_function(mail):
                     continue
                 yield mail
+
+    def enumerate_search_person(self,
+                                person,
+                                folder,
+                                skip_function=None,
+                                date=None,
+                                max_dest=5):
+        """
+        enumerates all mails in folder folder from a user or sent to a user
+
+        @param      person          person to look for
+        @param      folder          folder name
+        @param      skip_function   if not None, use this function on the header/body to avoid loading the entire message (and skip it)
+        @param      pattern         search pattern (see below)
+        @param      max_dest        maximum number of receivers
+        @return                     iterator on (message)
+        """
+        raise NotImplementedError()
+
+    def enumerate_search_subject(self,
+                                 subject,
+                                 folder,
+                                 skip_function=None,
+                                 date=None,
+                                 max_dest=5):
+        """
+        enumerates all mails in folder folder with a subject verifying a regular expression
+
+        @param      subject         subject to look for
+        @param      folder          folder name
+        @param      skip_function   if not None, use this function on the header/body to avoid loading the entire message (and skip it)
+        @param      pattern         search pattern (see below)
+        @param      max_dest        maximum number of receivers
+        @return                     iterator on (message)
+        """
+        raise NotImplementedError()

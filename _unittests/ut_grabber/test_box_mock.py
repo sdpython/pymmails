@@ -38,7 +38,7 @@ except ImportError:
     import pyquickhelper
 
 
-from src.pymmails import MailBoxImap, EmailMessage, MailBoxMock
+from src.pymmails import MailBoxImap, EmailMessage, MailBoxMock, EmailMessageRenderer
 from pyquickhelper import fLOG
 
 
@@ -62,7 +62,20 @@ class TestMessageBoxMock(unittest.TestCase):
         fLOG(len(mails))
         assert len(mails) > 0
         mail0 = mails[0]
-        fLOG(mail0)
+        # fLOG(mail0)
+
+        bin = mail0.as_bytes()
+        ema = EmailMessage.create_from_bytes(bin)
+        d0 = mail0.to_dict()
+        d1 = ema.to_dict()
+        self.assertEqual(d0["Subject"], d1["Subject"])
+
+        render = EmailMessageRenderer()
+        html, css = render.render("__LOC__", mail0, "example_css.css")
+        assert "example_css.css" in html
+        # fLOG(css)
+        fLOG(html)
+        assert "<tr><th>Date</th><td>Sat, 1 Aug 2015 11:40:50 +0200 (CEST)</td></tr>" in html
 
 
 if __name__ == "__main__":
