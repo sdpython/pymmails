@@ -42,18 +42,19 @@ class EmailMessageRenderer:
         self._template = Template(self._template)
         self._css = Template(self._css)
 
-    def render(self, location, mail, file_css):
+    def render(self, location, mail, file_css, attachments):
         """
         render a mail
 
-        @paramp     location    location where this mail should be saved
-        @param      mail        instance of @see cl EmailMessage
-        @param      file_css    css file
-        @return                 html, css (content)
+        @paramp     location        location where this mail should be saved
+        @param      mail            instance of @see cl EmailMessage
+        @param      file_css        css file
+        @param      attachments     attachments
+        @return                     html, css (content)
 
         The mail is stored in object ``message``, ``css`` means the style sheet,
         ``render`` means this object, ``location`` means *store_location*,
-        ``EmailMessage`` is the class *EmailMessage*::
+        ``EmailMessage`` is the class *EmailMessage*, ``attachments`` is *attachments*::
 
             {{ message.get_subject() }}
 
@@ -61,7 +62,8 @@ class EmailMessageRenderer:
         """
         css = self._css.render(mail)
         html = self._template.render(message=mail, css=file_css, render=self,
-                                     location=location, EmailMessage=EmailMessage)
+                                     location=location, EmailMessage=EmailMessage,
+                                     attachments=attachments)
         return html, css
 
     def produce_table_html(self, email, location, toshow, tohighlight=None, atts=None, avoid=None,
@@ -133,14 +135,15 @@ class EmailMessageRenderer:
         @param      atts        attachements (filename, message id, content id)
         @return                 modified body html
         """
-        for filename, mid, cid in atts:
-            if cid is None:
-                continue
-            pattern = 'src="cid:{0}"'.format(cid.strip("<>"))
-            exp = re.compile('({0})'.format(pattern))
-            fall = exp.findall(body)
-            if len(fall) > 0:
-                relf = os.path.relpath(filename, location)
-                link = 'src="{0}"'.format(relf)
-                body = body.replace(pattern, link)
+        if atts:
+            for filename, mid, cid in atts:
+                if cid is None:
+                    continue
+                pattern = 'src="cid:{0}"'.format(cid.strip("<>"))
+                exp = re.compile('({0})'.format(pattern))
+                fall = exp.findall(body)
+                if len(fall) > 0:
+                    relf = os.path.relpath(filename, location)
+                    link = 'src="{0}"'.format(relf)
+                    body = body.replace(pattern, link)
         return body

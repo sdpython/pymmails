@@ -123,7 +123,10 @@ template_email_html = """<?xml version="1.0" encoding="utf-8"?>
 </head>
 <body>
 <h1>{{ message.get_field("subject") }}</h1>
+<h2>attribues</h2>
 {{ render.produce_table_html(message, toshow=EmailMessage.subset, location=location, avoid=EmailMessage.avoid) }}
+<h2>message</h2>
+{{ render.process_body_html(location, message.body_html, attachments) }}
 </body>
 </html>
 """

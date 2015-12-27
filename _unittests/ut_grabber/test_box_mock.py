@@ -71,7 +71,7 @@ class TestMessageBoxMock(unittest.TestCase):
         self.assertEqual(d0["Subject"], d1["Subject"])
 
         render = EmailMessageRenderer()
-        html, css = render.render("__LOC__", mail0, "example_css.css")
+        html, css = render.render("__LOC__", mail0, "example_css.css", None)
         assert "example_css.css" in html
         # fLOG(css)
         fLOG(html)
