@@ -32,6 +32,7 @@ install:
   - "%PYTHON%\\Scripts\\pymy_install3 --set=pyquickhelper"
   - "%PYTHON%\\Scripts\\pip install pyquickhelper"
   - "%PYTHON%\\Scripts\\pip install cryptography"
+  - "%PYTHON%\\Scripts\\pip install cryptodome"
 
 build: off
 
