@@ -38,8 +38,8 @@ except ImportError:
     import pyquickhelper
 
 
-from src.pymmails import MailBoxImap, EmailMessage
-from pyquickhelper import fLOG
+from src.pymmails import MailBoxImap, EmailMessage, EmailMessageRenderer
+from pyquickhelper import fLOG, get_temp_folder
 
 
 class TestEmail (unittest.TestCase):
@@ -167,15 +167,18 @@ class TestEmail (unittest.TestCase):
                 obj = pickle.load(f)
                 del sys.path[-1]
 
-        temp = os.path.join(data, "..", "temp_html")
-        if os.path.exists(temp):
-            pyquickhelper.remove_folder(temp)
-        if not os.path.exists(temp):
-            os.mkdir(temp)
-
-        ff = obj.dump_html(temp, fLOG=fLOG)
+        temp = get_temp_folder(__file__, "temp_dump_html")
+        render = EmailMessageRenderer()
+        ff = obj.dump(render, location=temp, fLOG=fLOG)
         fLOG(type(ff), ff)
-        assert "d_2014-12-15_p_yyyyy_matthieu-xxxxx_xxx_ii_48bdbc9f9fd180ab917cec5bed8ca529.html" in ff
+        with open(ff[0], "r", encoding="utf8") as f:
+            content = f.read()
+        if '<link rel="stylesheet" type="text/css" href="mail_style.css">' not in content:
+            raise Exception(content)
+        if "d_2014-12-15_p_yyyyy_matthieu-xxxxx_xxx_ii_48bdbc9f9fd180ab917cec5bed8ca529.html" not in ff[0]:
+            raise Exception(ff[0])
+        if "<h1>2014/30/15 - projet 3A - élément logiciel</h1>" not in content:
+            raise Exception(content)
 
     def test_decode_header(self):
         fLOG(
@@ -185,8 +188,10 @@ class TestEmail (unittest.TestCase):
 
         st = '"dupre [MailContact]" <xavier.dupre@gmail.com>,  	=?iso-8859-1?Q?Emmanuel_Gu=E9rin?= <m@emmanuelguerin.fr>'
         res, enc = EmailMessage.call_decode_header(st)
-        fLOG(enc)
-        fLOG(res)
+        fLOG("***", enc)
+        fLOG("***", res)
+        self.assertEqual(enc, "iso-8859-1")
+        assert res.startswith('"dupre [MailContact]" <xavier.dupre@gmail.com>')
 
 
 if __name__ == "__main__":

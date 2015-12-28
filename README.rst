@@ -55,25 +55,20 @@ I now use it to download to material sent by my students before an oral presenta
 I receive many of them and it is usually annoying to download them one by one.
 Here is the code I use::
 
-    from pyquickhelper import fLOG
-    from pymmails import MailBoxImap
-    fLOG(OutputPrint=True)
+    from pymmails import MailBoxImap, EmailMessageRenderer
+
     user = "your.email"
     pwd = "passsword"
     server = "imap.your_provider.ext"
+
     box = MailBoxImap(user, pwd, server)
+    render = EmailMessageRenderer()
     box.login()
-    box.dump_html(folder=os.path.abspath(r"folder_destination"))
+    for mail in box.enumerate_mails_in_folder("saved", pattern="<pattern>") :
+        mail.dump(render, location=temp, fLOG=fLOG)    
     box.logout()
     
-A parameter ``pattern`` can be added to look for a subset of emails::    
-
-    ...
-    box.dump_html(folder=os.path.abspath(r"folder_destination"),
-                pattern='FROM "xavier"')
-    ...
-    
-Below, some examples of patterns::
+Some examples of patterns::
 
     pattern='FROM "xavier" SINCE 1-Feb-2013'
     pattern='FROM "xavier" SINCE 1-Feb-2013 BEFORE 5-May-2013'
@@ -83,9 +78,8 @@ Below, some examples of patterns::
     pattern='LARGER 10000 SMALLER 1000000'
     pattern='SUBJECT "programmation"'
     pattern='TO "student" FLAGGED'
-    pattern='UNSEEN'
+    pattern='UNSEEN'    
     
-
 Design
 ------
 

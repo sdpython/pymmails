@@ -523,53 +523,22 @@ class EmailMessage (email.message.Message):
         res["attached"] = self.get_nb_attachements()
         return res
 
-    def is_dumped(self, folder=".", attachfolder=".", filename=None):
-        """
-        @see me isDumped
-        """
-        return self.isDumped(
-            folder=folder, attachfolder=attachfolder, filename=filename)
-
-    def isDumped(self, folder=".", attachfolder=".", filename=None):
-        """
-        checks if the email was already dumped
-
-        @param  folder          destination folder
-        @param  attachments     destination folder for the attachments
-        @param  filename        filename or a default one if None (see meth default_filename)
-        @return                 boolean
-        """
-        if filename is None:
-            filename = self.default_filename() + ".html"
-
-        filename = os.path.abspath(os.path.join(folder, filename))
-        if os.path.exists(filename):
-            return True
-        return False
-
-    def dump_html(
-            self, folder=".", attachfolder=".", filename=None, fLOG=noLOG):
+    def dump_attachments(self, attach_folder=".", fLOG=noLOG):
         """
         Dumps the mail into a folder using HTML format.
         If the destination files already exists, it skips it.
         If an attachments already has the same name, it chooses another one.
 
-        @param  folder          destination folder
-        @param  attachments     destination folder for the attachments
-        @param  filename        filename or a default one if None (see meth default_filename)
+        @param  attach_folder   destination folder
         @param  fLOG            logging function
-        @return                 html filename
+        @return                 list of attachments
+
+        The results is a list of 3-uple:
+
+        * full name of the attachments
+        * message id
+        * content id
         """
-        if filename is None:
-            filename = self.default_filename() + ".html"
-
-        filename = os.path.abspath(os.path.join(folder, filename))
-        filefold = os.path.dirname(filename)
-
-        if os.path.exists(filename):
-            fLOG("skip file {0} already exists".format(filename))
-            return filename
-
         atts = []
         for att in self.enumerate_attachments():
             if att[1] is None:
@@ -577,7 +546,7 @@ class EmailMessage (email.message.Message):
             att_id = att[2]
             cont_id = att[3]
             to = os.path.split(att[0].replace(":", "_"))[-1]
-            to = os.path.join(attachfolder, to)
+            to = os.path.join(attach_folder, to)
             spl = os.path.splitext(to)
             i = 1
             while os.path.exists(to):
@@ -588,11 +557,9 @@ class EmailMessage (email.message.Message):
             to = os.path.abspath(to)
             if "?" in to:
                 raise MailException(
-                    "issue with " +
-                    filename +
-                    " \n + " +
+                    "issue with attachments (mail to " +
                     to +
-                    "\n" +
+                    ")\n" +
                     str(att))
             fLOG("dump attachment:", to)
 
@@ -600,40 +567,27 @@ class EmailMessage (email.message.Message):
                 f.write(att[1])
 
             atts.append((to, att_id, cont_id))
+        return atts
 
-        subj = self["subject"]
-        if subj is None:
-            subj = self["subject"]
-        if subj is None:
-            subj = "none"
-        subj = self.decode_header("subject", subj)
+    def dump(self, render, location, attach_folder="attachments", fLOG=noLOG, **params):
+        """
+        dump a message using a call such as @see cl EmailMessageRenderer
 
-        rows = [EmailMessage.html_header.replace("__TITLE__", subj)]
-
-        table1 = self.produce_table_html(EmailMessage.subset, [], folder,
-                                         atts, avoid=EmailMessage.avoid)
-        rows.append(table1)
-
-        rows.append('<div class="bodymail">')
-
-        body_mod = EmailMessage.process_body_html(
-            filefold,
-            self.body_html,
-            atts)
-        rows.append(body_mod)
-
-        rows.append("</div>")
-
-        table2 = self.produce_table_html(None, EmailMessage.subset, folder,
-                                         avoid=EmailMessage.avoid)
-        rows.append(table2)
-
-        rows.append("</body>\n</html>")
-
-        body = "\n".join(rows)
-
-        fLOG("dump mail:", filename, "(", self.default_filename(), ")")
-        with open(filename, "w", encoding="utf8") as f:
-            f.write(body)
-
-        return filename
+        @param      render          instance of class @see cl EmailMessageRenderer
+        @param      location        location of the file to store
+        @param      attach_folder   folder for the attachments, it will be created if it does not exist
+        @param      fLOG            logging function
+        @param      params          others parameters, see :meth:`EmailMessageRenderer.write <pymmails.grabber.email_message_renderer.EmailMessageRenderer.write>`
+        @return                     list of stored files
+        """
+        full_fold = os.path.join(location, attach_folder)
+        if not os.path.exists(full_fold):
+            os.makedirs(full_fold)
+        atts = self.dump_attachments(full_fold, fLOG=fLOG)
+        return render.write(location=location, mail=self,
+                            filename=params.get(
+                                "filename", self.default_filename() + ".html"),
+                            attachments=atts,
+                            overwrite=params.get("overwrite", False),
+                            file_css=params.get("file_css", "mail_style.css"),
+                            encoding=params.get("encoding", "utf8"))

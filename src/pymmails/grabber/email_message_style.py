@@ -5,23 +5,7 @@
 """
 
 template_email_css = """
-.bodymail {
-    // __MORE_STYLE1__
-    margin-top:1%;
-    margin-left:20%;
-    margin-right:5%;
-    padding: 0;
-    width=75%
-    font-family: Calibri;
-    font-size: 100%;
-    cursor: pointer;
-}
-
 .dataframe100l {
-    // __MORE_STYLE2__
-    margin-top:1%;
-    margin-left:20%;
-    margin-right:5%;
     padding: 0;
     width=75%
     font-family: Calibri;
@@ -60,6 +44,10 @@ template_email_css = """
     }
 
 .dataframe100l_hl td {
+    background: #FFFF00;
+    }
+
+.dataframe100l_hl th {
     background: #FFFF00;
     }
 
@@ -122,11 +110,13 @@ template_email_html = """<?xml version="1.0" encoding="utf-8"?>
 <link rel="stylesheet" type="text/css" href="{{ css }}">
 </head>
 <body>
-<h1>{{ message.get_field("subject") }}</h1>
-<h2>attribues</h2>
+<h1>{{ message.get_date().strftime('%Y/%M/%d') }} - {{ message.get_field("subject") }}</h1>
+<h2>attributes</h2>
 {{ render.produce_table_html(message, toshow=EmailMessage.subset, location=location, avoid=EmailMessage.avoid) }}
 <h2>message</h2>
 {{ render.process_body_html(location, message.body_html, attachments) }}
+<h2>full list of attributes</h2>
+{{ render.produce_table_html(message, toshow=message.Fields, location=location, tohighlight=EmailMessage.subset) }}
 </body>
 </html>
 """
