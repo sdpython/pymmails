@@ -22,7 +22,7 @@ set_sphinx_variables(__file__,
                      "pymmails",
                      "Xavier Dupré",
                      2015,
-                     "sphinxjp",
+                     "alabaster", # bizstyle
                      None,
                      locals(),
                      add_extensions=None)
