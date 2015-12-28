@@ -4,7 +4,6 @@
 @brief Defines a mailbox using IMAP
 """
 
-import os
 import imaplib
 import re
 import email
@@ -70,37 +69,6 @@ class MailBoxImap:
             name = exp[-1]
             res.append(name)
         return res
-
-    def dump_html(self, iterator, folder="."):
-        """
-        Dumps all emails to a folder,
-        it creates a subfolder for all inbox folders.
-
-        @param      iterator    iterator on emails or tuples (mail, subfolder)
-        @param      folder      folder where to dump
-        @return                 list of tuple (mail,dumped files)
-
-        """
-        dumped = []
-        skip1, skip2 = True, True
-        for mail in iterator:
-            if isinstance(mail, tuple):
-                mail, subfold = mail
-                subfold = os.path.join(folder, subfold)
-                attach = os.path.join(subfold, "_attachments")
-            else:
-                subfold = folder
-                attach = os.path.join(subfold, "_attachments")
-
-            if skip1 and not os.path.exists(subfold):
-                os.makedirs(subfold)
-                skip1 = False
-            if skip2 and not os.path.exists(attach):
-                os.makedirs(attach)
-                skip2 = False
-            f = mail.dump_html(subfold, attach, fLOG=self.fLOG)
-            dumped.append((mail, f))
-        return dumped
 
     def enumerate_mails_in_folder(
             self, folder, skip_function=None, pattern="ALL"):

@@ -1,0 +1,176 @@
+# -*- coding: utf-8 -*-
+"""
+@file
+@brief Functions to dump emails
+"""
+import os
+import datetime
+from jinja2 import Template
+from pyquickhelper import noLOG
+from .renderer import Renderer
+from .email_message_style import template_email_list_html_iter, template_email_list_html_begin, template_email_list_html_end, template_email_css
+
+
+class EmailMessageListRenderer(Renderer):
+    """
+    defines way to render an email
+    """
+
+    def __init__(self, title, email_renderer, tmpl_begin=None, tmpl_iter=None, tmpl_end=None,
+                 css=None, style_table="dataframe100l", style_highlight="dataframe100l_hl",
+                 fLOG=noLOG):
+        """
+        constructor, defines a template based
+        on `Jinja2 <http://jinja.pocoo.org/docs/dev/>`_
+
+        @param      title           title
+        @param      email_renderer  email renderer (see @see cl EmailMessageRenderer)
+        @param      tmpl_begin      template which begins the summary
+        @param      tmpl_iter       template which adds an element
+        @param      tmpl_end        template which ends the summary
+        @param      css             template style
+        @param      style_table     style for the table
+        @param      style_highlight style for highlighted cells
+        @param      fLOG            logging function
+        """
+        if tmpl_begin is None:
+            _template_begin = template_email_list_html_begin
+        elif len(tmpl_begin) < 5000 and os.path.exists(tmpl_begin):
+            with open(tmpl_begin, "r", encoding="utf8") as f:
+                _template_begin = f.read()
+        else:
+            _template_begin = tmpl_begin
+
+        if tmpl_iter is None:
+            _template_iter = template_email_list_html_iter
+        elif len(tmpl_iter) < 5000 and os.path.exists(tmpl_iter):
+            with open(tmpl_iter, "r", encoding="utf8") as f:
+                _template_iter = f.read()
+        else:
+            _template_iter = tmpl_iter
+
+        if tmpl_end is None:
+            _template_end = template_email_list_html_end
+        elif len(tmpl_end) < 5000 and os.path.exists(tmpl_end):
+            with open(tmpl_end, "r", encoding="utf8") as f:
+                _template_end = f.read()
+        else:
+            _template_end = tmpl_end
+
+        if css is None:
+            _css = template_email_css
+        elif len(css) < 5000 and os.path.exists(css):
+            with open(css, "r", encoding="utf8") as f:
+                _css = f.read()
+        else:
+            _css = css
+
+        Renderer.__init__(self, tmpl=_template_iter, css=_css, style_table=style_table,
+                          style_highlight=style_highlight)
+
+        self._email_renderer = email_renderer
+        self._template_begin = Template(_template_begin)
+        self._template_end = Template(_template_end)
+        self._title = title
+        self.fLOG = fLOG
+
+    def render(self, location, iter, attachments=None, file_css="mail_style.css"):
+        """
+        render a mail
+
+        @paramp     location        location where this mail should be saved
+        @param      iter            iterator on tuple (object, function to call to render the object)
+        @param      attachments     unused
+        @param      file_css        css file (where it is supposed to be stored)
+        @return                     html, css (content)
+
+        The method populate fields ``now``, ``message``, ``css``, ``render``, ``location``, ``title``.
+        """
+        now = datetime.datetime.now()
+        file_css = os.path.relpath(file_css, location)
+        content = []
+        self.fLOG("EmailMessageListRenderer.render.begin")
+        css = self._css.render()
+        h = self._template_begin.render(css=file_css, render=self,
+                                        location=location, title=self._title, now=now)
+        content.append(h)
+        self.fLOG("EmailMessageListRenderer.render.iterate")
+        for i, mail in enumerate(iter):
+            self.fLOG("EmailMessageListRenderer.render.iterate", i)
+            if isinstance(mail, tuple) and len(mail) == 3:
+                obj, f, url = mail
+            else:
+                obj, f = mail
+                url = f(obj, location)
+            if url:
+                url = os.path.relpath(url, location)
+            h = self._template.render(message=obj, css=file_css, render=self,
+                                      location=location, title=self._title, url=url, now=now)
+            content.append(h)
+        self.fLOG("EmailMessageListRenderer.render.end", i)
+        h = self._template_end.render(css=file_css, render=self,
+                                      location=location, title=self._title, now=now)
+        content.append(h)
+        return "\n".join(content), css
+
+    '''
+    def write(self, location, iter, filename, attachments=None,
+              overwrite=False, file_css="mail_style.css", encoding="utf8"):
+        """
+        writes a mail, the function assumes the attachments were already dumped
+
+        @param      location        location
+        @param      mail            instance of @see cl EmailMessage
+        @param      attachments     list of attachments (see @see me dump_attachments)
+        @param      overwrite       the function does not overwrite
+        @param      file_css        css file (where it is supposed to be stored)
+        @param      encoding        encoding
+        @return                     list of written local files
+        """
+        if not isinstance(mail, collections.Iterable):
+            raise TypeError("class {0} is not iterable".format(type(iter)))
+
+        full_css = os.path.join(location, file_css)
+        full_mail = os.path.join(location, filename)
+        if not overwrite and os.path.exists(full_css) and os.path.exists(full_mail):
+            return [full_mail, full_css]
+        html, css = self.render(location, mail, attachments, file_css=full_css)
+        if overwrite or not os.path.exists(full_css):
+            with open(full_css, "w", encoding=encoding) as f:
+                f.write(css)
+        if overwrite or not os.path.exists(full_mail):
+            with open(full_mail, "w", encoding=encoding) as f:
+                f.write(html)
+        return [full_mail, full_css]
+
+    def dump_html(self, iterator, folder="."):
+        """
+        Dumps all emails to a folder,
+        it creates a subfolder for all inbox folders.
+
+        @param      iterator    iterator on emails or tuples (mail, subfolder)
+        @param      folder      folder where to dump
+        @return                 list of tuple (mail,dumped files)
+
+        """
+        dumped = []
+        skip1, skip2 = True, True
+        for mail in iterator:
+            if isinstance(mail, tuple):
+                mail, subfold = mail
+                subfold = os.path.join(folder, subfold)
+                attach = os.path.join(subfold, "_attachments")
+            else:
+                subfold = folder
+                attach = os.path.join(subfold, "_attachments")
+
+            if skip1 and not os.path.exists(subfold):
+                os.makedirs(subfold)
+                skip1 = False
+            if skip2 and not os.path.exists(attach):
+                os.makedirs(attach)
+                skip2 = False
+            f = mail.dump_html(subfold, attach, fLOG=self.fLOG)
+            dumped.append((mail, f))
+        return dumped
+    '''

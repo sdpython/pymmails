@@ -322,6 +322,20 @@ class EmailMessage (email.message.Message):
         else:
             raise TypeError("cannot decode type: {0}".format(type(st)))
 
+    def get_from_str(self):
+        """
+        return a string for the receivers
+
+        @return     string
+        """
+        l, a = self.get_from()
+        res = []
+        if l:
+            res.append(l)
+        else:
+            res.append(a)
+        return ";".join(res)
+
     def get_from(self):
         """
         returns a tuple (label, email address)
@@ -351,6 +365,22 @@ class EmailMessage (email.message.Message):
                         text, encoding = EmailMessage.call_decode_header(text)
         gr = cp.groups()
         return gr[1], gr[2]
+
+    def get_to_str(self, cc=False):
+        """
+        return a string for the receivers
+
+        @param      cc      get receivers or second receivers
+        @return             string
+        """
+        to = self.get_to(cc=cc)
+        res = []
+        for l, a in to:
+            if l:
+                res.append(l)
+            else:
+                res.append(a)
+        return ";".join(res)
 
     def get_to(self, cc=False):
         """

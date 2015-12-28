@@ -5,12 +5,12 @@
 """
 import os
 import re
-from jinja2 import Template
 from .email_message_style import template_email_html, template_email_css
 from .email_message import EmailMessage
+from .renderer import Renderer
 
 
-class EmailMessageRenderer:
+class EmailMessageRenderer(Renderer):
     """
     defines way to render an email
     """
@@ -19,7 +19,7 @@ class EmailMessageRenderer:
                  style_table="dataframe100l",
                  style_highlight="dataframe100l_hl"):
         """
-        constructor, defines a template to use based
+        constructor, defines a template based
         on `Jinja2 <http://jinja.pocoo.org/docs/dev/>`_
 
         @param      tmpl            template (string or file)
@@ -153,25 +153,23 @@ class EmailMessageRenderer:
 
         """
         if tmpl is None:
-            self._template = template_email_html
+            _template = template_email_html
         elif len(tmpl) < 5000 and os.path.exists(tmpl):
             with open(tmpl, "r", encoding="utf8") as f:
-                self._template = f.read()
+                _template = f.read()
         else:
-            self._template = tmpl
+            _template = tmpl
 
         if css is None:
-            self._css = template_email_css
+            _css = template_email_css
         elif len(css) < 5000 and os.path.exists(css):
             with open(css, "r", encoding="utf8") as f:
-                self._css = f.read()
+                _css = f.read()
         else:
-            self._css = css
+            _css = css
 
-        self._template = Template(self._template)
-        self._css = Template(self._css)
-        self._style_table = style_table
-        self._style_highlight = style_highlight
+        Renderer.__init__(self, tmpl=_template, css=_css, style_table=style_table,
+                          style_highlight=style_highlight)
 
     def render(self, location, mail, attachments, file_css="mail_style.css"):
         """
@@ -184,7 +182,7 @@ class EmailMessageRenderer:
         @return                     html, css (content)
 
         The mail is stored in object ``message``, ``css`` means the style sheet,
-        ``render`` means this object, ``location`` means *store_location*,
+        ``render`` means this object, ``location`` means *location*,
         ``EmailMessage`` is the class *EmailMessage*, ``attachments`` is *attachments*::
 
             {{ message.get_subject() }}
@@ -193,11 +191,37 @@ class EmailMessageRenderer:
 
         """
         file_css = os.path.relpath(file_css, location)
-        css = self._css.render(mail)
+        css = self._css.render(message=mail)
         html = self._template.render(message=mail, css=file_css, render=self,
                                      location=location, EmailMessage=EmailMessage,
                                      attachments=attachments)
         return html, css
+
+    def write(self, location, mail, filename, attachments=None,
+              overwrite=False, file_css="mail_style.css", encoding="utf8"):
+        """
+        writes a mail, the function assumes the attachments were already dumped
+
+        @param      location        location
+        @param      mail            instance of @see cl EmailMessage
+        @param      attachments     list of attachments (see @see me dump_attachments)
+        @param      overwrite       the function does not overwrite
+        @param      file_css        css file (where it is supposed to be stored)
+        @param      encoding        encoding
+        @return                     list of written local files
+        """
+        full_css = os.path.join(location, file_css)
+        full_mail = os.path.join(location, filename)
+        if not overwrite and os.path.exists(full_css) and os.path.exists(full_mail):
+            return [full_mail, full_css]
+        html, css = self.render(location, mail, attachments, file_css=full_css)
+        if overwrite or not os.path.exists(full_css):
+            with open(full_css, "w", encoding=encoding) as f:
+                f.write(css)
+        if overwrite or not os.path.exists(full_mail):
+            with open(full_mail, "w", encoding=encoding) as f:
+                f.write(html)
+        return [full_mail, full_css]
 
     def produce_table_html(self, email, location, toshow, tohighlight=None, atts=None, avoid=None):
         """
@@ -276,28 +300,3 @@ class EmailMessageRenderer:
                     link = 'src="{0}"'.format(relf)
                     body = body.replace(pattern, link)
         return body
-
-    def write(self, location, mail, filename, attachments=None, overwrite=False, file_css="mail_style.css", encoding="utf8"):
-        """
-        writes a mail, the function assumes the attachments were already dumped
-
-        @param      location        location
-        @param      mail            instance of @see cl EmailMessage
-        @param      attachments     list of attachments (see @see me dump_attachments)
-        @param      overwrite       the function does not overwrite
-        @param      file_css        css file (where it is supposed to be stored)
-        @param      encoding        encoding
-        @return                     list of written local files
-        """
-        full_css = os.path.join(location, file_css)
-        full_mail = os.path.join(location, filename)
-        if not overwrite and os.path.exists(full_css) and os.path.exists(full_mail):
-            return [full_mail, full_css]
-        html, css = self.render(location, mail, attachments, file_css=full_css)
-        if overwrite or not os.path.exists(full_css):
-            with open(full_css, "w", encoding=encoding) as f:
-                f.write(css)
-        if overwrite or not os.path.exists(full_mail):
-            with open(full_mail, "w", encoding=encoding) as f:
-                f.write(html)
-        return [full_mail, full_css]

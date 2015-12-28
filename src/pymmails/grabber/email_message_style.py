@@ -120,3 +120,25 @@ template_email_html = """<?xml version="1.0" encoding="utf-8"?>
 </body>
 </html>
 """
+
+template_email_list_html_begin = """<?xml version="1.0" encoding="utf-8"?>
+<body>
+<html>
+<head>
+<title>{{ title }}</title>
+<link rel="stylesheet" type="text/css" href="{{ css }}">
+</head>
+<body>
+<h1>{{ now.strftime('%Y/%M/%d') }} - {{ title }}</h1>
+<ul>
+"""
+
+template_email_list_html_end = """
+</ul>
+</body>
+</html>
+"""
+
+template_email_list_html_iter = """
+<li><a href="{{url}}">{{ message.get_date().strftime('%Y/%M/%d') }} - {{ message.get_from_str() }}</a> to {{ message.get_to_str() }} - {{ message.get_field("subject") }}</li>
+"""
