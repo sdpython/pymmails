@@ -5,6 +5,7 @@
 """
 import os
 import datetime
+import collections
 from jinja2 import Template
 from pyquickhelper import noLOG
 from .renderer import Renderer
@@ -13,7 +14,27 @@ from .email_message_style import template_email_list_html_iter, template_email_l
 
 class EmailMessageListRenderer(Renderer):
     """
-    defines way to render an email
+    defines a way to render a list of emails
+
+    @example(Render a list of emails)
+
+    The following example extracts all mails in a folder of a gmail inbox,
+    dumps them in a folder and produces a summary which connects to them.
+
+    ::
+
+        from pymmails import EmailMessageRenderer, EmailMessageListRenderer, MailBoxImap
+        box = MailBoxImap(user, pwd, server)
+        box.login()
+        mails = box.enumerate_mails_in_folder("<your_folder)")
+
+        email_render = EmailMessageRenderer()
+
+        render = EmailMessageListRenderer(title="list of mails", email_renderer=email_render)
+        render.write(iter=mails, location=temp, filename="summary.html")
+        box.logout())
+
+    @endexample
     """
 
     def __init__(self, title, email_renderer, tmpl_begin=None, tmpl_iter=None, tmpl_end=None,
@@ -96,7 +117,8 @@ class EmailMessageListRenderer(Renderer):
         content.append(h)
         self.fLOG("EmailMessageListRenderer.render.iterate")
         for i, mail in enumerate(iter):
-            self.fLOG("EmailMessageListRenderer.render.iterate", i)
+            if i % 10 == 9:
+                self.fLOG("EmailMessageListRenderer.render.iterate", i + 1)
             if isinstance(mail, tuple) and len(mail) == 3:
                 obj, f, url = mail
             else:
@@ -113,11 +135,10 @@ class EmailMessageListRenderer(Renderer):
         content.append(h)
         return "\n".join(content), css
 
-    '''
     def write(self, location, iter, filename, attachments=None,
               overwrite=False, file_css="mail_style.css", encoding="utf8"):
         """
-        writes a mail, the function assumes the attachments were already dumped
+        writes a list of mails in a folder and writes a summary
 
         @param      location        location
         @param      mail            instance of @see cl EmailMessage
@@ -127,14 +148,24 @@ class EmailMessageListRenderer(Renderer):
         @param      encoding        encoding
         @return                     list of written local files
         """
-        if not isinstance(mail, collections.Iterable):
+        if not isinstance(iter, collections.Iterable):
             raise TypeError("class {0} is not iterable".format(type(iter)))
 
         full_css = os.path.join(location, file_css)
         full_mail = os.path.join(location, filename)
         if not overwrite and os.path.exists(full_css) and os.path.exists(full_mail):
             return [full_mail, full_css]
-        html, css = self.render(location, mail, attachments, file_css=full_css)
+
+        def fwrite(message, location):
+            html, css = message.dump(
+                self._email_renderer, location=location, fLOG=self.fLOG)
+            return html
+
+        def walk_iter():
+            for obj in iter:
+                yield obj, fwrite
+
+        html, css = self.render(location, walk_iter(), file_css=full_css)
         if overwrite or not os.path.exists(full_css):
             with open(full_css, "w", encoding=encoding) as f:
                 f.write(css)
@@ -142,35 +173,3 @@ class EmailMessageListRenderer(Renderer):
             with open(full_mail, "w", encoding=encoding) as f:
                 f.write(html)
         return [full_mail, full_css]
-
-    def dump_html(self, iterator, folder="."):
-        """
-        Dumps all emails to a folder,
-        it creates a subfolder for all inbox folders.
-
-        @param      iterator    iterator on emails or tuples (mail, subfolder)
-        @param      folder      folder where to dump
-        @return                 list of tuple (mail,dumped files)
-
-        """
-        dumped = []
-        skip1, skip2 = True, True
-        for mail in iterator:
-            if isinstance(mail, tuple):
-                mail, subfold = mail
-                subfold = os.path.join(folder, subfold)
-                attach = os.path.join(subfold, "_attachments")
-            else:
-                subfold = folder
-                attach = os.path.join(subfold, "_attachments")
-
-            if skip1 and not os.path.exists(subfold):
-                os.makedirs(subfold)
-                skip1 = False
-            if skip2 and not os.path.exists(attach):
-                os.makedirs(attach)
-                skip2 = False
-            f = mail.dump_html(subfold, attach, fLOG=self.fLOG)
-            dumped.append((mail, f))
-        return dumped
-    '''

@@ -129,8 +129,9 @@ def send_email(server, fr,
     @code
     from pymmails import create_smtp_server, send_email
     server = create_smtp_server("gmail", "somebody", "pwd")
-    send_email(server, "somebody.like.me@gmail.com", "somebody.like.you@else.com",
-                    "subject", attachements = [ os.path.abspath(__file__) ])
+    send_email(server, "somebody.like.me@gmail.com",
+               "somebody.like.you@else.com", "subject",
+               attachements = [ os.path.abspath(__file__) ])
     server.quit()
     @endcode
     @endexample

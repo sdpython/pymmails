@@ -162,19 +162,6 @@ class MailBoxImap:
         @param      pattern         search pattern (see below)
         @param      max_dest        maximum number of receivers
         @return                     iterator on (message)
-
-        @example(Grab all emails received or sent to a user from gmail)
-        @code
-        import pymmails
-        imap = pymmails.MailBoxImap("alias", "pwd", "imap.gmail.com", True)
-        imap.login()
-        print("inbox folders", imap.folders())
-        iter = imap.enumerate_search_person("user", "folder", date="1-Oct-2014")
-        fs = imap.dump_html(iter, "destination")
-        imap.logout()
-        print("list of stored files", fs)
-        @endcode
-        @endexample
         """
         pat1 = 'FROM "{0}"'.format(person)
         if date is not None:
@@ -210,19 +197,6 @@ class MailBoxImap:
         @param      pattern         search pattern (see below)
         @param      max_dest        maximum number of receivers
         @return                     iterator on (message)
-
-        @example(Grab all emails with a specific subject)
-        @code
-        import pymmails
-        imap = pymmails.MailBoxImap("alias", "pwd", "imap.gmail.com", True)
-        imap.login()
-        print("inbox folders", imap.folders())
-        iter = imap.enumerate_search_subject("user", "folder", subject="something")
-        fs = imap.dump_html(iter, "destination")
-        imap.logout()
-        print("list of stored files", fs)
-        @endcode
-        @endexample
         """
         pat1 = 'SUBJECT "{0}"'.format(subject)
         for mail in self.enumerate_mails_in_folder(
