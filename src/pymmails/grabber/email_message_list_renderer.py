@@ -8,6 +8,7 @@ import datetime
 import collections
 from jinja2 import Template
 from pyquickhelper import noLOG
+from .iter_helper import iterator_prev_next
 from .renderer import Renderer
 from .email_message_style import template_email_list_html_iter, template_email_list_html_begin, template_email_list_html_end, template_email_css
 
@@ -116,20 +117,32 @@ class EmailMessageListRenderer(Renderer):
                                         location=location, title=self._title, now=now)
         content.append(h)
         self.fLOG("EmailMessageListRenderer.render.iterate")
-        for i, mail in enumerate(iter):
-            if i % 10 == 9:
-                self.fLOG("EmailMessageListRenderer.render.iterate", i + 1)
-            if isinstance(mail, tuple) and len(mail) == 3:
-                obj, f, url = mail
-            else:
-                obj, f = mail
-                url = f(obj, location)
-            if url:
-                url = os.path.relpath(url, location)
-            h = self._template.render(message=obj, css=file_css, render=self,
-                                      location=location, title=self._title, url=url, now=now)
+
+        def iter_on_mail():
+            for i, mail in enumerate(iter):
+                if i % 10 == 9:
+                    self.fLOG("EmailMessageListRenderer.render.iterate", i + 1)
+                if isinstance(mail, tuple) and len(mail) == 3:
+                    obj, f, url = mail
+                else:
+                    obj, f = mail
+                    url = f(obj, location)
+                if url:
+                    url = os.path.relpath(url, location)
+                yield obj, url
+
+        for prev, item, next in iterator_prev_next(iter_on_mail()):
+            addition = dict()
+            if prev:
+                addition["url_prev"] = prev[1]
+            if next:
+                addition["url_next"] = next[1]
+            h = self._template.render(message=item[0], css=file_css, render=self,
+                                      location=location, title=self._title, url=item[
+                                          1], now=now,
+                                      **addition)
             content.append(h)
-        self.fLOG("EmailMessageListRenderer.render.end", i)
+        self.fLOG("EmailMessageListRenderer.render.end")
         h = self._template_end.render(css=file_css, render=self,
                                       location=location, title=self._title, now=now)
         content.append(h)

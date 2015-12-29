@@ -1,4 +1,3 @@
-# coding: latin-1
 """
 @file
 @brief Defines a mailbox using IMAP

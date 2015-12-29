@@ -100,5 +100,6 @@ class TestMessageBoxMock(unittest.TestCase):
         assert '<a href="d_2015-12-20_p_noreply-voyages-sncf_com_ii_1bb6fa70421145bed927e00c5e292277.html">2015/07/20 - Voyages-sncf.com</a>' in content
         assert 'list of mails</h1>' in content
 
+
 if __name__ == "__main__":
     unittest.main()

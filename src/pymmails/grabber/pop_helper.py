@@ -1,4 +1,3 @@
-# coding: latin-1
 """
 @file
 @brief Helper around POP server
