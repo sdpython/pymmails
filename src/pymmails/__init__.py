@@ -34,6 +34,6 @@ from .grabber.mail_exception import MailException
 from .grabber.email_message import EmailMessage
 from .grabber.mailboximap import MailBoxImap
 from .grabber.mailbox_mock import MailBoxMock
-from .grabber.email_message_renderer import EmailMessageRenderer
-from .grabber.email_message_list_renderer import EmailMessageListRenderer
+from .render.email_message_renderer import EmailMessageRenderer
+from .render.email_message_list_renderer import EmailMessageListRenderer
 from .sender.email_sender import create_smtp_server, send_email, compose_email

@@ -67,6 +67,7 @@ Here is the code I use::
     for mail in box.enumerate_mails_in_folder("saved", pattern="<pattern>") :
         mail.dump(render, location=temp, fLOG=fLOG)    
     box.logout()
+    render.flush()
     
 Some examples of patterns::
 
@@ -95,11 +96,6 @@ This project contains various helper about logging functions, unit tests and hel
 Versions
 --------
 
-* **0.3 - 2014/??/??**
-    * **change:** add a version parameter
-    * **fix:** the setup does not need the file ``README.rst`` anymore
-    * **add:** method *pymmails.grabber.email_message.EmailMessage.get_to*
-    * **add:** method *pymmails.grabber.mailboximap.MailBoxImap.enumerate_search_person* to grap all emails received from or send to a person
-    * **fix:** fix paths of embedded images in emails when dumping them on disk
-    * **new:** functions to send emails, see *pymmails.sender.email_sender*
+* **0.3 - 2016/??/??**
+    * **new:** new design
 

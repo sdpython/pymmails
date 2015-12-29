@@ -170,6 +170,7 @@ class TestEmail (unittest.TestCase):
         temp = get_temp_folder(__file__, "temp_dump_html")
         render = EmailMessageRenderer()
         ff = obj.dump(render, location=temp, fLOG=fLOG)
+        render.flush()
         fLOG(type(ff), ff)
         with open(ff[0], "r", encoding="utf8") as f:
             content = f.read()

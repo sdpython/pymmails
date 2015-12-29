@@ -5,8 +5,9 @@
 """
 import os
 import re
+from ..grabber.email_message import EmailMessage
+from ..helpers.buffer_files_writing import BufferFilesWriting
 from .email_message_style import template_email_html, template_email_css
-from .email_message import EmailMessage
 from .renderer import Renderer
 
 
@@ -17,15 +18,17 @@ class EmailMessageRenderer(Renderer):
 
     def __init__(self, tmpl=None, css=None,
                  style_table="dataframe100l",
-                 style_highlight="dataframe100l_hl"):
+                 style_highlight="dataframe100l_hl",
+                 buffer_write=None):
         """
         constructor, defines a template based
         on `Jinja2 <http://jinja.pocoo.org/docs/dev/>`_
 
-        @param      tmpl            template (string or file)
-        @param      css             style
-        @param      style_table     style for the table
-        @param      style_highlight style for highlighted cells
+        @param      tmpl                template (string or file)
+        @param      css                 style
+        @param      style_table         style for the table
+        @param      style_highlight     style for highlighted cells
+        @param      buffer_write        instance of class @see cl BufferFilesWriting
 
         @example(Template to render an email)
 
@@ -168,8 +171,10 @@ class EmailMessageRenderer(Renderer):
         else:
             _css = css
 
+        if buffer_write is None:
+            buffer_write = BufferFilesWriting()
         Renderer.__init__(self, tmpl=_template, css=_css, style_table=style_table,
-                          style_highlight=style_highlight)
+                          style_highlight=style_highlight, buffer_write=buffer_write)
 
     def render(self, location, mail, attachments, file_css="mail_style.css", **addition):
         """
@@ -179,7 +184,7 @@ class EmailMessageRenderer(Renderer):
         @param      mail            instance of @see cl EmailMessage
         @param      file_css        css file (where it is supposed to be stored)
         @param      attachments     attachments
-        @param      addition        sent to Jinja
+        @param      addition        sent to *Jinja*
         @return                     html, css (content)
 
         The mail is stored in object ``message``, ``css`` means the style sheet,
@@ -215,16 +220,17 @@ class EmailMessageRenderer(Renderer):
         """
         full_css = os.path.join(location, file_css)
         full_mail = os.path.join(location, filename)
-        if not overwrite and os.path.exists(full_css) and os.path.exists(full_mail):
+        if not overwrite and self.BufferWrite.exists(full_css) and \
+                self.BufferWrite.exists(full_mail):
             return [full_mail, full_css]
         html, css = self.render(
             location, mail, attachments, file_css=full_css, **addition)
-        if overwrite or not os.path.exists(full_css):
-            with open(full_css, "w", encoding=encoding) as f:
-                f.write(css)
-        if overwrite or not os.path.exists(full_mail):
-            with open(full_mail, "w", encoding=encoding) as f:
-                f.write(html)
+        if overwrite or not self.BufferWrite.exists(full_css):
+            f = self.BufferWrite.open(full_css, text=True, encoding=encoding)
+            f.write(css)
+        if overwrite or not self.BufferWrite.exists(full_mail):
+            f = self.BufferWrite.open(full_mail, text=True, encoding=encoding)
+            f.write(html)
         return [full_mail, full_css]
 
     def produce_table_html(self, email, location, toshow, tohighlight=None, atts=None, avoid=None):
@@ -234,7 +240,7 @@ class EmailMessageRenderer(Renderer):
         @param      toshow          list of fields to show, if None, it considers all fields
         @param      tohighlight     list of fields to highlights
         @param      atts            list of files to append at the end of the table,
-                                    list of tuple ((filename,message_id,content_id))
+                                    list of tuple *((filename,message_id,content_id))*
         @param      location        folder where this page will be saved (for attachment)
         @param      avoid           fields to avoid
         @return                     html string

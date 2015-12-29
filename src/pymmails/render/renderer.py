@@ -13,21 +13,39 @@ class Renderer:
 
     def __init__(self, tmpl, css,
                  style_table="dataframe100l",
-                 style_highlight="dataframe100l_hl"):
+                 style_highlight="dataframe100l_hl",
+                 buffer_write=None):
         """
         constructor, defines a template based
         on `Jinja2 <http://jinja.pocoo.org/docs/dev/>`_
 
-        @param      tmpl            template (string or file)
-        @param      css             style
-        @param      style_table     style for the table
-        @param      style_highlight style for highlighted cells
+        @param      tmpl                template (string or file)
+        @param      css                 style
+        @param      style_table         style for the table
+        @param      style_highlight     style for highlighted cells
+        @param      buffer_write        instance of class @see cl BufferFilesWriting
         """
         self._template = Template(tmpl)
         self._css = Template(css)
         self._style_table = style_table
         self._style_highlight = style_highlight
         self._session = None
+        self._buffer_write = buffer_write
+
+    def flush(self):
+        """
+        flushes all files
+
+        @return     number of bytes written
+        """
+        return self.BufferWrite.flush(None)
+
+    @property
+    def BufferWrite(self):
+        """
+        returns ``self._buffer_write``
+        """
+        return self._buffer_write
 
     def render(self, location, obj, attachments=None, file_css="mail_style.css"):
         """

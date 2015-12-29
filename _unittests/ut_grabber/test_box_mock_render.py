@@ -95,6 +95,7 @@ class TestMessageBoxMock(unittest.TestCase):
         render = EmailMessageListRenderer(
             title="list of mails", email_renderer=email_render, fLOG=fLOG)
         res = render.write(iter=mails, location=temp, filename="essai.html")
+        render.flush()
         with open(res[0], "r", encoding="utf8") as f:
             content = f.read()
         assert '<a href="d_2015-12-20_p_noreply-voyages-sncf_com_ii_1bb6fa70421145bed927e00c5e292277.html">2015/07/20 - Voyages-sncf.com</a>' in content

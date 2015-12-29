@@ -66,6 +66,7 @@ Here is the code I use::
     for mail in box.enumerate_mails_in_folder("saved", pattern="<pattern>") :
         mail.dump(render, location=temp, fLOG=fLOG)    
     box.logout()
+    render.flush()
     
 Some examples of patterns::
 

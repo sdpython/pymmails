@@ -553,13 +553,14 @@ class EmailMessage (email.message.Message):
         res["attached"] = self.get_nb_attachements()
         return res
 
-    def dump_attachments(self, attach_folder=".", fLOG=noLOG):
+    def dump_attachments(self, attach_folder=".", buffer_write=None, fLOG=noLOG):
         """
         Dumps the mail into a folder using HTML format.
         If the destination files already exists, it skips it.
         If an attachments already has the same name, it chooses another one.
 
         @param  attach_folder   destination folder
+        @param  buffer_write    None or instance of @see cl BufferFilesWriting
         @param  fLOG            logging function
         @return                 list of attachments
 
@@ -569,6 +570,11 @@ class EmailMessage (email.message.Message):
         * message id
         * content id
         """
+        def local_exists(name):
+            if buffer_write:
+                return buffer_write.exists(name)
+            else:
+                return os.path.exists(name)
         atts = []
         for att in self.enumerate_attachments():
             if att[1] is None:
@@ -579,7 +585,7 @@ class EmailMessage (email.message.Message):
             to = os.path.join(attach_folder, to)
             spl = os.path.splitext(to)
             i = 1
-            while os.path.exists(to):
+            while local_exists(to):
                 to = spl[0] + (".%d" % i) + spl[1]
                 i += 1
 
@@ -593,7 +599,11 @@ class EmailMessage (email.message.Message):
                     str(att))
             fLOG("dump attachment:", to)
 
-            with open(to, "wb") as f:
+            if buffer_write is None:
+                with open(to, "wb") as f:
+                    f.write(att[1])
+            else:
+                f = buffer_write.open(to, text=False)
                 f.write(att[1])
 
             atts.append((to, att_id, cont_id))
@@ -606,14 +616,15 @@ class EmailMessage (email.message.Message):
         @param      render          instance of class @see cl EmailMessageRenderer
         @param      location        location of the file to store
         @param      attach_folder   folder for the attachments, it will be created if it does not exist
+        @param      buffer_write    None or instance of @see cl BufferFilesWriting
         @param      fLOG            logging function
         @param      params          others parameters, see :meth:`EmailMessageRenderer.write <pymmails.grabber.email_message_renderer.EmailMessageRenderer.write>`
         @return                     list of stored files
         """
         full_fold = os.path.join(location, attach_folder)
-        if not os.path.exists(full_fold):
-            os.makedirs(full_fold)
-        atts = self.dump_attachments(full_fold, fLOG=fLOG)
+        atts = self.dump_attachments(full_fold,
+                                     buffer_write=render.BufferWrite,
+                                     fLOG=fLOG)
         return render.write(location=location, mail=self,
                             filename=params.get(
                                 "filename", self.default_filename() + ".html"),

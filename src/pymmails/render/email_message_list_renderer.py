@@ -8,7 +8,7 @@ import datetime
 import collections
 from jinja2 import Template
 from pyquickhelper import noLOG
-from .iter_helper import iterator_prev_next
+from ..helpers import iterator_prev_next
 from .renderer import Renderer
 from .email_message_style import template_email_list_html_iter, template_email_list_html_begin, template_email_list_html_end, template_email_css
 
@@ -34,26 +34,28 @@ class EmailMessageListRenderer(Renderer):
         render = EmailMessageListRenderer(title="list of mails", email_renderer=email_render)
         render.write(iter=mails, location=temp, filename="summary.html")
         box.logout())
+        render.flush()
 
     @endexample
     """
 
     def __init__(self, title, email_renderer, tmpl_begin=None, tmpl_iter=None, tmpl_end=None,
                  css=None, style_table="dataframe100l", style_highlight="dataframe100l_hl",
-                 fLOG=noLOG):
+                 buffer_write=None, fLOG=noLOG):
         """
         constructor, defines a template based
         on `Jinja2 <http://jinja.pocoo.org/docs/dev/>`_
 
-        @param      title           title
-        @param      email_renderer  email renderer (see @see cl EmailMessageRenderer)
-        @param      tmpl_begin      template which begins the summary
-        @param      tmpl_iter       template which adds an element
-        @param      tmpl_end        template which ends the summary
-        @param      css             template style
-        @param      style_table     style for the table
-        @param      style_highlight style for highlighted cells
-        @param      fLOG            logging function
+        @param      title               title
+        @param      email_renderer      email renderer (see @see cl EmailMessageRenderer)
+        @param      tmpl_begin          template which begins the summary
+        @param      tmpl_iter           template which adds an element
+        @param      tmpl_end            template which ends the summary
+        @param      css                 template style
+        @param      style_table         style for the table
+        @param      style_highlight     style for highlighted cells
+        @param      buffer_write        instance of class @see cl BufferFilesWriting
+        @param      fLOG                logging function
         """
         if tmpl_begin is None:
             _template_begin = template_email_list_html_begin
@@ -87,8 +89,11 @@ class EmailMessageListRenderer(Renderer):
         else:
             _css = css
 
+        if buffer_write is None:
+            buffer_write = email_renderer.BufferWrite
+
         Renderer.__init__(self, tmpl=_template_iter, css=_css, style_table=style_table,
-                          style_highlight=style_highlight)
+                          style_highlight=style_highlight, buffer_write=buffer_write)
 
         self._email_renderer = email_renderer
         self._template_begin = Template(_template_begin)
@@ -142,6 +147,7 @@ class EmailMessageListRenderer(Renderer):
                                           1], now=now,
                                       **addition)
             content.append(h)
+
         self.fLOG("EmailMessageListRenderer.render.end")
         h = self._template_end.render(css=file_css, render=self,
                                       location=location, title=self._title, now=now)
@@ -166,7 +172,8 @@ class EmailMessageListRenderer(Renderer):
 
         full_css = os.path.join(location, file_css)
         full_mail = os.path.join(location, filename)
-        if not overwrite and os.path.exists(full_css) and os.path.exists(full_mail):
+        if not overwrite and self.BufferWrite.exists(full_css) and \
+                self.BufferWrite.exists(full_mail):
             return [full_mail, full_css]
 
         def fwrite(message, location):
@@ -179,10 +186,10 @@ class EmailMessageListRenderer(Renderer):
                 yield obj, fwrite
 
         html, css = self.render(location, walk_iter(), file_css=full_css)
-        if overwrite or not os.path.exists(full_css):
-            with open(full_css, "w", encoding=encoding) as f:
-                f.write(css)
-        if overwrite or not os.path.exists(full_mail):
-            with open(full_mail, "w", encoding=encoding) as f:
-                f.write(html)
+        if overwrite or not self.BufferWrite.exists(full_css):
+            f = self.BufferWrite.open(full_css, text=True, encoding=encoding)
+            f.write(css)
+        if overwrite or not self.BufferWrite.exists(full_mail):
+            f = self.BufferWrite.open(full_mail, text=True, encoding=encoding)
+            f.write(html)
         return [full_mail, full_css]
