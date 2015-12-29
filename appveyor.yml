@@ -17,11 +17,10 @@ environment:
       PYTHON_ARCH: "64"
       WINDOWS_SDK_VERSION: "v7.1"
 
-  # DLL issues with Python 3.5
-  #  - PYTHON: "C:\\Python35-x64"
-  #    PYTHON_VERSION: "3.5.x"
-  #    PYTHON_ARCH: "64"
-  #    WINDOWS_SDK_VERSION: "v7.2"
+    - PYTHON: "C:\\Python35-x64"
+     PYTHON_VERSION: "3.5.x"
+      PYTHON_ARCH: "64"
+      WINDOWS_SDK_VERSION: "v7.2"
 
 init:
   - "ECHO %PYTHON% %PYTHON_VERSION% %PYTHON_ARCH%"
@@ -32,7 +31,7 @@ install:
   - "%PYTHON%\\Scripts\\pymy_install3 --set=pyquickhelper"
   - "%PYTHON%\\Scripts\\pip install pyquickhelper"
   - "%PYTHON%\\Scripts\\pip install cryptography"
-  - "%PYTHON%\\Scripts\\pip install cryptodome"
+  - "%PYTHON%\\Scripts\\pip install pycryptodome"
 
 build: off
 
