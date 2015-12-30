@@ -29,7 +29,7 @@ class BufferFilesWriting:
         @param      name        name
         @return                 boolean
         """
-        return name in self._done or name in self._buffer
+        return name in self._done or name in self._buffer or os.path.exists(name)
 
     def listfiles(self):
         """
