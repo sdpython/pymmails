@@ -101,7 +101,7 @@ class EmailMessageListRenderer(Renderer):
         self._title = title
         self.fLOG = fLOG
 
-    def render(self, location, iter, attachments=None, file_css="mail_style.css"):
+    def render(self, location, iter, attachments=None, file_css="mail_style.css", _flush=False):
         """
         render a mail
 
@@ -109,6 +109,7 @@ class EmailMessageListRenderer(Renderer):
         @param      iter            iterator on tuple (object, function to call to render the object)
         @param      attachments     unused
         @param      file_css        css file (where it is supposed to be stored)
+        @param      _flush          calls ``self.BufferWrite.flush()``, private
         @return                     html, css (content)
 
         The method populate fields ``now``, ``message``, ``css``, ``render``, ``location``, ``title``.
@@ -124,28 +125,27 @@ class EmailMessageListRenderer(Renderer):
         self.fLOG("EmailMessageListRenderer.render.iterate")
 
         def iter_on_mail():
-            for i, mail in enumerate(iter):
+            for i, mail3 in enumerate(iterator_prev_next(iter)):
+                prev, item, next = mail3
                 if i % 10 == 9:
                     self.fLOG("EmailMessageListRenderer.render.iterate", i + 1)
-                if isinstance(mail, tuple) and len(mail) == 3:
-                    obj, f, url = mail
-                else:
-                    obj, f = mail
-                    url = f(obj, location)
-                if url:
-                    url = os.path.relpath(url, location)
-                yield obj, url
+                if not isinstance(item, tuple):
+                    raise TypeError(
+                        "expects a tuple (EmailMessage, function to render)")
+                prev_mail = prev[0].default_filename() + \
+                    ".html" if prev else None
+                next_mail = next[0].default_filename() + \
+                    ".html" if next else None
+                obj, f = item
+                f(obj, location, prev_mail, next_mail)
+                if _flush and prev:
+                    full_prev = os.path.join(location, prev_mail)
+                    self.BufferWrite.flush(full_prev, upto=True)
+                yield prev[0] if prev else None, item[0], next[0] if next else None
 
-        for prev, item, next in iterator_prev_next(iter_on_mail()):
-            addition = dict()
-            if prev:
-                addition["url_prev"] = prev[1]
-            if next:
-                addition["url_next"] = next[1]
-            h = self._template.render(message=item[0], css=file_css, render=self,
-                                      location=location, title=self._title, url=item[
-                                          1], now=now,
-                                      **addition)
+        for prev, item, next in iter_on_mail():
+            h = self._template.render(message=item, css=file_css, render=self, location=location,
+                                      title=self._title, url=item.default_filename() + ".html", now=now)
             content.append(h)
 
         self.fLOG("EmailMessageListRenderer.render.end")
@@ -166,6 +166,8 @@ class EmailMessageListRenderer(Renderer):
         @param      file_css        css file (where it is supposed to be stored)
         @param      encoding        encoding
         @return                     list of written local files
+
+        The method calls method :meth:`flush <pymmails.helpers.buffer_files_writing.BufferFilesWriting.flush>`.
         """
         if not isinstance(iter, collections.Iterable):
             raise TypeError("class {0} is not iterable".format(type(iter)))
@@ -176,16 +178,18 @@ class EmailMessageListRenderer(Renderer):
                 self.BufferWrite.exists(full_mail):
             return [full_mail, full_css]
 
-        def fwrite(message, location):
+        def fwrite(message, location, prev_mail, next_mail):
             html, css = message.dump(
-                self._email_renderer, location=location, fLOG=self.fLOG)
+                self._email_renderer, location=location,
+                prev_mail=prev_mail, next_mail=next_mail, fLOG=self.fLOG)
             return html
 
         def walk_iter():
             for obj in iter:
                 yield obj, fwrite
 
-        html, css = self.render(location, walk_iter(), file_css=full_css)
+        html, css = self.render(location, walk_iter(),
+                                file_css=full_css, _flush=True)
         if overwrite or not self.BufferWrite.exists(full_css):
             f = self.BufferWrite.open(full_css, text=True, encoding=encoding)
             f.write(css)

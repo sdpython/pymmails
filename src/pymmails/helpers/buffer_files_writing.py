@@ -31,6 +31,15 @@ class BufferFilesWriting:
         """
         return name in self._done or name in self._buffer
 
+    def listfiles(self):
+        """
+        returns the list of flushed and opened files,
+        does not preserved order
+
+        @return     list of files
+        """
+        return list(self._done) + list(self._buffer.keys())
+
     def __len__(self):
         """
         return the number of buffered files
@@ -74,7 +83,8 @@ class BufferFilesWriting:
             return size
         else:
             if name not in self._buffer:
-                raise FileNotFoundError(name)
+                raise FileNotFoundError(
+                    name + "\nEXISTING\n" + "\n".join(self.listfiles()))
             if upto:
                 n = self._buffer[name][2]
                 names = [name for name, v in self._buffer.items() if v[2] <= n]

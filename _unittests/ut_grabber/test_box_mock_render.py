@@ -62,17 +62,20 @@ class TestMessageBoxMock(unittest.TestCase):
 
         email_render = EmailMessageRenderer()
 
-        def tempf(message, location):
+        def tempf(message, location, prev_mail, next_mail):
             email_render.render(location, message, None,
-                                file_css="mail_style.css")
+                                file_css="mail_style.css",
+                                prev_mail=prev_mail, next_mail=next_mail)
             return ""
 
         mails = list((m, tempf) for m in mails)
         render = EmailMessageListRenderer(
             title="list of mails", email_renderer=email_render, fLOG=fLOG)
         res = render.render(iter=mails, location=temp)
+        render.flush()
         # fLOG(res[0])
-        assert '<a href="">2015/40/01 - Voyages-sncf.com</a>' in res[0]
+        if '<a href="d_2015-08-01_p_noreply-voyages-sncf_com_ii_52df24c718fdf138f997e73c383798eb.html">2015/40/01 - Voyages-sncf.com</a>' not in res[0]:
+            raise Exception(res[0])
 
     def test_box_mock_write(self):
         fLOG(
@@ -98,8 +101,10 @@ class TestMessageBoxMock(unittest.TestCase):
         render.flush()
         with open(res[0], "r", encoding="utf8") as f:
             content = f.read()
-        assert '<a href="d_2015-12-20_p_noreply-voyages-sncf_com_ii_1bb6fa70421145bed927e00c5e292277.html">2015/07/20 - Voyages-sncf.com</a>' in content
-        assert 'list of mails</h1>' in content
+        if '<a href="d_2015-12-20_p_noreply-voyages-sncf_com_ii_1bb6fa70421145bed927e00c5e292277.html">2015/07/20 - Voyages-sncf.com</a>' not in content:
+            raise Exception(content)
+        if 'list of mails</h1>' not in content:
+            raise Exception(content)
 
 
 if __name__ == "__main__":

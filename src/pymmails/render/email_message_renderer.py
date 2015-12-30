@@ -176,7 +176,8 @@ class EmailMessageRenderer(Renderer):
         Renderer.__init__(self, tmpl=_template, css=_css, style_table=style_table,
                           style_highlight=style_highlight, buffer_write=buffer_write)
 
-    def render(self, location, mail, attachments, file_css="mail_style.css", **addition):
+    def render(self, location, mail, attachments, file_css="mail_style.css",
+               prev_mail=None, next_mail=None, **addition):
         """
         render a mail
 
@@ -184,6 +185,8 @@ class EmailMessageRenderer(Renderer):
         @param      mail            instance of @see cl EmailMessage
         @param      file_css        css file (where it is supposed to be stored)
         @param      attachments     attachments
+        @param      prev_mail       previous mail (or None if there is none)
+        @param      next_mail       next mail (or None if there is none)
         @param      addition        sent to *Jinja*
         @return                     html, css (content)
 
@@ -200,12 +203,13 @@ class EmailMessageRenderer(Renderer):
         css = self._css.render(message=mail)
         html = self._template.render(message=mail, css=file_css, render=self,
                                      location=location, EmailMessage=EmailMessage,
-                                     attachments=attachments, **addition)
+                                     attachments=attachments, prev_mail=prev_mail,
+                                     next_mail=next_mail, **addition)
         return html, css
 
     def write(self, location, mail, filename, attachments=None,
               overwrite=False, file_css="mail_style.css", encoding="utf8",
-              **addition):
+              prev_mail=None, next_mail=None, **addition):
         """
         writes a mail, the function assumes the attachments were already dumped
 
@@ -216,6 +220,8 @@ class EmailMessageRenderer(Renderer):
         @param      file_css        css file (where it is supposed to be stored)
         @param      encoding        encoding
         @param      addition        additional parameter sent to Jinja2
+        @param      prev_mail       previous mail (or None if there is none)
+        @param      next_mail       next mail (or None if there is none)
         @return                     list of written local files
         """
         full_css = os.path.join(location, file_css)
@@ -224,7 +230,8 @@ class EmailMessageRenderer(Renderer):
                 self.BufferWrite.exists(full_mail):
             return [full_mail, full_css]
         html, css = self.render(
-            location, mail, attachments, file_css=full_css, **addition)
+            location, mail, attachments, file_css=full_css,
+            prev_mail=prev_mail, next_mail=next_mail, **addition)
         if overwrite or not self.BufferWrite.exists(full_css):
             f = self.BufferWrite.open(full_css, text=True, encoding=encoding)
             f.write(css)
