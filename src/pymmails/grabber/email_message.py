@@ -21,7 +21,7 @@ from .mail_exception import MailException
 from .additional_mime_type import additional_mime_type_ext_type
 
 
-class EmailMessage (email.message.Message):
+class EmailMessage(email.message.Message):
 
     """
     overloads the message to class to add some

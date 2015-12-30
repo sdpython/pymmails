@@ -178,7 +178,7 @@ class TestEmail (unittest.TestCase):
             raise Exception(content)
         if "d_2014-12-15_p_yyyyy_matthieu-xxxxx_xxx_ii_48bdbc9f9fd180ab917cec5bed8ca529.html" not in ff[0]:
             raise Exception(ff[0])
-        if "<h1>2014/30/15 - projet 3A - élément logiciel</h1>" not in content:
+        if "<h1>2014/12/15 - projet 3A - élément logiciel</h1>" not in content:
             raise Exception(content)
 
     def test_decode_header(self):

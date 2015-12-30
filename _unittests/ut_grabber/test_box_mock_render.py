@@ -74,7 +74,7 @@ class TestMessageBoxMock(unittest.TestCase):
         res = render.render(iter=mails, location=temp)
         render.flush()
         # fLOG(res[0])
-        if '<a href="d_2015-08-01_p_noreply-voyages-sncf_com_ii_52df24c718fdf138f997e73c383798eb.html">2015/40/01 - Voyages-sncf.com</a>' not in res[0]:
+        if '<a href="d_2015-08-01_p_noreply-voyages-sncf_com_ii_52df24c718fdf138f997e73c383798eb.html">2015/08/01 - Voyages-sncf.com</a>' not in res[0]:
             raise Exception(res[0])
 
     def test_box_mock_write(self):
@@ -94,14 +94,14 @@ class TestMessageBoxMock(unittest.TestCase):
         box.logout()
 
         email_render = EmailMessageRenderer()
-
         render = EmailMessageListRenderer(
             title="list of mails", email_renderer=email_render, fLOG=fLOG)
         res = render.write(iter=mails, location=temp, filename="essai.html")
         render.flush()
+
         with open(res[0], "r", encoding="utf8") as f:
             content = f.read()
-        if '<a href="d_2015-12-20_p_noreply-voyages-sncf_com_ii_1bb6fa70421145bed927e00c5e292277.html">2015/07/20 - Voyages-sncf.com</a>' not in content:
+        if '<a href="d_2015-12-20_p_noreply-voyages-sncf_com_ii_1bb6fa70421145bed927e00c5e292277.html">2015/12/20 - Voyages-sncf.com</a>' not in content:
             raise Exception(content)
         if 'list of mails</h1>' not in content:
             raise Exception(content)

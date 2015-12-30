@@ -124,55 +124,63 @@ class MailBoxImap:
         The keyword RECENT will be added to the search pattern
         in order to retreive the newest mails.
         """
-        qfold = self.M._quote(folder)
-        self.fLOG("MailBoxImap [folder={0}]".format(qfold))
-        self.M.select(qfold, readonly=True)
+        if isinstance(folder, list):
+            for fold in folder:
+                iter = self.enumerate_mails_in_folder(folder=fold,
+                                                      skip_function=skip_function, date=date, pattern=pattern, body=body)
+                for mail in iter:
+                    yield mail
+        else:
+            qfold = self.M._quote(folder)
+            self.M.select(qfold, readonly=True)
 
-        if date is not None:
-            pdat = 'SINCE {0}'.format(date)
-            if pattern == "ALL":
-                pattern = pdat
-            else:
-                pattern += " " + pdat
-
-        try:
-            typ, data = self.M.search(None, pattern)
-        except Exception as e:
-            if "SEARCH => got more " in str(e):
+            if date is not None:
+                pdat = 'SINCE {0}'.format(date)
                 if pattern == "ALL":
-                    pattern = "RECENT"
+                    pattern = pdat
                 else:
-                    pattern += " RECENT"
-                pattern = pattern.strip()
-                self.fLOG(
-                    "limit email search for folder",
-                    folder,
-                    " to recent emails with pattern",
-                    pattern)
+                    pattern += " " + pdat
+
+            try:
                 typ, data = self.M.search(None, pattern)
-            else:
-                raise MailException(
-                    "unable to search for pattern: {0}\nin subfolder {1}\ncheck the folder you search for is right"
-                    .format(pattern, qfold)) from e
+            except Exception as e:
+                if "SEARCH => got more " in str(e):
+                    if pattern == "ALL":
+                        pattern = "RECENT"
+                    else:
+                        pattern += " RECENT"
+                    pattern = pattern.strip()
+                    self.fLOG(
+                        "MailBoxImap.enumerate_mails_in_folder [limit email search for folder",
+                        folder,
+                        " to recent emails with pattern",
+                        pattern + "]")
+                    typ, data = self.M.search(None, pattern)
+                else:
+                    raise MailException(
+                        "unable to search for pattern: {0}\nin subfolder {1}\ncheck the folder you search for is right"
+                        .format(pattern, qfold)) from e
 
-        spl = data[0].split()
-        self.fLOG("MailBoxImap [folder={0} nbm={1}]".format(folder, len(spl)))
+            spl = data[0].split()
+            self.fLOG("MailBoxImap.enumerate_mails_in_folder [folder={0} nbm={1} body={2} pattern={3}]".format(
+                folder, len(spl), body, pattern))
 
-        for num in spl:
-            if skip_function is not None:
-                typ, data = self.M.fetch(num, '(BODY[HEADER])')
-                emailBody = data[0][1]
-                mail = email.message_from_bytes(emailBody, _class=EmailMessage)
-                if skip_function(mail):
-                    continue
+            for num in spl:
+                if skip_function is not None:
+                    typ, data = self.M.fetch(num, '(BODY[HEADER])')
+                    emailBody = data[0][1]
+                    mail = email.message_from_bytes(
+                        emailBody, _class=EmailMessage)
+                    if skip_function(mail):
+                        continue
+                if body:
+                    typ, data = self.M.fetch(num, '(RFC822)')
+                    emailBody = data[0][1]
+                    mail = email.message_from_bytes(
+                        emailBody, _class=EmailMessage)
+                yield mail
 
-            typ, data = self.M.fetch(
-                num, '(RFC822)' if body else '(BODY[HEADER])')
-            emailBody = data[0][1]
-            mail = email.message_from_bytes(emailBody, _class=EmailMessage)
-            yield mail
-
-        self.M.close()
+            self.M.close()
 
     def enumerate_search_person(self,
                                 person,
@@ -183,31 +191,48 @@ class MailBoxImap:
         """
         enumerates all mails in folder folder from a user or sent to a user
 
-        @param      person          person to look for
+        @param      person          person to look for or persons to look for
         @param      folder          folder name
         @param      skip_function   if not None, use this function on the header/body to avoid loading the entire message (and skip it)
         @param      pattern         search pattern (see below)
         @param      max_dest        maximum number of receivers
         @return                     iterator on (message)
+
+        If *person* is a list, the function iterates on the list of
+        persons to look for. It returns only unique mails.
         """
-        pat1 = 'FROM "{0}"'.format(person)
-        if date is not None:
-            pat1 += ' SINCE {0}'.format(date)
-        for mail in self.enumerate_mails_in_folder(
-                folder, skip_function=skip_function, pattern=pat1):
-            yield mail
-        pat2 = 'TO "{0}"'.format(person)
-        if date is not None:
-            pat2 += ' SINCE {0}'.format(date)
-        for mail in self.enumerate_mails_in_folder(
-                folder, skip_function=skip_function, pattern=pat2):
-            if max_dest > 0:
-                tos = mail.get_to()
-                l = len(tos)
-                if l <= max_dest:
-                    yield mail
-            else:
+        if isinstance(person, list):
+            unique_id = set()
+            for p in person:
+                mail_set = self.enumerate_search_person(p,
+                                                        folder=folder,
+                                                        skip_function=skip_function,
+                                                        date=date,
+                                                        max_dest=max_dest)
+                for mail in mail_set:
+                    uid = mail.UniqueID
+                    if uid not in unique_id:
+                        unique_id.add(uid)
+                        yield mail
+        else:
+            pat1 = 'FROM "{0}"'.format(person)
+            if date is not None:
+                pat1 += ' SINCE {0}'.format(date)
+            for mail in self.enumerate_mails_in_folder(
+                    folder, skip_function=skip_function, pattern=pat1):
                 yield mail
+            pat2 = 'TO "{0}"'.format(person)
+            if date is not None:
+                pat2 += ' SINCE {0}'.format(date)
+            for mail in self.enumerate_mails_in_folder(
+                    folder, skip_function=skip_function, pattern=pat2):
+                if max_dest > 0:
+                    tos = mail.get_to()
+                    l = len(tos)
+                    if l <= max_dest:
+                        yield mail
+                else:
+                    yield mail
 
     def enumerate_search_subject(self,
                                  subject,

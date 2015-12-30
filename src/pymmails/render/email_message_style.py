@@ -111,13 +111,30 @@ template_email_html = """<?xml version="1.0" encoding="utf-8"?>
 <body>
 {{ '<a href="{0}">&lt;--</a>'.format(prev_mail) if prev_mail else '' }}
 {{ '<a href="{0}">--&gt;</a>'.format(next_mail) if next_mail else '' }}
-<h1>{{ message.get_date().strftime('%Y/%M/%d') }} - {{ message.get_field("subject") }}</h1>
+<h1>{{ message.get_date().strftime('%Y/%m/%d') }} - {{ message.get_field("subject") }}</h1>
 <h2>attributes</h2>
-{{ render.produce_table_html(message, toshow=EmailMessage.subset, location=location, avoid=EmailMessage.avoid) }}
+{{ render.produce_table_html(message, toshow=EmailMessage.subset, location=location, avoid=EmailMessage.avoid, atts=attachments) }}
 <h2>message</h2>
 {{ render.process_body_html(location, message.body_html, attachments) }}
 <h2>full list of attributes</h2>
 {{ render.produce_table_html(message, toshow=message.Fields, location=location, tohighlight=EmailMessage.subset) }}
+</body>
+</html>
+"""
+
+template_email_html_short = """<?xml version="1.0" encoding="utf-8"?>
+<body>
+<html>
+<head>
+<title>{{ message.get_field("subject") }}</title>
+<link rel="stylesheet" type="text/css" href="{{ css }}">
+</head>
+<body>
+{{ '<a href="{0}">&lt;--</a>'.format(prev_mail) if prev_mail else '' }}
+{{ '<a href="{0}">--&gt;</a>'.format(next_mail) if next_mail else '' }}
+<h1>{{ message.get_date().strftime('%Y/%m/%d') }} - {{ message.get_field("subject") }}</h1>
+{{ render.produce_table_html(message, toshow=EmailMessage.subset, location=location, avoid=EmailMessage.avoid, atts=attachments) }}
+{{ render.process_body_html(location, message.body_html, attachments) }}
 </body>
 </html>
 """
@@ -130,7 +147,7 @@ template_email_list_html_begin = """<?xml version="1.0" encoding="utf-8"?>
 <link rel="stylesheet" type="text/css" href="{{ css }}">
 </head>
 <body>
-<h1>{{ now.strftime('%Y/%M/%d') }} - {{ title }}</h1>
+<h1>{{ now.strftime('%Y/%m/%d') }} - {{ title }}</h1>
 <ul>
 """
 
@@ -141,5 +158,5 @@ template_email_list_html_end = """
 """
 
 template_email_list_html_iter = """
-<li><a href="{{ url }}">{{ message.get_date().strftime('%Y/%M/%d') }} - {{ message.get_from_str() }}</a> to {{ message.get_to_str() }} - {{ message.get_field("subject") }}</li>
+<li><a href="{{ url }}">{{ message.get_date().strftime('%Y/%m/%d') }} - {{ message.get_from_str() }}</a> to {{ message.get_to_str() }} - {{ message.get_field("subject") }}</li>
 """

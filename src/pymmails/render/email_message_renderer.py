@@ -5,6 +5,7 @@
 """
 import os
 import re
+from pyquickhelper import noLOG
 from ..grabber.email_message import EmailMessage
 from ..helpers.buffer_files_writing import BufferFilesWriting
 from .email_message_style import template_email_html, template_email_css
@@ -19,7 +20,8 @@ class EmailMessageRenderer(Renderer):
     def __init__(self, tmpl=None, css=None,
                  style_table="dataframe100l",
                  style_highlight="dataframe100l_hl",
-                 buffer_write=None):
+                 buffer_write=None,
+                 fLOG=noLOG):
         """
         constructor, defines a template based
         on `Jinja2 <http://jinja.pocoo.org/docs/dev/>`_
@@ -29,6 +31,7 @@ class EmailMessageRenderer(Renderer):
         @param      style_table         style for the table
         @param      style_highlight     style for highlighted cells
         @param      buffer_write        instance of class @see cl BufferFilesWriting
+        @param      fLOG                logging function
 
         @example(Template to render an email)
 
@@ -46,7 +49,7 @@ class EmailMessageRenderer(Renderer):
             <body>
             {{ '<a href="{0}">&lt;--</a>'.format(prev_mail) if prev_mail else '' }}
             {{ '<a href="{0}">--&gt;</a>'.format(next_mail) if next_mail else '' }}
-            <h1>{{ message.get_date().strftime('%Y/%M/%d') }} - {{ message.get_field("subject") }}</h1>
+            <h1>{{ message.get_date().strftime('%Y/%m/%d') }} - {{ message.get_field("subject") }}</h1>
             <h2>attributes</h2>
             {{ render.produce_table_html(message, toshow=EmailMessage.subset, location=location, avoid=EmailMessage.avoid) }}
             <h2>message</h2>
@@ -174,9 +177,9 @@ class EmailMessageRenderer(Renderer):
             _css = css
 
         if buffer_write is None:
-            buffer_write = BufferFilesWriting()
+            buffer_write = BufferFilesWriting(fLOG=fLOG)
         Renderer.__init__(self, tmpl=_template, css=_css, style_table=style_table,
-                          style_highlight=style_highlight, buffer_write=buffer_write)
+                          style_highlight=style_highlight, buffer_write=buffer_write, fLOG=fLOG)
 
     def render(self, location, mail, attachments, file_css="mail_style.css",
                prev_mail=None, next_mail=None, **addition):
@@ -234,10 +237,10 @@ class EmailMessageRenderer(Renderer):
         html, css = self.render(
             location, mail, attachments, file_css=full_css,
             prev_mail=prev_mail, next_mail=next_mail, **addition)
-        if overwrite or not self.BufferWrite.exists(full_css):
+        if not self.BufferWrite.exists(full_css, local=not overwrite):
             f = self.BufferWrite.open(full_css, text=True, encoding=encoding)
             f.write(css)
-        if overwrite or not self.BufferWrite.exists(full_mail):
+        if not self.BufferWrite.exists(full_mail, local=not overwrite):
             f = self.BufferWrite.open(full_mail, text=True, encoding=encoding)
             f.write(html)
         return [full_mail, full_css]
@@ -280,13 +283,12 @@ class EmailMessageRenderer(Renderer):
 
         for i, a in enumerate(atts):
             filename, mid, cid = a
-            rows.append('<tr><td>{0}</td><td><a href="{1}">{2}</a> (size: {3} bytes, cid: {4})</td></tr>'.format(
-                        "attachment %d" % i,
+            rows.append('<tr><td>{0}</td><td><a href="{1}">{2}</a>{3}</td></tr>'.format(
+                        "attachment %d" % (i + 1),
                         os.path.relpath(
                             filename, location) if location else filename,
                         os.path.split(filename)[-1],
-                        os.stat(filename).st_size,
-                        cid))
+                        "id={0}".format(cid) if cid else ""))
 
         rows.append("</table>")
         rows.append("<br /></div>")

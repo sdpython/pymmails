@@ -4,6 +4,7 @@
 @brief Functions to dump emails
 """
 from jinja2 import Template
+from pyquickhelper import noLOG
 
 
 class Renderer:
@@ -14,7 +15,7 @@ class Renderer:
     def __init__(self, tmpl, css,
                  style_table="dataframe100l",
                  style_highlight="dataframe100l_hl",
-                 buffer_write=None):
+                 buffer_write=None, fLOG=noLOG):
         """
         constructor, defines a template based
         on `Jinja2 <http://jinja.pocoo.org/docs/dev/>`_
@@ -31,6 +32,7 @@ class Renderer:
         self._style_highlight = style_highlight
         self._session = None
         self._buffer_write = buffer_write
+        self.fLOG = fLOG
 
     def flush(self):
         """

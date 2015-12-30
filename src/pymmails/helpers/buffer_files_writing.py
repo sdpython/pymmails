@@ -4,6 +4,7 @@
 """
 import io
 import os
+from pyquickhelper import noLOG
 from .helpers_exceptions import FileAlreadyExistingException
 
 
@@ -14,22 +15,26 @@ class BufferFilesWriting:
     method *flush* actually writes the file
     """
 
-    def __init__(self):
+    def __init__(self, fLOG=noLOG):
         """
         constructor
         """
         self._nb = 0
         self._buffer = {}
         self._done = set()
+        self.fLOG = fLOG
 
-    def exists(self, name):
+    def exists(self, name, local=True):
         """
         tells if a file was already written
 
         @param      name        name
+        @param      local       check local existence too
         @return                 boolean
         """
-        return name in self._done or name in self._buffer or os.path.exists(name)
+        return name in self._done or \
+            name in self._buffer or \
+            (local and os.path.exists(name))
 
     def listfiles(self):
         """
@@ -105,6 +110,7 @@ class BufferFilesWriting:
                     b = buf.getvalue()
                     with open(name, "wb") as f:
                         f.write(b)
+                self.fLOG("BufferFilesWriting.flush [write {0}]".format(name))
                 del self._buffer[name]
                 self._done.add(name)
                 return len(b)
@@ -112,5 +118,7 @@ class BufferFilesWriting:
     def __del__(self):
         """
         destructor, flushes everything
+
+        use ``__exit__``?
         """
         self.flush(None)

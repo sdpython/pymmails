@@ -16,13 +16,16 @@ def iterator_prev_next(iter):
     the next item is the same at the end of the sequence
     """
     prev, item, next = None, None, None
+    notempty = False
     for current in iter:
+        notempty = True
         prev = item
         item = next
         next = current
         if item is not None:
             yield prev, item, next
-    prev = item
-    item = next
-    next = None
-    yield prev, item, next
+    if notempty:
+        prev = item
+        item = next
+        next = None
+        yield prev, item, next
