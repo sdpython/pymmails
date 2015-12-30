@@ -178,6 +178,11 @@ class MailBoxImap:
                     emailBody = data[0][1]
                     mail = email.message_from_bytes(
                         emailBody, _class=EmailMessage)
+                elif skip_function is None:
+                    typ, data = self.M.fetch(num, '(BODY[HEADER])')
+                    emailBody = data[0][1]
+                    mail = email.message_from_bytes(
+                        emailBody, _class=EmailMessage)
                 yield mail
 
             self.M.close()
