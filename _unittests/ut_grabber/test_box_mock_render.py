@@ -105,6 +105,14 @@ class TestMessageBoxMock(unittest.TestCase):
             raise Exception(content)
         if 'list of mails</h1>' not in content:
             raise Exception(content)
+        allfiles = render.BufferWrite.listfiles()
+        assert len(allfiles) > 0
+
+        allfiles.sort()
+        with open(allfiles[0], "r", encoding="utf8") as f:
+            content = f.read()
+        if '<a href="d_2015-08-01_p_noreply-voyages-sncf_com_ii_8de6a63addb7c03407bc6f0caabd967e.html">--&gt;</a>' not in content:
+            raise Exception(content)
 
 
 if __name__ == "__main__":

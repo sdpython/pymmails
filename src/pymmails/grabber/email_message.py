@@ -631,4 +631,6 @@ class EmailMessage (email.message.Message):
                             attachments=atts,
                             overwrite=params.get("overwrite", False),
                             file_css=params.get("file_css", "mail_style.css"),
-                            encoding=params.get("encoding", "utf8"))
+                            encoding=params.get("encoding", "utf8"),
+                            prev_mail=params.get("prev_mail", None),
+                            next_mail=params.get("next_mail", None))

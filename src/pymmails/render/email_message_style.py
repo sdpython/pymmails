@@ -109,8 +109,8 @@ template_email_html = """<?xml version="1.0" encoding="utf-8"?>
 <link rel="stylesheet" type="text/css" href="{{ css }}">
 </head>
 <body>
-{{ '<a pref="{0}">prev</a>'.format(prev_mail) if prev_mail else '' }}
-{{ '<a pref="{0}">next</a>'.format(next_mail) if next_mail else '' }}
+{{ '<a href="{0}">&lt;--</a>'.format(prev_mail) if prev_mail else '' }}
+{{ '<a href="{0}">--&gt;</a>'.format(next_mail) if next_mail else '' }}
 <h1>{{ message.get_date().strftime('%Y/%M/%d') }} - {{ message.get_field("subject") }}</h1>
 <h2>attributes</h2>
 {{ render.produce_table_html(message, toshow=EmailMessage.subset, location=location, avoid=EmailMessage.avoid) }}
