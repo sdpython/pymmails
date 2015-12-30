@@ -17,6 +17,23 @@ class MailBoxImap:
 
     """
     defines a mail box with IMAP interface
+
+    @example(Fetch mails from a gmail account)
+
+    ::
+
+        user = "address no domain"
+        pwd = "password"
+        server = "imap.gmail.com"
+
+        box = MailBoxImap(user, pwd, server, ssl=True)
+        box.login()
+
+        # ... fetch emails
+
+        box.logout()
+
+    @endexample
     """
 
     expFolderName = re.compile('\\"(.*?)\\"')
@@ -70,16 +87,19 @@ class MailBoxImap:
         return res
 
     def enumerate_mails_in_folder(
-            self, folder, skip_function=None, pattern="ALL"):
+            self, folder, skip_function=None, date=None, pattern="ALL", body=True):
         """
         enumerates all mails in folder folder
         @param      folder          folder name
         @param      skip_function   if not None, use this function on the header/body to avoid loading the entire message (and skip it)
         @param      pattern         search pattern (see below)
+        @param      date            add a date to the pattern
+        @param      body            add body
         @return                     iterator on (message)
 
         The search pattern can be used to look for a subset of email.
         It follows these `specifications <http://tools.ietf.org/html/rfc3501#page-49>`_.
+        If a folder is a subfolder, the syntax should be ``folder/subfolder``.
 
         @example(Search pattern)
 
@@ -108,6 +128,13 @@ class MailBoxImap:
         self.fLOG("MailBoxImap [folder={0}]".format(qfold))
         self.M.select(qfold, readonly=True)
 
+        if date is not None:
+            pdat = 'SINCE {0}'.format(date)
+            if pattern == "ALL":
+                pattern = pdat
+            else:
+                pattern += " " + pdat
+
         try:
             typ, data = self.M.search(None, pattern)
         except Exception as e:
@@ -124,7 +151,7 @@ class MailBoxImap:
                     pattern)
                 typ, data = self.M.search(None, pattern)
             else:
-                raise Exception(
+                raise MailException(
                     "unable to search for pattern: {0}\nin subfolder {1}\ncheck the folder you search for is right"
                     .format(pattern, qfold)) from e
 
@@ -139,7 +166,8 @@ class MailBoxImap:
                 if skip_function(mail):
                     continue
 
-            typ, data = self.M.fetch(num, '(RFC822)')
+            typ, data = self.M.fetch(
+                num, '(RFC822)' if body else '(BODY[HEADER])')
             emailBody = data[0][1]
             mail = email.message_from_bytes(emailBody, _class=EmailMessage)
             yield mail
