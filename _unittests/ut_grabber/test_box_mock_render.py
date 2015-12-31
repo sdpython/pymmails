@@ -111,7 +111,7 @@ class TestMessageBoxMock(unittest.TestCase):
         allfiles.sort()
         with open(allfiles[0], "r", encoding="utf8") as f:
             content = f.read()
-        if '<a href="d_2015-08-01_p_noreply-voyages-sncf_com_ii_8de6a63addb7c03407bc6f0caabd967e.html">--&gt;</a>' not in content:
+        if '<a href="d_2015-08-01_p_noreply-voyages-sncf_com_ii_8de6a63addb7c03407bc6f0caabd967e.html">&lt;--</a>' not in content:
             raise Exception(content)
 
 
