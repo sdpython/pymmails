@@ -5,7 +5,7 @@
 import io
 import os
 from pyquickhelper import noLOG
-from .helpers_exceptions import FileAlreadyExistingException
+from .helpers_exceptions import FileAlreadyExistingException, FileNotFlushedException
 
 
 class BufferFilesWriting:
@@ -15,14 +15,17 @@ class BufferFilesWriting:
     method *flush* actually writes the file
     """
 
-    def __init__(self, fLOG=noLOG):
+    def __init__(self, flush_every=20, fLOG=noLOG):
         """
         constructor
+
+        @param      flush_every     flush every 20 created files
         """
         self._nb = 0
         self._buffer = {}
         self._done = set()
         self.fLOG = fLOG
+        self._flush_every = flush_every
 
     def exists(self, name, local=True):
         """
@@ -60,6 +63,8 @@ class BufferFilesWriting:
         @param      encoding    encoding
         @return                 a buffer
         """
+        if len(self._buffer) > self._flush_every:
+            self.flush(None)
         if name in self._buffer:
             raise FileAlreadyExistingException(name)
         if text:
@@ -117,8 +122,8 @@ class BufferFilesWriting:
 
     def __del__(self):
         """
-        destructor, flushes everything
-
-        use ``__exit__``?
+        destructor, check everything was flushed
         """
-        self.flush(None)
+        if len(self._buffer) > 0:
+            raise FileNotFlushedException(
+                "\n".join(sorted(self._buffer.keys())))

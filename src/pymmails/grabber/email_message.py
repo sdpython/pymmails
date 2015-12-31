@@ -6,7 +6,9 @@
 
 import os
 import re
+import json
 import email
+import datetime
 import email.header
 import email.message
 import dateutil.parser
@@ -41,6 +43,7 @@ class EmailMessage(email.message.Message):
     avoid = ["X-me-spamcause", "X-YMail-OSG"]
 
     additionnalMimeType = additional_mime_type_ext_type
+    _date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
 
     def as_bytes(self):
         """
@@ -464,6 +467,14 @@ class EmailMessage(email.message.Message):
                 str(st))
         return p
 
+    def get_date_str(self):
+        """
+        return the date into a string
+
+        @return     date as a string (iso format)
+        """
+        return self.get_date().strftime(EmailMessage._date_format)
+
     def default_filename(self):
         """
         define a default filename (no extension)
@@ -552,22 +563,27 @@ class EmailMessage(email.message.Message):
         res["attached"] = self.get_nb_attachements()
         return res
 
-    def dump_attachments(self, attach_folder=".", buffer_write=None, fLOG=noLOG):
+    def dump_attachments(self, attach_folder=".", buffer_write=None, metadata=True, fLOG=noLOG):
         """
         Dumps the mail into a folder using HTML format.
         If the destination files already exists, it skips it.
         If an attachments already has the same name, it chooses another one.
 
-        @param  attach_folder   destination folder
-        @param  buffer_write    None or instance of @see cl BufferFilesWriting
-        @param  fLOG            logging function
-        @return                 list of attachments
+        @param      attach_folder   destination folder
+        @param      buffer_write    None or instance of @see cl BufferFilesWriting
+        @param      metadata        if True, also dump metadata about attachments
+        @param      fLOG            logging function
+        @return                     list of attachments
 
         The results is a list of 3-uple:
 
         * full name of the attachments
         * message id
         * content id
+
+        The metadata contains information about the mail it comes from.
+        The data is stored in a json format (except for date).
+        It is stored in a file with extension ``.metadata``.
         """
         def local_exists(name):
             if buffer_write:
@@ -575,7 +591,7 @@ class EmailMessage(email.message.Message):
             else:
                 return os.path.exists(name)
         atts = []
-        for att in self.enumerate_attachments():
+        for ai, att in enumerate(self.enumerate_attachments()):
             if att[1] is None:
                 continue
             att_id = att[2]
@@ -596,14 +612,31 @@ class EmailMessage(email.message.Message):
                     to +
                     ")\n" +
                     str(att))
+
             fLOG("dump attachment:", to)
+
+            if metadata:
+                d2 = dict(index=ai, filename=os.path.split(to)[-1],
+                          mail=self.default_filename() + ".html",
+                          from_=self.get_from(), to=self.get_to(),
+                          date=self.get_date_str(), uid=self.UniqueID)
+                st = StringIO()
+                json.dump(d2, st)
+                meta_text = st.getvalue()
+                meta_name = to + ".metadata"
 
             if buffer_write is None:
                 with open(to, "wb") as f:
                     f.write(att[1])
+                if metadata:
+                    with open(meta_name, "r", encoding="utf8") as f:
+                        f.write(meta_text)
             else:
                 f = buffer_write.open(to, text=False)
                 f.write(att[1])
+                if metadata:
+                    f = buffer_write.open(meta_name, text=True)
+                    f.write(meta_text)
 
             atts.append((to, att_id, cont_id))
         return atts
@@ -633,3 +666,20 @@ class EmailMessage(email.message.Message):
                             encoding=params.get("encoding", "utf8"),
                             prev_mail=params.get("prev_mail", None),
                             next_mail=params.get("next_mail", None))
+
+    @staticmethod
+    def read_metadata(metafile):
+        """
+        """
+        if isinstance(metafile, str):
+            if len(metafile) < 5000 and os.path.exists(metafile):
+                with open(metafile, "r", encoding="utf8") as f:
+                    d2 = json.load(f)
+            else:
+                f = StringIO(metafile)
+                d2 = json.load(f)
+        else:
+            d2 = json.load(metafile)
+        d2["date"] = datetime.datetime.strptime(
+            d2["date"], EmailMessage._date_format)
+        return d2
