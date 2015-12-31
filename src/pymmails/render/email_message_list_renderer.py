@@ -123,7 +123,7 @@ class EmailMessageListRenderer(Renderer):
         self.fLOG("EmailMessageListRenderer.render.iterate")
 
         def iter_on_mail():
-            for i, mail3 in enumerate(iterator_prev_next(iter)):
+            for i, mail3 in enumerate(iterator_prev_next(sorted(iter))):
                 prev, item, next = mail3
                 if i % 10 == 9:
                     self.fLOG("EmailMessageListRenderer.render.iterate", i + 1)

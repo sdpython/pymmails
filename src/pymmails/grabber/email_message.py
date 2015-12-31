@@ -241,8 +241,7 @@ class EmailMessage(email.message.Message):
         """
         usual
         """
-        return "-".join([str(self.get_date()), str(self.get_from()),
-                         str(self.get_to()), self.UniqueID, self["subject"]])
+        return (self.get_date(), self.get_from(), self.get_to(), self.UniqueID, self["subject"])
 
     def __lt__(self, at):
         """
