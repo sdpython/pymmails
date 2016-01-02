@@ -36,6 +36,9 @@ README / Changes
      :target: https://requires.io/github/sdpython/pymmails/requirements/?branch=master
      :alt: Requirements Status   
     
+.. image:: https://codecov.io/github/codecov/pymmails/coverage.svg?branch=master
+    :target: https://codecov.io/github/codecov/pymmails?branch=master
+   
 
 
 **Links:**
