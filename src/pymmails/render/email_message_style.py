@@ -102,6 +102,9 @@ template_email_css = """
 """
 
 template_email_html = """<?xml version="1.0" encoding="utf-8"?>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+</head>
 <body>
 <html>
 <head>
@@ -123,6 +126,9 @@ template_email_html = """<?xml version="1.0" encoding="utf-8"?>
 """
 
 template_email_html_short = """<?xml version="1.0" encoding="utf-8"?>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+</head>
 <body>
 <html>
 <head>
@@ -140,6 +146,9 @@ template_email_html_short = """<?xml version="1.0" encoding="utf-8"?>
 """
 
 template_email_list_html_begin = """<?xml version="1.0" encoding="utf-8"?>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+</head>
 <body>
 <html>
 <head>
