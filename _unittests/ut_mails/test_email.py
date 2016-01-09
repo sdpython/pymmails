@@ -75,9 +75,14 @@ class TestEmail (unittest.TestCase):
                 del sys.path[-1]
 
         tos = obj.get_to()
+        tod = obj.get_to(field="Delivered-To")
         cc = obj.get_to(True)
+        assert cc is None
+        fLOG("tos", len(tos), tos)
+        fLOG("tod", len(tod), tod)
         fLOG("cc", cc)
-        assert len(cc) == 1
+        assert len(tos) > 1
+        self.assertEqual(len(tod), 1)
         fro = obj.get_from()
         fLOG(tos)
         fLOG(fro)
@@ -91,49 +96,7 @@ class TestEmail (unittest.TestCase):
                     obj.get_field("subject"),
                     "projet 3A - élément logiciel"))
         fLOG(obj.Fields)
-        assert len(tos) > 10
-
-        exp = """
-            wwww1ww.wwwwwww@xxxxx.xx
-            wwww2ww.wwan@xxxxx.xx
-            wwwwwww.wwwrrab@xxxxx.xx
-            wwwwwwpe.ww@xxxxx.xx
-            wwwwwe.wwwwt@xxxxx.xx
-            wwww.wwwww@xxxxx.xx
-            wwwww.wwwwwL@xxxxx.xx
-            wwwwn.wwwwwwwE@xxxxx.xx
-            wwwwww.wwwwwwre@xxxxx.xx
-            wwwwwww.ww@xxxxx.xx
-            wwwwwwne.wwwww.wwwwww@xxxxx.xx
-            wwwwwn.wwwwy@xxxxx.xx
-            wwwww.wwwwww@xxxxx.xx
-            wwwo.wwwwwer@xxxxx.xx
-            wwwwwwin.wwwwwt@xxxxx.xx
-            wwwww.wwwwwwwI@xxxxx.xx
-            wwwweo.wwwwwww@xxxxx.xx
-            wwwwwwlt.wwwwwl@xxxxx.xx
-            wwwwwww.wwwwwwt@xxxxx.xx
-            wwwwas wwwwy <wwwwas.wwwwwer@xxxxx.xx>
-            wwwwo.wwwwAYA@xxxxx.xx
-            wwww.wwwba@xxxxx.xx
-            wwwwwwy.wwwwwwD@xxxxx.xx
-            wwwwwn.wwwRI@xxxxx.xx
-            wwwwwww.wwwwwiez@xxxxx.xx
-            wwww.www.ww@xxxxx.xx
-            Xavier zzzzz <xavier.zzzzz@xxxxx.xxx>
-            wwwthieu yyyyy <yyyyy.matthieu@xxxxx.xxx>
-            wwwwws wwwwout <wwwwwwwwwwwww@xxxxx.xxx>
-            """.replace("            ", "").strip("\n\r\t ").split("\n")
-        fLOG(len(exp), len(tos))
-        end = min(len(exp), len(tos))
-        for i, j in zip(exp[:end], tos[:end]):
-            if j[1] not in i:
-                raise Exception(
-                    "issue with {0} and {1} .... {2}".format(
-                        i, j[1], [
-                            i, j[1]]))
-
-        assert len(exp) == len(tos)
+        assert len(tos) == 8
 
     def test_tohtml(self):
         fLOG(

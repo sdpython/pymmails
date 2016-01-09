@@ -246,13 +246,25 @@ class EmailMessage(email.message.Message):
         """
         usual
         """
-        return (self.get_date(), self.get_from(), self.get_to(), self.UniqueID, self["subject"])
+        key = [self.get_date(), self.get_from(), self.get_to(),
+               self.UniqueID, self["subject"]]
+        for i, k in enumerate(key):
+            if isinstance(k, tuple):
+                if None in k:
+                    key[i] = tuple("" if _ is None else _ for _ in k)
+                elif k is None:
+                    key[i] = ""
+        return tuple(key)
 
     def __lt__(self, at):
         """
         usual
         """
-        return self.__sortkey__() < at.__sortkey__()
+        try:
+            return self.__sortkey__() < at.__sortkey__()
+        except TypeError as e:
+            raise Exception("issue with\n{0}\n{1}".format(
+                self.__sortkey__(), at.__sortkey__())) from e
 
     #: use for method @see me call_decode_header
     _search_encodings = ["iso-8859-1", "windows-1252", "UTF-8", "utf-8"]
@@ -387,14 +399,16 @@ class EmailMessage(email.message.Message):
         gr = cp.groups()
         return gr[1], gr[2]
 
-    def get_to_str(self, cc=False):
+    def get_to_str(self, cc=False, field="to"):
         """
         return a string for the receivers
 
         @param      cc      get receivers or second receivers
+        @param      field   field to use, ``to`` or ``Delivered-To``
+                            (the second one is used as a backup anyway)
         @return             string
         """
-        to = self.get_to(cc=cc)
+        to = self.get_to(cc=cc, field=field)
         res = []
         for l, a in to:
             if l:
@@ -403,14 +417,16 @@ class EmailMessage(email.message.Message):
                 res.append(a)
         return ";".join(res)
 
-    def get_to(self, cc=False):
+    def get_to(self, cc=False, field="to"):
         """
         return the receivers
 
         @param      cc      get receivers or second receivers
+        @param      field   field to use, ``to`` or ``Delivered-To``
+                            (the second one is used as a backup anyway)
         @return             list of tuple [ ( label, email address) ]
         """
-        st = self["to" if not cc else "cc"]
+        st = self[field if not cc else "cc"]
         if st is None and not cc:
             st = self["Delivered-To"]
         if st is None:
