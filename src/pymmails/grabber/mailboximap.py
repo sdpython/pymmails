@@ -233,9 +233,10 @@ class MailBoxImap:
                     folder, skip_function=skip_function, pattern=pat2):
                 if max_dest > 0:
                     tos = mail.get_to()
-                    l = len(tos)
-                    if l <= max_dest:
-                        yield mail
+                    if tos:
+                        l = len(tos)
+                        if l <= max_dest:
+                            yield mail
                 else:
                     yield mail
 

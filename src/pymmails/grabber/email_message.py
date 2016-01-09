@@ -34,6 +34,7 @@ class EmailMessage(email.message.Message):
     expMail1 = re.compile('(\\"([^;,]*?)\\" )?<([^;, ]+?@[^;, ]+)>')
     expMail2 = re.compile('(([^;,]*?) )?<([^;, ]+?@[^;, ]+)>')
     expMail3 = re.compile('(\\"([^;,]*?)\\" )?([^;, ]+?@[^;, ]+)')
+    expMail4 = re.compile('((=[?]([^;,]+?)[?]=)? ?<([^;, ]+?@[^;, ]+)>)')
     expMailA = re.compile(
         '({0})|({1})|({2})'.format(
             expMail1.pattern,
@@ -257,12 +258,13 @@ class EmailMessage(email.message.Message):
     _search_encodings = ["iso-8859-1", "windows-1252", "UTF-8", "utf-8"]
 
     @staticmethod
-    def call_decode_header(st):
+    def call_decode_header(st, is_email=False):
         """
         call `email.header.decode_header <https://docs.python.org/3.4/library/email.header.html#email.header.decode_header>`_
 
-        @param      st      string or `email.header.Header <https://docs.python.org/3.4/library/email.header.html#email.header.Header>`_
-        @return             text, encoding
+        @param      st          string or `email.header.Header <https://docs.python.org/3.4/library/email.header.html#email.header.Header>`_
+        @param      is_email    does something sepcific for emails
+        @return                 text, encoding
         """
         if isinstance(st, email.header.Header):
             text, encoding = email.header.decode_header(st)[0]
@@ -274,54 +276,69 @@ class EmailMessage(email.message.Message):
             else:
                 return text, encoding
         elif isinstance(st, str):
-            text, encoding = email.header.decode_header(st)[0]
-            if isinstance(text, bytes):
-                position = None
-                if encoding is None:
-                    # maybe the string contrains several encoding
-                    for enc in EmailMessage._search_encodings:
-                        look = "=?%s?" % enc
-                        if look in st:
-                            position = st.find(look)
+            if is_email:
+                zall = EmailMessage.expMail4.findall(st)
+                if zall:
+                    res = []
+                    for add in zall:
+                        head, enc = EmailMessage.call_decode_header(
+                            add[0], is_email=False)
+                        fin = "{0} <{1}>".format(head, add[-1])
+                        res.append(fin)
+                    return "; ".join(res), enc
+                else:
+                    return EmailMessage.call_decode_header(st, is_email=False)
+            else:
+                text, encoding = email.header.decode_header(st)[0]
+                if isinstance(text, bytes):
+                    position = None
+                    if encoding is None:
+                        # maybe the string contrains several encoding
+                        for enc in EmailMessage._search_encodings:
+                            look = "=?%s?" % enc
+                            if look in st:
+                                position = st.find(look)
 
-                    if position == 0:
-                        # otherwise we face an infinite loop
-                        position = None
+                        if position == 0:
+                            # otherwise we face an infinite loop
+                            position = None
 
-                    if position is not None:
-                        first = st[:position]
-                        second = st[position:]
-                        dec1, enc1 = EmailMessage.call_decode_header(first)
-                        dec2, enc2 = EmailMessage.call_decode_header(second)
+                        if position is not None:
+                            first = st[:position]
+                            second = st[position:]
+                            dec1, enc1 = EmailMessage.call_decode_header(first)
+                            dec2, enc2 = EmailMessage.call_decode_header(
+                                second)
 
-                        if isinstance(dec1, str) and isinstance(dec2, str):
-                            enc = enc2 if enc1 is None else enc1
-                            return dec1 + dec2, enc
+                            if isinstance(dec1, str) and isinstance(dec2, str):
+                                enc = enc2 if enc1 is None else enc1
+                                return dec1 + dec2, enc
+                            else:
+                                warnings.warn(
+                                    'decoding issue\n   File "{0}", line {1},\nunable to decode string:\n{2}\neven split into:\n1: {3}\n2: {4}'.format(
+                                        __file__,
+                                        250,
+                                        st.replace("\r", " ").replace(
+                                            "\n", " "),
+                                        first.replace("\r", " ").replace(
+                                            "\n", " "),
+                                        second.replace("\r", " ").replace("\n", " ")))
+                                return st, None
                         else:
                             warnings.warn(
-                                'decoding issue\n   File "{0}", line {1},\nunable to decode string:\n{2}\neven split into:\n1: {3}\n2: {4}'.format(
+                                'decoding issue\n   File "{0}", line {1},\nunable to decode string:\n{2}'.format(
                                     __file__,
-                                    250,
-                                    st.replace("\r", " ").replace("\n", " "),
-                                    first.replace("\r", " ").replace(
-                                        "\n", " "),
-                                    second.replace("\r", " ").replace("\n", " ")))
+                                    260,
+                                    st.replace(
+                                        "\r",
+                                        " ").replace(
+                                        "\n",
+                                        " ")))
                             return st, None
                     else:
-                        warnings.warn(
-                            'decoding issue\n   File "{0}", line {1},\nunable to decode string:\n{2}'.format(
-                                __file__,
-                                260,
-                                st.replace(
-                                    "\r",
-                                    " ").replace(
-                                    "\n",
-                                    " ")))
-                        return st, None
+                        return text.decode(encoding), encoding
                 else:
-                    return text.decode(encoding), encoding
-            else:
-                return text, encoding
+                    return text, encoding
         else:
             raise TypeError("cannot decode type: {0}".format(type(st)))
 
@@ -347,7 +364,7 @@ class EmailMessage(email.message.Message):
         """
         st = self["from"]
         if isinstance(st, email.header.Header):
-            text, encoding = EmailMessage.call_decode_header(st)
+            text, encoding = EmailMessage.call_decode_header(st, is_email=True)
             if text is None:
                 raise MailException(
                     "unable to parse: " +
@@ -365,7 +382,8 @@ class EmailMessage(email.message.Message):
                 if not cp:
                     if text.startswith('"=?utf-8?'):
                         text = text.strip('"')
-                        text, encoding = EmailMessage.call_decode_header(text)
+                        text, encoding = EmailMessage.call_decode_header(
+                            text, is_email=True)
         gr = cp.groups()
         return gr[1], gr[2]
 
@@ -392,8 +410,12 @@ class EmailMessage(email.message.Message):
         @param      cc      get receivers or second receivers
         @return             list of tuple [ ( label, email address) ]
         """
-        st = self["to" if not cc else "Delivered-To"]
-        text, encoding = EmailMessage.call_decode_header(st)
+        st = self["to" if not cc else "cc"]
+        if st is None and not cc:
+            st = self["Delivered-To"]
+        if st is None:
+            return None
+        text, encoding = EmailMessage.call_decode_header(st, is_email=True)
         if text is None:
             raise MailException("unable to parse: " + str(st))
 
@@ -408,22 +430,24 @@ class EmailMessage(email.message.Message):
         for st in EmailMessage.expMailA.finditer(text):
             gr = st.groups()
             if len(gr) != 12:
-                raise Exception(
+                raise MailException(
                     "unexpected error due to a change in regular expressions")
             values = gr[2], gr[3], gr[6], gr[7], gr[10], gr[11]
             label = find_unnone(values[::2])
             add = find_unnone(values[1::2])
             if label is not None:
                 label = label.strip(" \r\n\t")
-                text, encoding = EmailMessage.call_decode_header(label)
+                text, encoding = EmailMessage.call_decode_header(
+                    label, is_email=True)
                 if text.startswith('"=?utf-8?'):
                     text = text.strip('"')
-                    text, encoding = EmailMessage.call_decode_header(text)
+                    text, encoding = EmailMessage.call_decode_header(
+                        text, is_email=True)
                 cp.append((text, add))
             else:
                 cp.append((None, add))
 
-        return cp
+        return cp if cp else None
 
     def get_date(self):
         """
