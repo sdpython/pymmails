@@ -105,7 +105,8 @@ class MailBoxMock(MailBoxImap):
         @param      max_dest        maximum number of receivers
         @return                     iterator on (message)
         """
-        raise NotImplementedError()
+        return self.enumerate_mails_in_folder(folder=folder, 
+                skip_function=skip_function)
 
     def enumerate_search_subject(self,
                                  subject,
