@@ -15,6 +15,7 @@ import dateutil.parser
 import mimetypes
 import hashlib
 import warnings
+from collections import OrderedDict
 from io import BytesIO, StringIO
 from email.generator import BytesGenerator, Generator
 from pyquickhelper import noLOG
@@ -484,12 +485,34 @@ class EmailMessage(email.message.Message):
         a, b = self.get_from()
         if len(b) == 0:
             raise MailException("from is unknown: " + self["from"])
-        b = b.replace("@", "-").replace(".", "_")
+        b = b.replace("@", "-at-").replace(".", "-")
         date = self.get_date()
         d = "%04d-%02d-%02d" % (date.year, date.month, date.day)
         f = "d_{0}_p_{1}_ii_{2}".format(d, b, self.UniqueID)
         return f.replace(
             "\\", "-").replace("\r", "").replace("\n", "-").replace("%", "-").replace("/", "-")
+
+    @staticmethod
+    def interpret_default_filename(name):
+        """
+        reverse engineer method @see me default_filename
+
+        @param      name        filename
+        @return                 dictionary
+
+        The function creates a dictionary with keys date, from, uid, name.
+        """
+        pieces = name.split("_")
+        res = {}
+        for i, p in enumerate(pieces):
+            if p == "d" and "date" not in res:
+                res["date"] = pieces[i + 1]
+            elif p == "p" and "from" not in res:
+                res["from"] = pieces[i + 1]
+            elif p == "ii" and "uid" not in res:
+                res["uid"] = pieces[i + 1].split(".")[0]
+        res["name"] = name
+        return res
 
     @property
     def UniqueID(self):
@@ -620,6 +643,7 @@ class EmailMessage(email.message.Message):
                           mail=self.default_filename() + ".html",
                           from_=self.get_from(), to=self.get_to(),
                           date=self.get_date_str(), uid=self.UniqueID)
+                d2 = OrderedDict(sorted(d2.items()))
                 st = StringIO()
                 json.dump(d2, st)
                 meta_text = st.getvalue()
@@ -682,4 +706,5 @@ class EmailMessage(email.message.Message):
             d2 = json.load(metafile)
         d2["date"] = datetime.datetime.strptime(
             d2["date"], EmailMessage._date_format)
+        d2 = OrderedDict(sorted(d2.items()))
         return d2

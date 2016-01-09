@@ -7,7 +7,6 @@ import sys
 import os
 import unittest
 import pickle
-from collections import OrderedDict
 
 try:
     import src
@@ -43,19 +42,19 @@ from src.pymmails import MailBoxImap, EmailMessage, MailBoxMock, EmailMessageRen
 from pyquickhelper import fLOG
 
 
-class TestMetaData(unittest.TestCase):
+class TestDefault(unittest.TestCase):
 
-    def test_metadata(self):
+    def test_default_filename(self):
         fLOG(
             __file__,
             self._testMethodName,
             OutputPrint=__name__ == "__main__")
-        data = os.path.abspath(os.path.join(os.path.dirname(__file__), "data"))
-        meta = os.path.join(data, "e.ipynb.metadata")
-        d2 = EmailMessage.read_metadata(meta)
-        fLOG(d2)
-        fLOG(type(d2))
-        self.assertIsInstance(d2, OrderedDict)
+
+        name = "d_2015-08-01_p_noreply-at-voyages-sncf-com_ii_52df24c718fdf138f997e73c383798eb.html"
+        res = EmailMessage.interpret_default_filename(name)
+        self.assertIsInstance(res, dict)
+        self.assertEqual(len(res), 4)
+        self.assertEqual(res["date"], "2015-08-01")
 
 
 if __name__ == "__main__":
