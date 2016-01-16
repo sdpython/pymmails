@@ -275,7 +275,7 @@ class EmailMessage(email.message.Message):
         call `email.header.decode_header <https://docs.python.org/3.4/library/email.header.html#email.header.decode_header>`_
 
         @param      st          string or `email.header.Header <https://docs.python.org/3.4/library/email.header.html#email.header.Header>`_
-        @param      is_email    does something sepcific for emails
+        @param      is_email    does something specific for emails
         @return                 text, encoding
         """
         if isinstance(st, email.header.Header):
@@ -284,7 +284,15 @@ class EmailMessage(email.message.Message):
                 if encoding is None:
                     raise ValueError(
                         "encoding cannot be None if the returned string is bytes")
-                return text.decode(encoding), encoding
+                if encoding == "unknown-8bit":
+                    try:
+                        res = text.decode("utf8")
+                    except UnicodeDecodeError:
+                        res = text.decode("ascii", errors="ignore")
+                        # raise ValueError("encoding {0} is unexpected in\n{1}".format(encoding, st)) from e
+                    return res, "ascii"
+                else:
+                    return text.decode(encoding), encoding
             else:
                 return text, encoding
         elif isinstance(st, str):
