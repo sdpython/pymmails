@@ -76,6 +76,23 @@ class BufferFilesWriting:
         self._nb += 1
         return buf
 
+    def read_binary_content(self, name, local=True):
+        """
+        return the content of file (binary format)
+
+        @param      name        name
+        @param      local       check local existence too and read the content from it
+        @return                 boolean
+        """
+        if name in self._buffer:
+            content = self._buffer[name][0].getvalue()
+            if isinstance(content, str):
+                content = bytes(content, self._buffer[name][1])
+        else:
+            with open(name, "rb") as f:
+                content = f.read()
+        return content
+
     def flush(self, name, upto=False):
         """
         flush a file (actually write it) and make it disappear from the list of buffered files,

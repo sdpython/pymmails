@@ -638,7 +638,8 @@ class EmailMessage(email.message.Message):
         """
         Dumps the mail into a folder using HTML format.
         If the destination files already exists, it skips it.
-        If an attachments already has the same name, it chooses another one.
+        If an attachments already has the same name, it chooses another one if
+        the attachment is different (otherwise it keeps it as it is).
 
         @param      attach_folder   destination folder
         @param      buffer_write    None or instance of @see cl BufferFilesWriting
@@ -661,6 +662,15 @@ class EmailMessage(email.message.Message):
                 return buffer_write.exists(name)
             else:
                 return os.path.exists(name)
+
+        def local_different(to, content):
+            if buffer_write:
+                with open(to, "rb") as f:
+                    c2 = f.read()
+            else:
+                c2 = buffer_write.read_binary_content(to)
+            return c2 != content
+
         atts = []
         for ai, att in enumerate(self.enumerate_attachments()):
             if att[1] is None:
@@ -670,45 +680,49 @@ class EmailMessage(email.message.Message):
             to = os.path.split(att[0].replace(":", "_"))[-1]
             to = os.path.join(attach_folder, to)
             spl = os.path.splitext(to)
-            i = 1
-            while local_exists(to):
-                to = spl[0] + (".%d" % i) + spl[1]
-                i += 1
+            if local_exists(to):
+                # must be different otherwise we don't do anything
+                different = local_different(to, att[1])
+                if different:
+                    i = 1
+                    while local_exists(to):
+                        to = spl[0] + (".%d" % i) + spl[1]
+                        i += 1
+            else:
+                different = True
 
             to = to.replace("\n", "_").replace("\r", "")
             to = os.path.abspath(to)
             if "?" in to:
                 raise MailException(
-                    "issue with attachments (mail to " +
-                    to +
-                    ")\n" +
-                    str(att))
+                    "issue with attachments (mail to {0})\n{1}".format(to, att))
 
             fLOG("dump attachment:", to)
 
-            if metadata:
-                d2 = dict(index=ai, filename=os.path.split(to)[-1],
-                          mail=self.default_filename() + ".html",
-                          from_=self.get_from(), to=self.get_to(),
-                          date=self.get_date_str(), uid=self.UniqueID)
-                d2 = OrderedDict(sorted(d2.items()))
-                st = StringIO()
-                json.dump(d2, st)
-                meta_text = st.getvalue()
-                meta_name = to + ".metadata"
+            if different:
+                if metadata:
+                    d2 = dict(index=ai, filename=os.path.split(to)[-1],
+                              mail=self.default_filename() + ".html",
+                              from_=self.get_from(), to=self.get_to(),
+                              date=self.get_date_str(), uid=self.UniqueID)
+                    d2 = OrderedDict(sorted(d2.items()))
+                    st = StringIO()
+                    json.dump(d2, st)
+                    meta_text = st.getvalue()
+                    meta_name = to + ".metadata"
 
-            if buffer_write is None:
-                with open(to, "wb") as f:
+                if buffer_write is None:
+                    with open(to, "wb") as f:
+                        f.write(att[1])
+                    if metadata:
+                        with open(meta_name, "r", encoding="utf8") as f:
+                            f.write(meta_text)
+                else:
+                    f = buffer_write.open(to, text=False)
                     f.write(att[1])
-                if metadata:
-                    with open(meta_name, "r", encoding="utf8") as f:
+                    if metadata:
+                        f = buffer_write.open(meta_name, text=True)
                         f.write(meta_text)
-            else:
-                f = buffer_write.open(to, text=False)
-                f.write(att[1])
-                if metadata:
-                    f = buffer_write.open(meta_name, text=True)
-                    f.write(meta_text)
 
             atts.append((to, att_id, cont_id))
         return atts
