@@ -192,7 +192,8 @@ class MailBoxImap:
                                 folder,
                                 skip_function=None,
                                 date=None,
-                                max_dest=5):
+                                max_dest=5,
+                                body=True):
         """
         enumerates all mails in folder folder from a user or sent to a user
 
@@ -201,6 +202,7 @@ class MailBoxImap:
         @param      skip_function   if not None, use this function on the header/body to avoid loading the entire message (and skip it)
         @param      pattern         search pattern (see below)
         @param      max_dest        maximum number of receivers
+        @param      body            get the body
         @return                     iterator on (message)
 
         If *person* is a list, the function iterates on the list of
@@ -209,11 +211,9 @@ class MailBoxImap:
         if isinstance(person, list):
             unique_id = set()
             for p in person:
-                mail_set = self.enumerate_search_person(p,
-                                                        folder=folder,
-                                                        skip_function=skip_function,
-                                                        date=date,
-                                                        max_dest=max_dest)
+                mail_set = self.enumerate_search_person(p, folder=folder,
+                                                        skip_function=skip_function, date=date,
+                                                        max_dest=max_dest, body=body)
                 for mail in mail_set:
                     uid = mail.UniqueID
                     if uid not in unique_id:
@@ -223,8 +223,8 @@ class MailBoxImap:
             pat1 = 'FROM "{0}"'.format(person)
             if date is not None:
                 pat1 += ' SINCE {0}'.format(date)
-            for mail in self.enumerate_mails_in_folder(
-                    folder, skip_function=skip_function, pattern=pat1):
+            for mail in self.enumerate_mails_in_folder(folder, skip_function=skip_function,
+                                                       pattern=pat1, body=body):
                 yield mail
             pat2 = 'TO "{0}"'.format(person)
             if date is not None:
