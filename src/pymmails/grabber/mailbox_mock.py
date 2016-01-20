@@ -94,7 +94,8 @@ class MailBoxMock(MailBoxImap):
                                 folder,
                                 skip_function=None,
                                 date=None,
-                                max_dest=5):
+                                max_dest=5,
+                                body=True):
         """
         enumerates all mails in folder folder from a user or sent to a user
 
@@ -103,6 +104,7 @@ class MailBoxMock(MailBoxImap):
         @param      skip_function   if not None, use this function on the header/body to avoid loading the entire message (and skip it)
         @param      pattern         search pattern (see below)
         @param      max_dest        maximum number of receivers
+        @param      body            also extract the body
         @return                     iterator on (message)
         """
         return self.enumerate_mails_in_folder(folder=folder, skip_function=skip_function)
