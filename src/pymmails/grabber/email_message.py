@@ -665,10 +665,10 @@ class EmailMessage(email.message.Message):
 
         def local_different(to, content):
             if buffer_write:
+                c2 = buffer_write.read_binary_content(to)
+            else:
                 with open(to, "rb") as f:
                     c2 = f.read()
-            else:
-                c2 = buffer_write.read_binary_content(to)
             return c2 != content
 
         atts = []
