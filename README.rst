@@ -42,12 +42,10 @@ README / Changes
 
 
 **Links:**
-    * `pypi/pymmails <https://pypi.python.org/pypi/pymmails/>`_
-    * `GitHub/pymmails <https://github.com/sdpython/pymmails/>`_
-    * `documentation <http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html>`_
-    * `Windows Setup <http://www.xavierdupre.fr/site2013/index_code.html#pymmails>`_
-    * `Travis <https://travis-ci.org/sdpython/pymmails>`_
-    * `Blog <http://www.xavierdupre.fr/app/pymmails/helpsphinx/blog/main_0000.html#ap-main-0>`_
+
+* `GitHub/pymmails <https://github.com/sdpython/pymmails/>`_
+* `documentation <http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html>`_
+* `Blog <http://www.xavierdupre.fr/app/pymmails/helpsphinx/blog/main_0000.html#ap-main-0>`_
 
 
 Description
