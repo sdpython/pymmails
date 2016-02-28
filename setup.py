@@ -181,5 +181,7 @@ if not r:
         packages=packages,
         package_dir=package_dir,
         package_data=package_data,
-        install_requires=["pyquickhelper"],
+        install_requires=["pyquickhelper", 
+                          "pycryptodomex"  # to use encryption from pyquickhelper
+                          ],
     )

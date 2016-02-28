@@ -75,3 +75,4 @@ mccabe
 pep8
 mistune
 pyquickhelper
+pycryptodomex
