@@ -41,7 +41,6 @@ path.py
 pickleshare
 pkgtools
 pycparser
-pycryptodome
 pyparsing
 pyreadline
 python-dateutil
