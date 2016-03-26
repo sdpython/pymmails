@@ -7,7 +7,7 @@ import os
 import datetime
 import collections
 from jinja2 import Template
-from pyquickhelper import noLOG
+from pyquickhelper.loghelper import noLOG
 from ..helpers import iterator_prev_next
 from .renderer import Renderer
 from .email_message_style import template_email_list_html_iter, template_email_list_html_begin, template_email_list_html_end, template_email_css

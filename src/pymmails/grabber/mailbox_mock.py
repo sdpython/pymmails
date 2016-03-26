@@ -9,7 +9,7 @@ import email.message
 
 from .email_message import EmailMessage
 from .mailboximap import MailBoxImap
-from pyquickhelper import noLOG
+from pyquickhelper.loghelper import noLOG
 from pyquickhelper.filehelper.encryption import decrypt_stream
 
 

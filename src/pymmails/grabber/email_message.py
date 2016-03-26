@@ -18,7 +18,7 @@ import warnings
 from collections import OrderedDict
 from io import BytesIO, StringIO
 from email.generator import BytesGenerator, Generator
-from pyquickhelper import noLOG
+from pyquickhelper.loghelper import noLOG
 
 from .mail_exception import MailException
 from .additional_mime_type import additional_mime_type_ext_type

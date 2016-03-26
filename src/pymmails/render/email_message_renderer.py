@@ -5,7 +5,7 @@
 """
 import os
 import re
-from pyquickhelper import noLOG
+from pyquickhelper.loghelper import noLOG
 from ..grabber.email_message import EmailMessage
 from ..helpers.buffer_files_writing import BufferFilesWriting
 from .email_message_style import template_email_html, template_email_css

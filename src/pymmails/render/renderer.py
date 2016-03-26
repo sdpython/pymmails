@@ -4,7 +4,7 @@
 @brief Functions to dump emails
 """
 from jinja2 import Template
-from pyquickhelper import noLOG
+from pyquickhelper.loghelper import noLOG
 
 
 class Renderer:

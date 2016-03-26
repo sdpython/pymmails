@@ -4,7 +4,7 @@
 """
 import io
 import os
-from pyquickhelper import noLOG
+from pyquickhelper.loghelper import noLOG
 from .helpers_exceptions import FileAlreadyExistingException, FileNotFlushedException
 
 

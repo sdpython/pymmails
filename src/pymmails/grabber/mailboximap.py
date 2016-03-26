@@ -10,7 +10,7 @@ import email.message
 
 from .mail_exception import MailException
 from .email_message import EmailMessage
-from pyquickhelper import noLOG
+from pyquickhelper.loghelper import noLOG
 
 
 class MailBoxImap:
