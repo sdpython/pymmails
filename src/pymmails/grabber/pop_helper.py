@@ -5,7 +5,7 @@
 
 import poplib
 
-from pyquickhelper import noLOG
+from pyquickhelper.loghelper import noLOG
 
 
 def retrieve_mails_pop(user, password, server, begin=0, end=-1, fLOG=noLOG):
