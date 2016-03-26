@@ -21,7 +21,7 @@ except ImportError:
     import src
 
 try:
-    import pyquickhelper
+    import pyquickhelper as skip_
 except ImportError:
     path = os.path.normpath(
         os.path.abspath(
@@ -34,11 +34,11 @@ except ImportError:
                 "src")))
     if path not in sys.path:
         sys.path.append(path)
-    import pyquickhelper
+    import pyquickhelper as skip_
 
 
 from src.pymmails import MailBoxImap
-from pyquickhelper import fLOG
+from pyquickhelper.loghelper import fLOG
 
 
 class TestGrab (unittest.TestCase):

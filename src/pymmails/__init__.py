@@ -2,6 +2,14 @@
 """
 Documentation for this file.
 """
+from .grabber.mail_exception import MailException
+from .grabber.email_message import EmailMessage
+from .grabber.mailboximap import MailBoxImap
+from .grabber.mailbox_mock import MailBoxMock
+from .render.email_message_renderer import EmailMessageRenderer
+from .render.email_message_list_renderer import EmailMessageListRenderer
+from .sender.email_sender import create_smtp_server, send_email, compose_email
+
 
 __version__ = "0.2"
 __author__ = "Xavier Dupré"
@@ -28,12 +36,3 @@ def check(log=False):
     @return             0 or exception
     """
     return True
-
-
-from .grabber.mail_exception import MailException
-from .grabber.email_message import EmailMessage
-from .grabber.mailboximap import MailBoxImap
-from .grabber.mailbox_mock import MailBoxMock
-from .render.email_message_renderer import EmailMessageRenderer
-from .render.email_message_list_renderer import EmailMessageListRenderer
-from .sender.email_sender import create_smtp_server, send_email, compose_email

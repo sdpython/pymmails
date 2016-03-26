@@ -5,7 +5,6 @@
 import sys
 import os
 import unittest
-import socket
 
 try:
     import src
@@ -21,7 +20,7 @@ except ImportError:
     import src
 
 try:
-    import pyquickhelper
+    import pyquickhelper as skip_
 except ImportError:
     path = os.path.normpath(
         os.path.abspath(
@@ -34,11 +33,11 @@ except ImportError:
                 "src")))
     if path not in sys.path:
         sys.path.append(path)
-    import pyquickhelper
+    import pyquickhelper as skip_
 
 
 from src.pymmails import create_smtp_server, send_email, compose_email, MailBoxImap
-from pyquickhelper import fLOG
+from pyquickhelper.loghelper import fLOG
 
 
 class TestSend(unittest.TestCase):
@@ -73,7 +72,7 @@ class TestSend(unittest.TestCase):
         imap = MailBoxImap("somebody", "pwd", "imap.gmail.com", True)
         imap.login()
         iter = imap.enumerate_search_subject("subject", "inbox")
-        fs = imap.dump_html(iter, "destination")
+        imap.dump_html(iter, "destination")
         imap.logout()
 
 

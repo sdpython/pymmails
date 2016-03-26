@@ -736,7 +736,8 @@ class EmailMessage(email.message.Message):
         @param      attach_folder   folder for the attachments, it will be created if it does not exist
         @param      buffer_write    None or instance of @see cl BufferFilesWriting
         @param      fLOG            logging function
-        @param      params          others parameters, see :meth:`EmailMessageRenderer.write <pymmails.grabber.email_message_renderer.EmailMessageRenderer.write>`
+        @param      params          others parameters, see
+                                    :meth:`EmailMessageRenderer.write <pymmails.grabber.email_message_renderer.EmailMessageRenderer.write>`
         @return                     list of stored files
         """
         full_fold = os.path.join(location, attach_folder)

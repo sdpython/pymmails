@@ -6,7 +6,6 @@
 import sys
 import os
 import unittest
-import pickle
 
 try:
     import src
@@ -22,7 +21,7 @@ except ImportError:
     import src
 
 try:
-    import pyquickhelper
+    import pyquickhelper as skip_
 except ImportError:
     path = os.path.normpath(
         os.path.abspath(
@@ -35,11 +34,12 @@ except ImportError:
                 "src")))
     if path not in sys.path:
         sys.path.append(path)
-    import pyquickhelper
+    import pyquickhelper as skip_
 
 
-from src.pymmails import MailBoxImap, EmailMessage, MailBoxMock, EmailMessageRenderer, EmailMessageListRenderer
-from pyquickhelper import fLOG, get_temp_folder
+from src.pymmails import MailBoxMock, EmailMessageRenderer, EmailMessageListRenderer
+from pyquickhelper.loghelper import fLOG
+from pyquickhelper.pycode import get_temp_folder
 
 
 class TestMessageBoxMock(unittest.TestCase):

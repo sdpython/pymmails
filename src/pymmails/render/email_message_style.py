@@ -167,5 +167,6 @@ template_email_list_html_end = """
 """
 
 template_email_list_html_iter = """
-<li><a href="{{ url }}">{{ message.get_date().strftime('%Y/%m/%d') }} - {{ message.get_from_str() }}</a> to {{ message.get_to_str() }} - {{ message.get_field("subject") }}</li>
+<li><a href="{{ url }}">{{ message.get_date().strftime('%Y/%m/%d') }} -
+ {{ message.get_from_str() }}</a> to {{ message.get_to_str() }} - {{ message.get_field("subject") }}</li>
 """
