@@ -237,8 +237,10 @@ class EmailMessage(email.message.Message):
                                             str([cont]))
             else:
                 cont = part.get_payload(decode=True)
-                cont_id = part["Message-ID"]
-                cont_id2 = part["Content-ID"]
+                cont_id = part[
+                    "Message-ID"].strip("<>") if part["Message-ID"] else None
+                cont_id2 = part[
+                    "Content-ID"].strip("<>") if part["Content-ID"] else None
 
             yield fileName, cont, cont_id, cont_id2
 
