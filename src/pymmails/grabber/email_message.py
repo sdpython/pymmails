@@ -378,9 +378,10 @@ class EmailMessage(email.message.Message):
 
     def get_from(self):
         """
-        returns a tuple (label, email address)
+        returns a tuple (label, email address) or a list of groups
+        from the regular expression
 
-        @return     tuple ( label, email address)
+        @return     tuple       ( label, email address)
         """
         st = self["from"]
         if isinstance(st, email.header.Header):
@@ -406,6 +407,30 @@ class EmailMessage(email.message.Message):
                             text, is_email=True)
         gr = cp.groups()
         return gr[1], gr[2]
+
+    def get_name(self):
+        """
+        return the sender name of an email (if available)
+
+        @return     name (or None if not found)
+        """
+        st = self["from"]
+        if isinstance(st, email.header.Header):
+            text, encoding = EmailMessage.call_decode_header(st, is_email=True)
+            if text is None:
+                raise MailException(
+                    "unable to parse: " +
+                    str(text) +
+                    "\n" +
+                    str(st))
+        else:
+            text = st
+
+        if "<" in text:
+            r = text.split("<")[0].strip()
+            return r if r else None
+        else:
+            return None
 
     def get_to_str(self, cc=False, field="to"):
         """
@@ -757,6 +782,10 @@ class EmailMessage(email.message.Message):
     @staticmethod
     def read_metadata(metafile):
         """
+        read metadata assuming metafile contaings a json string
+
+        @param      metafile        json string
+        @return                     dictionary
         """
         if isinstance(metafile, str):
             if len(metafile) < 5000 and os.path.exists(metafile):
