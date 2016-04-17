@@ -16,12 +16,7 @@ from email.mime.text import MIMEText
 COMMASPACE = ', '
 
 
-def compose_email(
-        fr,
-        to,
-        subject,
-        body=None,
-        attachements=None):
+def compose_email(fr, to, subject, body=None, attachements=None):
     """
     compose an email as a string
 
@@ -109,11 +104,7 @@ def create_smtp_server(host, username, password):
     return server
 
 
-def send_email(server, fr,
-               to,
-               subject,
-               body=None,
-               attachements=None):
+def send_email(server, fr, to, subject, body=None, attachements=None):
     """
     compose an email as a string
 
@@ -144,10 +135,6 @@ def send_email(server, fr,
     explains how to enable that option.
     @endFAQ
     """
-    astring = compose_email(
-        fr,
-        to,
-        subject,
-        body=body,
-        attachements=attachements)
+    astring = compose_email(fr, to, subject, body=body,
+                            attachements=attachements)
     server.sendmail(fr, to, astring)
