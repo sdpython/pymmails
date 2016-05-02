@@ -16,14 +16,16 @@ from email.mime.text import MIMEText
 COMMASPACE = ', '
 
 
-def compose_email(fr, to, subject, body=None, attachements=None):
+def compose_email(fr, to, subject, body_html=None, body_text=None, attachements=None, cc=None):
     """
     compose an email as a string
 
     @param      fr              from
-    @param      to              destination (or list of receivers)
+    @param      to              receiver (or list of receivers)
     @param      subject         subject
-    @param      body            body
+    @param      body_text       body text
+    @param      body_html       body html
+    @param      cc              list of ccs
     @param      attachements    list of files to attach to the email
     @return                     string
 
@@ -31,8 +33,8 @@ def compose_email(fr, to, subject, body=None, attachements=None):
     """
     if isinstance(to, str):
         to = [to]
-    if body is None:
-        body = ""
+    if isinstance(cc, str):
+        cc = [cc]
     if attachements is None:
         attachements = []
 
@@ -41,6 +43,16 @@ def compose_email(fr, to, subject, body=None, attachements=None):
     outer['Subject'] = subject
     outer['To'] = COMMASPACE.join(to)
     outer['From'] = fr
+
+    if body_text is not None:
+        part1 = MIMEText(body_text, 'plain')
+        outer.attach(part1)
+    if body_html is not None:
+        part2 = MIMEText(body_html, 'html')
+        outer.attach(part2)
+
+    if cc is not None:
+        outer["Cc"] = ";".join(cc)
     outer.preamble = 'prepared by pymmails.\n'
 
     for filename in attachements:
@@ -104,7 +116,8 @@ def create_smtp_server(host, username, password):
     return server
 
 
-def send_email(server, fr, to, subject, body=None, attachements=None):
+def send_email(server, fr, to, subject, body_html=None, body_text=None,
+               attachements=None, delay_sending=False):
     """
     compose an email as a string
 
@@ -112,16 +125,21 @@ def send_email(server, fr, to, subject, body=None, attachements=None):
     @param      fr              from
     @param      to              destination (or list of receivers)
     @param      subject         subject
-    @param      body            body
+    @param      body_text       body text
+    @param      body_html       body html
     @param      attachements    list of files to attach to the email
-    @return                     string
+    @param      delay_sending   if True, the function returns a function which will send the mail if
+                                executed
+    @return                     function (if *delay_sending*), return of
+                                `sendmail <https://docs.python.org/3.5/library/smtplib.html#smtplib.SMTP.sendmail>`_
+                                otherwise
 
     @example(Send an email)
     @code
     from pymmails import create_smtp_server, send_email
     server = create_smtp_server("gmail", "somebody", "pwd")
-    send_email(server, "somebody.like.me@gmail.com",
-               "somebody.like.you@else.com", "subject",
+    send_email(server, "from.sender@gmail.com",
+               "to.receiver@else.com", "subject",
                attachements = [ os.path.abspath(__file__) ])
     server.quit()
     @endcode
@@ -135,6 +153,11 @@ def send_email(server, fr, to, subject, body=None, attachements=None):
     explains how to enable that option.
     @endFAQ
     """
-    astring = compose_email(fr, to, subject, body=body,
-                            attachements=attachements)
-    server.sendmail(fr, to, astring)
+    astring = compose_email(fr, to, subject, body_html=body_html,
+                            body_text=body_text, attachements=attachements)
+    if delay_sending:
+        def f(fr=fr, to=to, astring=astring):
+            server.sendmail(fr, to, astring)
+        return f
+    else:
+        return server.sendmail(fr, to, astring)
