@@ -117,13 +117,14 @@ def create_smtp_server(host, username, password):
 
 
 def send_email(server, fr, to, subject, body_html=None, body_text=None,
-               attachements=None, delay_sending=False):
+               attachements=None, delay_sending=False, cc=None):
     """
     compose an email as a string
 
     @param      server          result from function @see fn create_smtp_server
     @param      fr              from
     @param      to              destination (or list of receivers)
+    @param      cc              cc
     @param      subject         subject
     @param      body_text       body text
     @param      body_html       body html
@@ -153,7 +154,7 @@ def send_email(server, fr, to, subject, body_html=None, body_text=None,
     explains how to enable that option.
     @endFAQ
     """
-    astring = compose_email(fr, to, subject, body_html=body_html,
+    astring = compose_email(fr, to, subject, body_html=body_html, cc=cc,
                             body_text=body_text, attachements=attachements)
     if delay_sending:
         def f(fr=fr, to=to, astring=astring):
