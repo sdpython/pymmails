@@ -16,7 +16,7 @@ from email.mime.text import MIMEText
 COMMASPACE = ', '
 
 
-def compose_email(fr, to, subject, body_html=None, body_text=None, attachements=None, cc=None):
+def compose_email(fr, to, subject, body_html=None, body_text=None, attachements=None, cc=None, bcc=None):
     """
     compose an email as a string
 
@@ -26,6 +26,7 @@ def compose_email(fr, to, subject, body_html=None, body_text=None, attachements=
     @param      body_text       body text
     @param      body_html       body html
     @param      cc              list of ccs
+    @param      bcc             list of bccs
     @param      attachements    list of files to attach to the email
     @return                     string
 
@@ -36,6 +37,8 @@ def compose_email(fr, to, subject, body_html=None, body_text=None, attachements=
         to = [to]
     if isinstance(cc, str):
         cc = [cc]
+    if isinstance(bcc, str):
+        bcc = [bcc]
     if attachements is None:
         attachements = []
 
@@ -44,6 +47,10 @@ def compose_email(fr, to, subject, body_html=None, body_text=None, attachements=
     outer['Subject'] = subject
     outer['To'] = COMMASPACE.join(to)
     outer['From'] = fr
+    if cc is not None:
+        outer["CC"] = COMMASPACE.join(cc)
+    if bcc is not None:
+        outer["BCC"] = COMMASPACE.join(bcc)
 
     if body_html is not None:
         part2 = MIMEText(body_html, 'html')
@@ -55,8 +62,6 @@ def compose_email(fr, to, subject, body_html=None, body_text=None, attachements=
         # no body
         pass
 
-    if cc is not None:
-        outer["Cc"] = ";".join(cc)
     outer.preamble = 'prepared by pymmails.\n'
 
     for filename in attachements:
@@ -121,7 +126,7 @@ def create_smtp_server(host, username, password):
 
 
 def send_email(server, fr, to, subject, body_html=None, body_text=None,
-               attachements=None, delay_sending=False, cc=None):
+               attachements=None, delay_sending=False, cc=None, bcc=None):
     """
     compose an email as a string
 
@@ -129,6 +134,7 @@ def send_email(server, fr, to, subject, body_html=None, body_text=None,
     @param      fr              from
     @param      to              destination (or list of receivers)
     @param      cc              cc
+    @param      bcc             bcc
     @param      subject         subject
     @param      body_text       body text
     @param      body_html       body html
@@ -158,8 +164,18 @@ def send_email(server, fr, to, subject, body_html=None, body_text=None,
     explains how to enable that option.
     @endFAQ
     """
-    astring = compose_email(fr, to, subject, body_html=body_html, cc=cc,
+    astring = compose_email(fr, to, subject, body_html=body_html, cc=cc, bcc=bcc,
                             body_text=body_text, attachements=attachements)
+    to = list(to) if isinstance(to, (list, tuple)) else [to]
+    if isinstance(cc, str):
+        to.append(cc)
+    elif isinstance(cc, (list, tuple)):
+        to.extend(cc)
+    if isinstance(bcc, str):
+        to.append(bcc)
+    elif isinstance(bcc, (list, tuple)):
+        to.extend(bcc)
+
     if delay_sending:
         def f(fr=fr, to=to, astring=astring):
             server.sendmail(fr, to, astring)
