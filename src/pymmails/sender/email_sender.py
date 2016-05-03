@@ -30,6 +30,7 @@ def compose_email(fr, to, subject, body_html=None, body_text=None, attachements=
     @return                     string
 
     If the file is a text file, the filename can be replaced by (filename, encoding).
+    If *body_html* and *body_text* are filled, only the first one will be used.
     """
     if isinstance(to, str):
         to = [to]
@@ -44,12 +45,15 @@ def compose_email(fr, to, subject, body_html=None, body_text=None, attachements=
     outer['To'] = COMMASPACE.join(to)
     outer['From'] = fr
 
-    if body_text is not None:
-        part1 = MIMEText(body_text, 'plain')
-        outer.attach(part1)
     if body_html is not None:
         part2 = MIMEText(body_html, 'html')
         outer.attach(part2)
+    elif body_text is not None:
+        part1 = MIMEText(body_text, 'plain')
+        outer.attach(part1)
+    else:
+        # no body
+        pass
 
     if cc is not None:
         outer["Cc"] = ";".join(cc)
