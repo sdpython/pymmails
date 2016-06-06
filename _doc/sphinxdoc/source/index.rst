@@ -46,7 +46,8 @@ pymmails documentation
 `documentation <http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html>`_,
 `wheel <http://www.xavierdupre.fr/site2013/index_code.html#pymmails>`_,
 :ref:`l-README`,
-:ref:`blog <ap-main-0>`
+:ref:`blog <ap-main-0>`,
+:ref:`l-issues-todolist`
 
 What is it?
 -----------
