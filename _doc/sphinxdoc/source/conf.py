@@ -20,6 +20,6 @@ from pyquickhelper.helpgen.default_conf import set_sphinx_variables
 
 set_sphinx_variables(__file__, "pymmails", "Xavier Dupré", 2016,
                      "alabaster", None, locals(), add_extensions=None,
-                     extlinks=dict(issue=('https://github.com/sdpython/pymmails/issues/%d', 'issue')))
+                     extlinks=dict(issue=('https://github.com/sdpython/pymmails/issues/%s', 'issue')))
 
 blog_root = "http://www.xavierdupre.fr/app/pymmails/helpsphinx/"
