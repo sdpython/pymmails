@@ -2,8 +2,8 @@
 
 .. _l-README:
 
-README / Changes
-================
+README
+======
 
 .. image:: https://travis-ci.org/sdpython/pymmails.svg?branch=master
     :target: https://travis-ci.org/sdpython/pymmails
@@ -93,10 +93,3 @@ This project contains various helper about logging functions, unit tests and hel
 * a file ``setup.py`` to build and to install the module
 * a file ``make_help.py`` to build the sphinx documentation
     
-
-Versions
---------
-
-* **0.3 - 2016/??/??**
-    * **new:** new design
-
