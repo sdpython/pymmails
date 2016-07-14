@@ -42,7 +42,7 @@ from pyquickhelper.loghelper import fLOG
 
 class TestSend(unittest.TestCase):
 
-    def test_send_email(self):
+    def test_compose_email(self):
         fLOG(
             __file__,
             self._testMethodName,
@@ -53,6 +53,21 @@ class TestSend(unittest.TestCase):
         assert len(st) > 0
         assert "main_wrapper_tests(__file__)" in st
         assert "To: machinto@gmail.com" in st
+
+    def test_send_email(self):
+        fLOG(
+            __file__,
+            self._testMethodName,
+            OutputPrint=__name__ == "__main__")
+        st = send_email(None, "machine@gmail.com", "machinto@gmail.com",
+                        "subject", cc=["a@a"], bcc=["b@b"], delay_sending=True,
+                        attachements=[os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", "run_unittests.py")])
+        assert st is not None
+        try:
+            st()
+            assert False
+        except AttributeError:
+            return
 
     def should_bemocked_test_server_send(self):
         fLOG(
