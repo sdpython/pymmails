@@ -706,25 +706,30 @@ class EmailMessage(email.message.Message):
             cont_id = att[3]
             to = os.path.split(att[0].replace(":", "_"))[-1]
             to = os.path.join(attach_folder, to)
+
+            to = to.replace("\n", "_").replace("\r", "")
+            to = os.path.abspath(to)
             spl = os.path.splitext(to)
+
+            if "?" in to:
+                raise MailException(
+                    "issue with attachments (mail to {0})\n{1}".format(to, att))
+
             if local_exists(to):
+                already = True
                 # must be different otherwise we don't do anything
                 different = local_different(to, att[1])
                 if different:
                     i = 1
                     while local_exists(to):
-                        to = spl[0] + (".%d" % i) + spl[1]
+                        to = spl[0] + (".(%d)" % i) + spl[1]
                         i += 1
             else:
+                already = False
                 different = True
 
-            to = to.replace("\n", "_").replace("\r", "")
-            to = os.path.abspath(to)
-            if "?" in to:
-                raise MailException(
-                    "issue with attachments (mail to {0})\n{1}".format(to, att))
-
-            fLOG("dump attachment:", to)
+            fLOG("dump attachment:", to,
+                 "different={0} notnew={1}".format(different, already))
 
             if different:
                 if metadata:
