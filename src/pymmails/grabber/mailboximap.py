@@ -234,8 +234,8 @@ class MailBoxImap:
                 if max_dest > 0:
                     tos = mail.get_to()
                     if tos:
-                        l = len(tos)
-                        if l <= max_dest:
+                        ll = len(tos)
+                        if ll <= max_dest:
                             yield mail
                 else:
                     yield mail

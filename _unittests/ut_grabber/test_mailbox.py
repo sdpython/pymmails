@@ -79,5 +79,6 @@ class TestMailBox(unittest.TestCase):
         render.flush()
         box.logout()
 
+
 if __name__ == "__main__":
     unittest.main()
