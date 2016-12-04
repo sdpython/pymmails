@@ -39,7 +39,7 @@ except ImportError:
 
 from src.pymmails import MailBoxImap, EmailMessageRenderer
 from pyquickhelper.loghelper import fLOG
-from pyquickhelper.pycode import get_temp_folder
+from pyquickhelper.pycode import get_temp_folder, is_travis_or_appveyor
 
 
 class TestMailBox(unittest.TestCase):
@@ -50,8 +50,11 @@ class TestMailBox(unittest.TestCase):
             self._testMethodName,
             OutputPrint=__name__ == "__main__")
 
-        code = "voju/uftu/1/teqzuipo%"
-        code = "".join(chr(ord(_) - 1) for _ in code)
+        if is_travis_or_appveyor():
+            warnings.warn("requires a password")
+        import keyring
+        code = keyring.get_password(
+            "sdut", os.environ["COMPUTERNAME"] + "pymmails")
         box = MailBoxImap("unittest.sdpython", code,
                           "imap.gmail.com", ssl=True, fLOG=fLOG)
         box.login()
@@ -66,9 +69,12 @@ class TestMailBox(unittest.TestCase):
             self._testMethodName,
             OutputPrint=__name__ == "__main__")
 
+        if is_travis_or_appveyor():
+            warnings.warn("requires a password")
+        import keyring
+        code = keyring.get_password(
+            "sdut", os.environ["COMPUTERNAME"] + "pymmails")
         temp = get_temp_folder(__file__, "temp_dump")
-        code = "voju/uftu/1/teqzuipo%"
-        code = "".join(chr(ord(_) - 1) for _ in code)
         box = MailBoxImap("unittest.sdpython", code,
                           "imap.gmail.com", ssl=True, fLOG=fLOG)
         render = EmailMessageRenderer()
