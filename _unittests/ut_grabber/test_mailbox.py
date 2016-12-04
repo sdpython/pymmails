@@ -53,6 +53,7 @@ class TestMailBox(unittest.TestCase):
 
         if is_travis_or_appveyor():
             warnings.warn("requires a password")
+            return
         import keyring
         code = keyring.get_password(
             "sdut", os.environ["COMPUTERNAME"] + "pymmails")
@@ -72,6 +73,7 @@ class TestMailBox(unittest.TestCase):
 
         if is_travis_or_appveyor():
             warnings.warn("requires a password")
+            return
         import keyring
         code = keyring.get_password(
             "sdut", os.environ["COMPUTERNAME"] + "pymmails")
