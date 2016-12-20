@@ -1,7 +1,3 @@
-.. project_name documentation documentation master file, created by
-   sphinx-quickstart on Fri May 10 18:35:14 2013.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
 
 pymmails documentation
 ======================
@@ -85,16 +81,16 @@ Installation
 ``pip install pymmails``
     
 
-Quick start
------------
+Galleries
+---------
 
 .. toctree::
-    :maxdepth: 1
+    :maxdepth: 2
     
-    all_example
-    all_notebooks
-        
-        
+    gyexamples/index
+    gynotebooks/index            
+
+
 Functionalities
 ---------------
 
