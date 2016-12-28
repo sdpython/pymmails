@@ -1,31 +1,29 @@
 
-
 .. blogpost::
     :title: pymmails for teachings
     :keywords: about
     :date: 2015-06-06
     :categories: teachings
-    
-    Over the past year, I needed this module in two cases. 
+
+    Over the past year, I needed this module in two cases.
     I set up a remote notebook server for my students this year
     and they needed to retrieve data they produced on this remote
-    machine. IPython 3 solved that issue by exposing links to any 
-    new file but IPython could not do that. So, I suggested to 
+    machine. IPython 3 solved that issue by exposing links to any
+    new file but IPython could not do that. So, I suggested to
     send emails with attachments and I implemented a module
     to make it easier::
-    
+
         from pymmails import create_smtp_server, send_email
         server = create_smtp_server("gmail", "somebody", "pwd")
-        send_email(server, "somebody@gmail.com", "somebody@else.com", 
+        send_email(server, "somebody@gmail.com", "somebody@else.com",
                         "subject", attachements = [ os.path.abspath(__file__) ])
         server.quit()
-        
+
     With more than 80 students to follow, it is difficult to download
     reports, files for every student project I need to evaluate.
     To avoid that, I just move every email I receive in a separate folder
     in my inbox and I dump this folder on my laptop::
-    
-    
+
         def grab_mails(mailbox, emails, subfolder, date, no_domain=False):
             """
             look for some emails in a mail box
@@ -55,11 +53,10 @@
 
         imap = pymmails.MailBoxImap("firstname.lastname", "pwd", "imap.gmail.com", True)
         imap.login()
-        
+
         listmails = grab_mails(emails=["student@school.country", mailbox=imap,
                                subfolder="inbox_folder_teachings", date="1-Oct-2014",
-                               no_domain=no_domain)        
-        
+                               no_domain=no_domain)
+
         mailbox.dump_html(listmails, "local_folder")
-        imap.logout()    
-            
+        imap.logout()

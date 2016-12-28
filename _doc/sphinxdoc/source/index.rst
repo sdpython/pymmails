@@ -5,34 +5,33 @@ pymmails documentation
 .. image:: https://travis-ci.org/sdpython/pymmails.svg?branch=master
     :target: https://travis-ci.org/sdpython/pymmails
     :alt: Build status
-   
+
 .. image:: https://ci.appveyor.com/api/projects/status/isbawgkh38kmw0lw?svg=true
     :target: https://ci.appveyor.com/project/sdpython/pymmails
     :alt: Build Status Windows
-    
+
 .. image:: https://badge.fury.io/py/pymmails.svg
     :target: http://badge.fury.io/py/pymmails
-   
+
 .. image:: http://img.shields.io/github/issues/sdpython/pymmails.png
     :alt: GitHub Issues
     :target: https://github.com/sdpython/pymmails/issues
-    
+
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
     :alt: MIT License
-    :target: http://opensource.org/licenses/MIT     
-   
+    :target: http://opensource.org/licenses/MIT
+
 .. image:: https://landscape.io/github/sdpython/pymmails/master/landscape.svg?style=flat
    :target: https://landscape.io/github/sdpython/pymmails/master
-   :alt: Code Health         
-   
+   :alt: Code Health
+
 .. image:: https://requires.io/github/sdpython/pymmails/requirements.svg?branch=master
      :target: https://requires.io/github/sdpython/pymmails/requirements/?branch=master
-     :alt: Requirements Status   
-    
+     :alt: Requirements Status
+
 .. image:: https://codecov.io/github/sdpython/pymmails/coverage.svg?branch=master
     :target: https://codecov.io/github/sdpython/pymmails?branch=master
-   
-   
+
 **Links:** `pypi <https://pypi.python.org/pypi/pymmails/>`_,
 `github <https://github.com/sdpython/pymmails/>`_,
 `documentation <http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html>`_,
@@ -59,10 +58,10 @@ Here is the code I use::
     render = EmailMessageRenderer()
     box.login()
     for mail in box.enumerate_mails_in_folder("saved", pattern="<pattern>") :
-        mail.dump(render, location=temp, fLOG=fLOG)    
+        mail.dump(render, location=temp, fLOG=fLOG)
     box.logout()
     render.flush()
-    
+
 Some examples of patterns::
 
     pattern='FROM "xavier" SINCE 1-Feb-2013'
@@ -73,23 +72,21 @@ Some examples of patterns::
     pattern='LARGER 10000 SMALLER 1000000'
     pattern='SUBJECT "programmation"'
     pattern='TO "student" FLAGGED'
-    pattern='UNSEEN'    
-    
+    pattern='UNSEEN'
+
 Installation
 ------------
 
 ``pip install pymmails``
-    
 
 Galleries
 ---------
 
 .. toctree::
     :maxdepth: 2
-    
-    gyexamples/index
-    gynotebooks/index            
 
+    gyexamples/index
+    gynotebooks/index
 
 Functionalities
 ---------------
@@ -101,8 +98,6 @@ By default, IMAP functionalities are not enabled on gmail (if you have
 a gmail account), it can be enabled from the settings page
 (see `Enable POP and IMAP for Google Apps <https://support.google.com/a/answer/105694>`_).
 
-
-    
 Indices and tables
 ------------------
 
@@ -114,12 +109,10 @@ Indices and tables
 | :ref:`genindex`      |  :ref:`l-FAQ`       | :ref:`l-notebooks`  |                    | :ref:`l-statcode`      | `Unit Test Coverage <coverage/index.html>`_    |
 +----------------------+---------------------+---------------------+--------------------+------------------------+------------------------------------------------+
 
-
 Navigation
 ----------
 
 .. toctree::
     :maxdepth: 1
 
-    indexmenu   
-
+    indexmenu
