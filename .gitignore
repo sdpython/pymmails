@@ -246,3 +246,7 @@ auto_*.bat
 auto_setup_dep.py
 auto_*.py
 auto_*.xml
+_doc/sphinxdoc/source/phdoc_static/style_notebook_snippet.css
+_doc/sphinxdoc/source/LICENSE.txt
+_doc/sphinxdoc/source/phdoc_static/require.js
+
