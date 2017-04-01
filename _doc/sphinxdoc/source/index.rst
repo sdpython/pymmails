@@ -74,6 +74,8 @@ Some examples of patterns::
     pattern='TO "student" FLAGGED'
     pattern='UNSEEN'
 
+See `pattern specifications <https://tools.ietf.org/html/rfc3501#page-49>`_.
+
 Installation
 ------------
 
