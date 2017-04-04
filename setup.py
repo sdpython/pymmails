@@ -117,6 +117,7 @@ def verbose():
 # version
 ##########
 
+
 if is_local():
     def write_version():
         pyquickhelper = import_pyquickhelper()

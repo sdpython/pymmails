@@ -408,13 +408,21 @@ class EmailMessage(email.message.Message):
                         text, encoding = EmailMessage.call_decode_header(
                             text, is_email=True)
         gr = cp.groups()
-        return gr[1], gr[2]
+        name, mail = gr[1], gr[2]
+        if name is None:
+            name = self.get_name(_fallback_get_from=False)
+        elif name.startswith("=?"):
+            name, encoding = EmailMessage.call_decode_header(name)
+            if name is None:
+                name = gr[1]
+        return name, mail
 
-    def get_name(self):
+    def get_name(self, _fallback_get_from=True):
         """
         return the sender name of an email (if available)
 
-        @return     name (or None if not found)
+        @param      _fallback_get_from      internal parameter, avoir recursion
+        @return                             name (or None if not found)
         """
         st = self["from"]
         if isinstance(st, email.header.Header):
@@ -425,14 +433,18 @@ class EmailMessage(email.message.Message):
                     str(text) +
                     "\n" +
                     str(st))
+        elif st.startswith("=?"):
+            text, encoding = EmailMessage.call_decode_header(st)
         else:
             text = st
 
         if "<" in text:
             r = text.split("<")[0].strip()
             return r if r else None
+        elif text is None and _fallback_get_from:
+            return self.get_from()[0]
         else:
-            return None
+            return text
 
     def get_to_str(self, cc=False, field="to"):
         """
