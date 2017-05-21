@@ -15,7 +15,6 @@ __version__ = "0.2"
 __author__ = "Xavier Dupré"
 __github__ = "https://github.com/sdpython/pymmails"
 __url__ = "http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html"
-__downloadUrl__ = "http://www.xavierdupre.fr/site2013/index_code.html#pymmails"
 __license__ = "MIT License"
 
 
