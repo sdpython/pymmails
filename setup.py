@@ -175,7 +175,7 @@ if is_local():
         unittest_modules=["pyquickhelper"],
         additional_notebook_path=["pyquickhelper"],
         requirements=["pyquickhelper"], fLOG=logging_function,
-        covtoken=("c17fe586-68b7-4157-9af0-a73c92d16fc7", "'_UT_35_std' in outfile"))
+        covtoken=("c17fe586-68b7-4157-9af0-a73c92d16fc7", "'_UT_36_std' in outfile"))
     if not r and not ({"bdist_msi", "sdist",
                        "bdist_wheel", "publish", "publish_doc", "register",
                        "upload_docs", "bdist_wininst"} & set(sys.argv)):
