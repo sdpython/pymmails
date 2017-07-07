@@ -2,35 +2,37 @@
 pymmails documentation
 ======================
 
-.. image:: https://travis-ci.org/sdpython/pymmails.svg?branch=master
-    :target: https://travis-ci.org/sdpython/pymmails
-    :alt: Build status
+.. only:: html
 
-.. image:: https://ci.appveyor.com/api/projects/status/hqhhdndvayrx0r9k?svg=true
-    :target: https://ci.appveyor.com/project/sdpython/pymmails
-    :alt: Build Status Windows
+    .. image:: https://travis-ci.org/sdpython/pymmails.svg?branch=master
+        :target: https://travis-ci.org/sdpython/pymmails
+        :alt: Build status
 
-.. image:: https://badge.fury.io/py/pymmails.svg
-    :target: http://badge.fury.io/py/pymmails
+    .. image:: https://ci.appveyor.com/api/projects/status/hqhhdndvayrx0r9k?svg=true
+        :target: https://ci.appveyor.com/project/sdpython/pymmails
+        :alt: Build Status Windows
 
-.. image:: http://img.shields.io/github/issues/sdpython/pymmails.png
-    :alt: GitHub Issues
-    :target: https://github.com/sdpython/pymmails/issues
+    .. image:: https://badge.fury.io/py/pymmails.svg
+        :target: http://badge.fury.io/py/pymmails
 
-.. image:: https://img.shields.io/badge/license-MIT-blue.svg
-    :alt: MIT License
-    :target: http://opensource.org/licenses/MIT
+    .. image:: http://img.shields.io/github/issues/sdpython/pymmails.png
+        :alt: GitHub Issues
+        :target: https://github.com/sdpython/pymmails/issues
 
-.. image:: https://landscape.io/github/sdpython/pymmails/master/landscape.svg?style=flat
-   :target: https://landscape.io/github/sdpython/pymmails/master
-   :alt: Code Health
+    .. image:: https://img.shields.io/badge/license-MIT-blue.svg
+        :alt: MIT License
+        :target: http://opensource.org/licenses/MIT
 
-.. image:: https://requires.io/github/sdpython/pymmails/requirements.svg?branch=master
-     :target: https://requires.io/github/sdpython/pymmails/requirements/?branch=master
-     :alt: Requirements Status
+    .. image:: https://landscape.io/github/sdpython/pymmails/master/landscape.svg?style=flat
+       :target: https://landscape.io/github/sdpython/pymmails/master
+       :alt: Code Health
 
-.. image:: https://codecov.io/github/sdpython/pymmails/coverage.svg?branch=master
-    :target: https://codecov.io/github/sdpython/pymmails?branch=master
+    .. image:: https://requires.io/github/sdpython/pymmails/requirements.svg?branch=master
+         :target: https://requires.io/github/sdpython/pymmails/requirements/?branch=master
+         :alt: Requirements Status
+
+    .. image:: https://codecov.io/github/sdpython/pymmails/coverage.svg?branch=master
+        :target: https://codecov.io/github/sdpython/pymmails?branch=master
 
 **Links:** `pypi <https://pypi.python.org/pypi/pymmails/>`_,
 `github <https://github.com/sdpython/pymmails/>`_,

@@ -4,34 +4,36 @@
 README
 ======
 
-.. image:: https://travis-ci.org/sdpython/pymmails.svg?branch=master
+.. only:: html
+
+    .. image:: https://travis-ci.org/sdpython/pymmails.svg?branch=master
     :target: https://travis-ci.org/sdpython/pymmails
     :alt: Build status
 
-.. image:: https://ci.appveyor.com/api/projects/status/hqhhdndvayrx0r9k?svg=true
+    .. image:: https://ci.appveyor.com/api/projects/status/hqhhdndvayrx0r9k?svg=true
     :target: https://ci.appveyor.com/project/sdpython/pymmails
     :alt: Build Status Windows
 
-.. image:: https://badge.fury.io/py/pymmails.svg
+    .. image:: https://badge.fury.io/py/pymmails.svg
     :target: http://badge.fury.io/py/pymmails
 
-.. image:: http://img.shields.io/github/issues/sdpython/pymmails.png
+    .. image:: http://img.shields.io/github/issues/sdpython/pymmails.png
     :alt: GitHub Issues
     :target: https://github.com/sdpython/pymmails/issues
 
-.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+    .. image:: https://img.shields.io/badge/license-MIT-blue.svg
     :alt: MIT License
     :target: http://opensource.org/licenses/MIT
 
-.. image:: https://landscape.io/github/sdpython/pymmails/master/landscape.svg?style=flat
-   :target: https://landscape.io/github/sdpython/pymmails/master
-   :alt: Code Health
+    .. image:: https://landscape.io/github/sdpython/pymmails/master/landscape.svg?style=flat
+    :target: https://landscape.io/github/sdpython/pymmails/master
+    :alt: Code Health
 
-.. image:: https://requires.io/github/sdpython/pymmails/requirements.svg?branch=master
+    .. image:: https://requires.io/github/sdpython/pymmails/requirements.svg?branch=master
      :target: https://requires.io/github/sdpython/pymmails/requirements/?branch=master
      :alt: Requirements Status
 
-.. image:: https://codecov.io/github/sdpython/pymmails/coverage.svg?branch=master
+    .. image:: https://codecov.io/github/sdpython/pymmails/coverage.svg?branch=master
     :target: https://codecov.io/github/sdpython/pymmails?branch=master
 
 **Links:**
