@@ -14,6 +14,9 @@ README
     :target: https://ci.appveyor.com/project/sdpython/pymmails
     :alt: Build Status Windows
 
+    .. image:: https://circleci.com/gh/sdpython/pymmails/tree/master.svg?style=svg
+        :target: https://circleci.com/gh/sdpython/pymmails/tree/master
+
     .. image:: https://badge.fury.io/py/pymmails.svg
     :target: http://badge.fury.io/py/pymmails
 
