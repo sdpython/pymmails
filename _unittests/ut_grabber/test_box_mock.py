@@ -76,7 +76,7 @@ class TestMessageBoxMock(unittest.TestCase):
             raise Exception(html)
         # fLOG(css)
         fLOG(html)
-        if "<tr><th>Date</th><td>Sat, 1 Aug 2015 11:40:50 +0200 (CEST)</td></tr>" not in html:
+        if "<tr><th>Date</th><td>Sat, 1 Aug 2015" not in html:
             raise Exception(html)
 
 
