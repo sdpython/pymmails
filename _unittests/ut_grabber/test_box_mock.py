@@ -53,13 +53,13 @@ class TestMessageBoxMock(unittest.TestCase):
         box = MailBoxMock(data, b"unittestunittest", fLOG)
         box.login()
         folders = box.folders()
-        assert len(folders) == 1
+        self.assertEqual(len(folders), 1)
         fLOG(folders)
         mails = list(box.enumerate_mails_in_folder("trav"))
         box.logout()
 
         fLOG(len(mails))
-        assert len(mails) > 0
+        self.assertTrue(len(mails) > 0)
         mail0 = mails[0]
         # fLOG(mail0)
 
@@ -72,10 +72,12 @@ class TestMessageBoxMock(unittest.TestCase):
         render = EmailMessageRenderer()
         html, css = render.render(
             "__LOC__", mail0, file_css="example_css.css", attachments=None)
-        assert "example_css.css" in html
+        if "example_css.css" not in html:
+            raise Exception(html)
         # fLOG(css)
         fLOG(html)
-        assert "<tr><th>Date</th><td>Sat, 1 Aug 2015 11:40:50 +0200 (CEST)</td></tr>" in html
+        if "<tr><th>Date</th><td>Sat, 1 Aug 2015 11:40:50 +0200 (CEST)</td></tr>" not in html:
+            raise Exception(html)
 
 
 if __name__ == "__main__":
