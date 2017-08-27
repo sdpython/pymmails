@@ -95,6 +95,7 @@ Galleries
     api/index
     gyexamples/index
     gynotebooks/index
+    blog/blogindex
 
 Functionalities
 ---------------
