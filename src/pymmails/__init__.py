@@ -1,6 +1,8 @@
 #-*- coding: utf-8 -*-
 """
-Documentation for this file.
+@file
+@brief Module *pymmails*.
+Functions to automatically grab and send mails.
 """
 from .grabber.mail_exception import MailException
 from .grabber.email_message import EmailMessage
