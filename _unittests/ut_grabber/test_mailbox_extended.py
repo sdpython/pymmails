@@ -64,7 +64,9 @@ class TestMailBox(unittest.TestCase):
             # does not work on the remote build server
             return
 
-        import keyring
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', DeprecationWarning)
+            import keyring
         user = keyring.get_password(
             "gmail", os.environ["COMPUTERNAME"] + "user")
         code = keyring.get_password(

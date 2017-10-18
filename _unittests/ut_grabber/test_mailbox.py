@@ -54,7 +54,9 @@ class TestMailBox(unittest.TestCase):
         if is_travis_or_appveyor():
             warnings.warn("requires a password")
             return
-        import keyring
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', DeprecationWarning)
+            import keyring
         code = keyring.get_password(
             "sdut", os.environ["COMPUTERNAME"] + "pymmails")
         box = MailBoxImap("unittest.sdpython", code,
@@ -74,7 +76,9 @@ class TestMailBox(unittest.TestCase):
         if is_travis_or_appveyor():
             warnings.warn("requires a password")
             return
-        import keyring
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', DeprecationWarning)
+            import keyring
         code = keyring.get_password(
             "sdut", os.environ["COMPUTERNAME"] + "pymmails")
         temp = get_temp_folder(__file__, "temp_dump")
