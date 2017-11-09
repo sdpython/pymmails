@@ -87,7 +87,8 @@ class TestMailBox(unittest.TestCase):
             if "=?" in mail:
                 issues.append(name)
             fr = mail.get_from()
-            if "=?" in fr[0]:
+            frm = [_ for _ in fr if _]
+            if "=?" in frm[0]:
                 issues.append(name)
             if "@" not in fr[1]:
                 issues.append(name)
