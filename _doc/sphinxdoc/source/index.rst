@@ -26,10 +26,6 @@ pymmails documentation
         :alt: MIT License
         :target: http://opensource.org/licenses/MIT
 
-    .. image:: https://landscape.io/github/sdpython/pymmails/master/landscape.svg?style=flat
-       :target: https://landscape.io/github/sdpython/pymmails/master
-       :alt: Code Health
-
     .. image:: https://requires.io/github/sdpython/pymmails/requirements.svg?branch=master
          :target: https://requires.io/github/sdpython/pymmails/requirements/?branch=master
          :alt: Requirements Status
