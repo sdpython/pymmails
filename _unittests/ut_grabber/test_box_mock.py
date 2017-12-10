@@ -75,9 +75,10 @@ class TestMessageBoxMock(unittest.TestCase):
         if "example_css.css" not in html:
             raise Exception(html)
         # fLOG(css)
-        fLOG(html)
-        if "<tr><th>Date</th><td>Sat, 1 Aug 2015" not in html:
+        if "<tr><th>Date</th><td>Sat, 1 Aug 2015" not in html and \
+                "<tr><th>Date</th><td>Fri, 14 Aug 2015" not in html:
             raise Exception(html)
+        fLOG(html)
 
 
 if __name__ == "__main__":
