@@ -18,7 +18,7 @@ sys.path.insert(
 
 from pyquickhelper.helpgen.default_conf import set_sphinx_variables
 
-set_sphinx_variables(__file__, "pymmails", "Xavier Dupré", 2017,
+set_sphinx_variables(__file__, "pymmails", "Xavier Dupré", 2018,
                      "alabaster", None, locals(), add_extensions=None,
                      extlinks=dict(issue=('https://github.com/sdpython/pymmails/issues/%s', 'issue')))
 
