@@ -126,7 +126,8 @@ class EmailMessageListRenderer(Renderer):
             for i, mail3 in enumerate(iterator_prev_next(sorted(iter))):
                 prev, item, next = mail3
                 if i % 10 == 9:
-                    self.fLOG("[EmailMessageListRenderer.render] iterate", i + 1)
+                    self.fLOG(
+                        "[EmailMessageListRenderer.render] iterate", i + 1)
                 if not isinstance(item, tuple):
                     raise TypeError(
                         "expects a tuple (EmailMessage, function to render) not {0}".format(type(item)))
