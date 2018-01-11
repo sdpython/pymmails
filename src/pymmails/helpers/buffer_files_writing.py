@@ -132,7 +132,7 @@ class BufferFilesWriting:
                     b = buf.getvalue()
                     with open(name, "wb") as f:
                         f.write(b)
-                self.fLOG("BufferFilesWriting.flush [write {0}]".format(name))
+                self.fLOG("[BufferFilesWriting.flush] write '{0}'".format(name))
                 del self._buffer[name]
                 self._done.add(name)
                 return len(b)

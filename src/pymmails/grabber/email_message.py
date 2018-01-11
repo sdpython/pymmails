@@ -740,7 +740,7 @@ class EmailMessage(email.message.Message):
                 already = False
                 different = True
 
-            fLOG("dump attachment:", to,
+            fLOG("[dump_attachments] attachment:", to,
                  "different={0} notnew={1}".format(different, already))
 
             if different:

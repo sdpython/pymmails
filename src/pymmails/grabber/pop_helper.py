@@ -27,7 +27,7 @@ def retrieve_mails_pop(user, password, server, begin=0, end=-1, fLOG=noLOG):
     numMessages = len(messageList[1])
     allemails = []
     stat = M.stat()
-    fLOG(stat)
+    fLOG("[retrieve_mails_pop]", stat)
     end = numMessages if end == -1 else end
     for i in range(begin, end):
         mail = M.retr(i + 1)

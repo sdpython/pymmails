@@ -150,11 +150,7 @@ class MailBoxImap:
                     else:
                         pattern += " RECENT"
                     pattern = pattern.strip()
-                    self.fLOG(
-                        "MailBoxImap.enumerate_mails_in_folder [limit email search for folder",
-                        folder,
-                        " to recent emails with pattern",
-                        pattern + "]")
+                    self.fLOG("[MailBoxImap.enumerate_mails_in_folder] limit email search for folder '{0}' to recent emails with pattern '{1}'".format(folder, pattern))
                     typ, data = self.M.search(None, pattern)
                 else:
                     raise MailException(

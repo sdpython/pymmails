@@ -115,18 +115,18 @@ class EmailMessageListRenderer(Renderer):
         now = datetime.datetime.now()
         file_css = os.path.relpath(file_css, location)
         content = []
-        self.fLOG("EmailMessageListRenderer.render.begin")
+        self.fLOG("[EmailMessageListRenderer.render] begin")
         css = self._css.render()
         h = self._template_begin.render(css=file_css, render=self,
                                         location=location, title=self._title, now=now)
         content.append(h)
-        self.fLOG("EmailMessageListRenderer.render.iterate")
+        self.fLOG("[EmailMessageListRenderer.render] iterate")
 
         def iter_on_mail():
             for i, mail3 in enumerate(iterator_prev_next(sorted(iter))):
                 prev, item, next = mail3
                 if i % 10 == 9:
-                    self.fLOG("EmailMessageListRenderer.render.iterate", i + 1)
+                    self.fLOG("[EmailMessageListRenderer.render] iterate", i + 1)
                 if not isinstance(item, tuple):
                     raise TypeError(
                         "expects a tuple (EmailMessage, function to render) not {0}".format(type(item)))
@@ -143,7 +143,7 @@ class EmailMessageListRenderer(Renderer):
                                       title=self._title, url=item.default_filename() + ".html", now=now)
             content.append(h)
 
-        self.fLOG("EmailMessageListRenderer.render.end")
+        self.fLOG("[EmailMessageListRenderer.render] end")
         h = self._template_end.render(css=file_css, render=self,
                                       location=location, title=self._title, now=now)
         content.append(h)
@@ -171,7 +171,7 @@ class EmailMessageListRenderer(Renderer):
         full_mail = os.path.join(location, filename)
         if self.BufferWrite.exists(full_css, local=not overwrite) and \
                 self.BufferWrite.exists(full_mail, local=not overwrite):
-            self.fLOG("EmailMessageListRenderer.write [already exist css={0} html={1}]".format(
+            self.fLOG("[EmailMessageListRenderer.write] already exist css='{0}' html='{1}']".format(
                 full_css, full_mail))
             return [full_mail, full_css]
 
