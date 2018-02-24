@@ -2,6 +2,7 @@ coverage
 jyquickhelper
 keyring
 Mako
+pycryptodomex
 pyquickhelper>=1.7.2438
 sphinx-better-theme
 wheel
