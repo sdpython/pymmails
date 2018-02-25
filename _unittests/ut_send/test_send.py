@@ -38,9 +38,10 @@ except ImportError:
 
 from src.pymmails import create_smtp_server, send_email, compose_email, MailBoxImap
 from pyquickhelper.loghelper import fLOG
+from pyquickhelper.pycode import ExtTestCase
 
 
-class TestSend(unittest.TestCase):
+class TestSend(ExtTestCase):
 
     def test_compose_email(self):
         fLOG(
@@ -50,9 +51,9 @@ class TestSend(unittest.TestCase):
         st = compose_email("machine@gmail.com", "machinto@gmail.com",
                            "subject", attachements=[os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", "run_unittests.py")])
         # fLOG(st)
-        assert len(st) > 0
-        assert "main_wrapper_tests(__file__)" in st
-        assert "To: machinto@gmail.com" in st
+        self.assertGreater(len(st), 0)
+        self.assertIn("main_wrapper_tests(__file__)", st)
+        self.assertIn("To: machinto@gmail.com", st)
 
     def test_send_email(self):
         fLOG(
@@ -62,12 +63,8 @@ class TestSend(unittest.TestCase):
         st = send_email(None, "machine@gmail.com", "machinto@gmail.com",
                         "subject", cc=["a@a"], bcc=["b@b"], delay_sending=True,
                         attachements=[os.path.join(os.path.abspath(os.path.dirname(__file__)), "..", "run_unittests.py")])
-        assert st is not None
-        try:
-            st()
-            assert False
-        except AttributeError:
-            return
+        self.assertTrue(st is not None)
+        self.assertRaise(lambda: st())
 
     def should_bemocked_test_server_send(self):
         fLOG(
