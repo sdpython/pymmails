@@ -18,7 +18,7 @@ COMMASPACE = ', '
 
 def compose_email(fr, to, subject, body_html=None, body_text=None, attachements=None, cc=None, bcc=None):
     """
-    compose an email as a string
+    Composes an email as a string.
 
     @param      fr              from
     @param      to              receiver (or list of receivers)
@@ -107,7 +107,7 @@ def compose_email(fr, to, subject, body_html=None, body_text=None, attachements=
 
 def create_smtp_server(host, username, password):
     """
-    creates a SMTP server and log into it.
+    Creates a SMTP server and log into it.
 
     @param      host        something like ``smtp.gmail.com:587``
     @param      username    username
@@ -128,7 +128,7 @@ def create_smtp_server(host, username, password):
 def send_email(server, fr, to, subject, body_html=None, body_text=None,
                attachements=None, delay_sending=False, cc=None, bcc=None):
     """
-    compose an email as a string
+    Sends an email as a string.
 
     @param      server          result from function @see fn create_smtp_server
     @param      fr              from
@@ -145,24 +145,26 @@ def send_email(server, fr, to, subject, body_html=None, body_text=None,
                                 `sendmail <https://docs.python.org/3.5/library/smtplib.html#smtplib.SMTP.sendmail>`_
                                 otherwise
 
-    @example(Send an email)
-    @code
-    from pymmails import create_smtp_server, send_email
-    server = create_smtp_server("gmail", "somebody", "pwd")
-    send_email(server, "from.sender@gmail.com",
-               "to.receiver@else.com", "subject",
-               attachements = [ os.path.abspath(__file__) ])
-    server.quit()
-    @endcode
-    @endexample
+    .. exref::
+        :title: Send an email
+        
+        ::
+        
+            from pymmails import create_smtp_server, send_email
+            server = create_smtp_server("gmail", "somebody", "pwd")
+            send_email(server, "from.sender@gmail.com",
+                       "to.receiver@else.com", "subject",
+                       attachements = [ os.path.abspath(__file__) ])
+            server.quit()
 
-    @FAQ(Gmail does not allow to send or get emails with Python)
-    By default, a Gmail account does not enable the IMAP access.
-    That explains why it is not possible to send or get messages from Gmail.
-    The following page
-    `Get started with IMAP and POP3 <https://support.google.com/mail/troubleshooter/1668960?hl=en#ts=1665018>`_
-    explains how to enable that option.
-    @endFAQ
+    .. faqref::
+        :title: Gmail does not allow to send or get emails with Python
+
+        By default, a Gmail account does not enable the IMAP access.
+        That explains why it is not possible to send or get messages from Gmail.
+        The following page
+        `Get started with IMAP and POP3 <https://support.google.com/mail/troubleshooter/1668960?hl=en#ts=1665018>`_
+        explains how to enable that option.
     """
     astring = compose_email(fr, to, subject, body_html=body_html, cc=cc, bcc=bcc,
                             body_text=body_text, attachements=attachements)
@@ -178,7 +180,13 @@ def send_email(server, fr, to, subject, body_html=None, body_text=None,
 
     if delay_sending:
         def f(fr=fr, to=to, astring=astring):
-            server.sendmail(fr, to, astring)
+            try:
+                server.sendmail(fr, to, astring)
+            except Exception as e:
+                raise Exception("Unable to send mail to {0} from '{1}'".format(to, fr)) from e
         return f
     else:
-        return server.sendmail(fr, to, astring)
+        try:
+            return server.sendmail(fr, to, astring)
+        except Exception as e:
+            raise Exception("Unable to send mail to {0} from '{1}'".format(to, fr)) from e
