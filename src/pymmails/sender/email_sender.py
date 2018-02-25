@@ -147,9 +147,9 @@ def send_email(server, fr, to, subject, body_html=None, body_text=None,
 
     .. exref::
         :title: Send an email
-        
+
         ::
-        
+
             from pymmails import create_smtp_server, send_email
             server = create_smtp_server("gmail", "somebody", "pwd")
             send_email(server, "from.sender@gmail.com",
@@ -183,10 +183,12 @@ def send_email(server, fr, to, subject, body_html=None, body_text=None,
             try:
                 server.sendmail(fr, to, astring)
             except Exception as e:
-                raise Exception("Unable to send mail to {0} from '{1}'".format(to, fr)) from e
+                raise Exception(
+                    "Unable to send mail to {0} from '{1}'".format(to, fr)) from e
         return f
     else:
         try:
             return server.sendmail(fr, to, astring)
         except Exception as e:
-            raise Exception("Unable to send mail to {0} from '{1}'".format(to, fr)) from e
+            raise Exception(
+                "Unable to send mail to {0} from '{1}'".format(to, fr)) from e
