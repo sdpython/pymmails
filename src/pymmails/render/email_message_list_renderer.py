@@ -10,7 +10,8 @@ from jinja2 import Template
 from pyquickhelper.loghelper import noLOG
 from ..helpers import iterator_prev_next
 from .renderer import Renderer
-from .email_message_style import template_email_list_html_iter, template_email_list_html_begin, template_email_list_html_end, template_email_css
+from .email_message_style import template_email_list_html_iter, template_email_list_html_begin
+from .email_message_style import template_email_list_html_end, template_email_css
 
 
 class EmailMessageListRenderer(Renderer):
@@ -123,6 +124,7 @@ class EmailMessageListRenderer(Renderer):
         self.fLOG("[EmailMessageListRenderer.render] iterate")
 
         def iter_on_mail():
+            "local function"
             for i, mail3 in enumerate(iterator_prev_next(sorted(iter))):
                 prev, item, next = mail3
                 if i % 10 == 9:
@@ -139,7 +141,7 @@ class EmailMessageListRenderer(Renderer):
                 f(obj, location, prev_mail, next_mail)
                 yield prev[0] if prev else None, item[0], next[0] if next else None
 
-        for prev, item, next in iter_on_mail():
+        for _, item, __ in iter_on_mail():
             h = self._template.render(message=item, css=file_css, render=self, location=location,
                                       title=self._title, url=item.default_filename() + ".html", now=now)
             content.append(h)
@@ -177,12 +179,14 @@ class EmailMessageListRenderer(Renderer):
             return [full_mail, full_css]
 
         def fwrite(message, location, prev_mail, next_mail):
-            html, css = message.dump(self._email_renderer, location=location,
-                                     prev_mail=prev_mail, next_mail=next_mail, fLOG=self.fLOG,
-                                     overwrite=overwrite)
+            "local function"
+            html, _ = message.dump(self._email_renderer, location=location,
+                                   prev_mail=prev_mail, next_mail=next_mail, fLOG=self.fLOG,
+                                   overwrite=overwrite)
             return html
 
         def walk_iter():
+            "local function"
             for obj in iter:
                 yield obj, fwrite
 

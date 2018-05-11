@@ -5,70 +5,55 @@
 import sys
 import os
 import unittest
-import warnings
-
+from pyquickhelper.loghelper import fLOG
+from pyquickhelper.pycode import check_pep8, ExtTestCase
 
 try:
-    import pyquickhelper as skip_
+    import src
 except ImportError:
     path = os.path.normpath(
         os.path.abspath(
             os.path.join(
                 os.path.split(__file__)[0],
                 "..",
-                "..",
-                "..",
-                "pyquickhelper",
-                "src",)))
+                "..")))
     if path not in sys.path:
         sys.path.append(path)
-    import pyquickhelper as skip_
-
-from pyquickhelper.loghelper import fLOG
-from pyquickhelper.pycode import check_pep8
-from pyquickhelper.pycode.utils_tests_helper import _extended_refactoring
+    import src
 
 
-class TestCodeStyle(unittest.TestCase):
+class TestCodeStyle(ExtTestCase):
 
-    def test_code_style_src(self):
-        fLOG(
-            __file__,
-            self._testMethodName,
-            OutputPrint=__name__ == "__main__")
-
-        if sys.version_info[0] == 2 or "Anaconda" in sys.executable \
-                or "condavir" in sys.executable:
-            warnings.warn(
-                "skipping test_code_style because of Python 2 or " + sys.executable)
-            return
-
+    def test_style_src(self):
         thi = os.path.abspath(os.path.dirname(__file__))
         src_ = os.path.normpath(os.path.join(thi, "..", "..", "src"))
-        check_pep8(src_, fLOG=fLOG, extended=[("fLOG", _extended_refactoring)])
+        check_pep8(src_, fLOG=fLOG,
+                   skip=["email_sender.py:45: W0603",
+                         "Redefining built-in ",
+                         "Parameters differ from overridden ",
+                         "Access to a protected member ",
+                         "mailbox_mock.py:22: W0231",
+                         "Catching too general exception Exception",
+                         "Too many nested blocks",
+                         "mailbox_mock.py:21: W0231",
+                         ])
 
-    def test_code_style_test(self):
-        fLOG(
-            __file__,
-            self._testMethodName,
-            OutputPrint=__name__ == "__main__")
-
-        if sys.version_info[0] == 2 or "Anaconda" in sys.executable \
-                or "condavir" in sys.executable:
-            warnings.warn(
-                "skipping test_code_style because of Python 2 or " + sys.executable)
-            return
-
+    def test_style_test(self):
         thi = os.path.abspath(os.path.dirname(__file__))
         test = os.path.normpath(os.path.join(thi, "..", ))
-        check_pep8(test, fLOG=fLOG, neg_filter="temp_.*",
+        check_pep8(test, fLOG=fLOG, neg_pattern="temp_.*",
+                   pylint_ignore=('C0103', 'C1801', 'R0201', 'R1705', 'W0108', 'W0613',
+                                  'C0111', 'C0412', 'W0622', 'W0621'),
                    skip=["src' imported but unused",
                          "skip_' imported but unused",
                          "skip__' imported but unused",
                          "skip___' imported but unused",
-                         ],
-                   extended=[("fLOG", _extended_refactoring)],
-                   max_line_length=320)
+                         "Unused variable 'skip_'",
+                         "Unused import src",
+                         "Unused variable 'skip_",
+                         "imported as skip_",
+                         "Imports from package src are not grouped",
+                         ])
 
 
 if __name__ == "__main__":

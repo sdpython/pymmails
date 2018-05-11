@@ -7,10 +7,9 @@ import imaplib
 import re
 import email
 import email.message
-
+from pyquickhelper.loghelper import noLOG
 from .mail_exception import MailException
 from .email_message import EmailMessage
-from pyquickhelper.loghelper import noLOG
 
 
 class MailBoxImap:
@@ -74,7 +73,7 @@ class MailBoxImap:
         if folders[0] != "OK":
             raise MailException(
                 "unable to retrieve the folder list for " +
-                self.user)
+                self._user)
         res = []
         for f in folders[1]:
             s = f.decode("utf8")
@@ -142,7 +141,7 @@ class MailBoxImap:
                     pattern += " " + pdat
 
             try:
-                typ, data = self.M.search(None, pattern)
+                _, data = self.M.search(None, pattern)
             except Exception as e:
                 if "SEARCH => got more " in str(e):
                     if pattern == "ALL":
@@ -150,9 +149,9 @@ class MailBoxImap:
                     else:
                         pattern += " RECENT"
                     pattern = pattern.strip()
-                    self.fLOG("[MailBoxImap.enumerate_mails_in_folder] limit email search for folder '{0}' to recent emails with pattern '{1}'".format(
-                        folder, pattern))
-                    typ, data = self.M.search(None, pattern)
+                    self.fLOG("[MailBoxImap.enumerate_mails_in_folder] limit email search for folder " +
+                              "'{0}' to recent emails with pattern '{1}'".format(folder, pattern))
+                    data = self.M.search(None, pattern)[1]
                 else:
                     raise MailException(
                         "unable to search for pattern: {0}\nin subfolder {1}\ncheck the folder you search for is right"
@@ -164,19 +163,19 @@ class MailBoxImap:
 
             for num in spl:
                 if skip_function is not None:
-                    typ, data = self.M.fetch(num, '(BODY[HEADER])')
+                    data = self.M.fetch(num, '(BODY[HEADER])')[1]
                     emailBody = data[0][1]
                     mail = email.message_from_bytes(
                         emailBody, _class=EmailMessage)
                     if skip_function(mail):
                         continue
                 if body:
-                    typ, data = self.M.fetch(num, '(RFC822)')
+                    data = self.M.fetch(num, '(RFC822)')[1]
                     emailBody = data[0][1]
                     mail = email.message_from_bytes(
                         emailBody, _class=EmailMessage)
                 elif skip_function is None:
-                    typ, data = self.M.fetch(num, '(BODY[HEADER])')
+                    data = self.M.fetch(num, '(BODY[HEADER])')[1]
                     emailBody = data[0][1]
                     mail = email.message_from_bytes(
                         emailBody, _class=EmailMessage)
@@ -184,15 +183,10 @@ class MailBoxImap:
 
             self.M.close()
 
-    def enumerate_search_person(self,
-                                person,
-                                folder,
-                                skip_function=None,
-                                date=None,
-                                max_dest=5,
-                                body=True):
+    def enumerate_search_person(self, person, folder, skip_function=None,
+                                date=None, max_dest=5, body=True):
         """
-        enumerates all mails in folder folder from a user or sent to a user
+        Enumerates all mails in folder folder from a user or sent to a user.
 
         @param      person          person to look for or persons to look for
         @param      folder          folder name

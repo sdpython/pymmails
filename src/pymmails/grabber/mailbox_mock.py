@@ -6,22 +6,20 @@
 import os
 import email
 import email.message
-
-from .email_message import EmailMessage
-from .mailboximap import MailBoxImap
 from pyquickhelper.loghelper import noLOG
 from pyquickhelper.filehelper.encryption import decrypt_stream
+from .email_message import EmailMessage
+from .mailboximap import MailBoxImap
 
 
 class MailBoxMock(MailBoxImap):
 
     """
-    define a mail box reading from file (kind of mock)
+    Define a mail box reading from file (kind of mock).
     """
 
     def __init__(self, folder, pwd, fLOG=noLOG):
         """
-        constructor
         @param  folder      folder to look into
         @param  pwd         password, in case mails are encrypted
         @param  fLOG        logging function
@@ -50,7 +48,7 @@ class MailBoxMock(MailBoxImap):
         returns the list of folder of the mail box
         """
         res = []
-        for root, dirs, files in os.walk(self._folder):
+        for __, dirs, _ in os.walk(self._folder):
             for name in dirs:
                 res.append(name)
         return res

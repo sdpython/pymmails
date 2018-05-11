@@ -23,7 +23,7 @@ def main():
         import pyquickhelper as skip_
 
     from pyquickhelper.loghelper import fLOG
-    from pyquickhelper.pycopde import main_wrapper_tests
+    from pyquickhelper.pycode import main_wrapper_tests
     fLOG(OutputPrint=True)
     main_wrapper_tests(__file__)
 

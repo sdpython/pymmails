@@ -105,8 +105,8 @@ class BufferFilesWriting:
         if name is None:
             size = 0
             keys = list(self._buffer.keys())
-            for name in keys:
-                size += self.flush(name)
+            for name_ in keys:
+                size += self.flush(name_)
             return size
         else:
             if name not in self._buffer:
@@ -116,8 +116,8 @@ class BufferFilesWriting:
                 n = self._buffer[name][2]
                 names = [name for name, v in self._buffer.items() if v[2] <= n]
                 size = 0
-                for name in names:
-                    size += self.flush(name)
+                for name_ in names:
+                    size += self.flush(name_)
                 return size
             else:
                 fold = os.path.dirname(name)

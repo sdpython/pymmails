@@ -282,7 +282,7 @@ class EmailMessageRenderer(Renderer):
                         tu[1].replace("<", "&lt;").replace(">", "&gt;")))
 
         for i, a in enumerate(atts):
-            filename, mid, cid = a
+            filename, _, cid = a
             rows.append('<tr><td>{0}</td><td><a href="{1}">{2}</a>{3}</td></tr>'.format(
                         "attachment %d" % (i + 1),
                         os.path.relpath(
@@ -310,7 +310,7 @@ class EmailMessageRenderer(Renderer):
         @return                 modified body html
         """
         if atts:
-            for filename, mid, cid in atts:
+            for filename, _, cid in atts:
                 if cid is None:
                     continue
                 pattern = 'src="cid:{0}"'.format(cid.strip("<>"))

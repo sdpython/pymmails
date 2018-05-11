@@ -84,7 +84,8 @@ class TestSend(ExtTestCase):
         imap = MailBoxImap("somebody", "pwd", "imap.gmail.com", True)
         imap.login()
         iter = imap.enumerate_search_subject("subject", "inbox")
-        imap.dump_html(iter, "destination")
+        for m in iter:
+            m.dump(iter, "destination")
         imap.logout()
 
 

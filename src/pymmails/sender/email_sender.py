@@ -180,6 +180,7 @@ def send_email(server, fr, to, subject, body_html=None, body_text=None,
 
     if delay_sending:
         def f(fr=fr, to=to, astring=astring):
+            "local function"
             try:
                 server.sendmail(fr, to, astring)
             except Exception as e:

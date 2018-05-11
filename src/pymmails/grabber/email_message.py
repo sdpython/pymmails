@@ -7,17 +7,17 @@
 import os
 import re
 import json
-import email
 import datetime
+import email
+from email.generator import BytesGenerator, Generator
 import email.header
 import email.message
-import dateutil.parser
+from io import BytesIO, StringIO
 import mimetypes
 import hashlib
 import warnings
 from collections import OrderedDict
-from io import BytesIO, StringIO
-from email.generator import BytesGenerator, Generator
+import dateutil.parser
 from pyquickhelper.loghelper import noLOG
 
 from .mail_exception import MailException
@@ -60,9 +60,9 @@ class EmailMessage(email.message.Message):
         g.flatten(self)
         return fp.getvalue()
 
-    def as_string(self):
+    def as_string(self, unixfrom=False, maxheaderlen=None, policy=None):
         """
-        converts the mail into a string
+        Converts the mail into a string.
 
         @return     string
 
@@ -73,10 +73,11 @@ class EmailMessage(email.message.Message):
         g.flatten(self)
         return fp.getvalue()
 
+    @staticmethod
     def create_from_bytes(b):
         """
-        creates an instance of @see cl EmailMessage
-        from a binary string (bytes) (see @see me as_bytes)
+        Creates an instance of @see cl EmailMessage
+        from a binary string (bytes) (see @see me as_bytes).
 
         @param      b       binary string
         @return             instance of @see cl EmailMessage
@@ -221,9 +222,9 @@ class EmailMessage(email.message.Message):
                         fileName += ".pdf"
                     elif part.get_content_maintype() == "text":
                         if cont.startswith(b"<html>"):
-                            fileName + ".html"
+                            fileName += ".html"
                         else:
-                            fileName + ".txt"
+                            fileName += ".txt"
                     else:
                         raise MailException("unable to guess type: " +
                                             part.get_content_maintype() +
@@ -336,15 +337,12 @@ class EmailMessage(email.message.Message):
                                 enc = enc2 if enc1 is None else enc1
                                 return dec1 + dec2, enc
                             else:
-                                warnings.warn(
-                                    'decoding issue\n   File "{0}", line {1},\nunable to decode string:\n{2}\neven split into:\n1: {3}\n2: {4}'.format(
-                                        __file__,
-                                        250,
-                                        st.replace("\r", " ").replace(
-                                            "\n", " "),
-                                        first.replace("\r", " ").replace(
-                                            "\n", " "),
-                                        second.replace("\r", " ").replace("\n", " ")))
+                                mes = ('decoding issue\n   File "{0}", line {1},\nunable to decode ' +
+                                       'string:\n{2}\neven split into:\n1: {3}\n2: {4}')
+                                warnings.warn(mes.format(__file__, 250, st.replace("\r", " ").replace("\n", " "),
+                                                         first.replace("\r", " ").replace(
+                                                             "\n", " "),
+                                                         second.replace("\r", " ").replace("\n", " ")))
                                 return st, None
                         else:
                             warnings.warn(
@@ -387,7 +385,7 @@ class EmailMessage(email.message.Message):
         """
         st = self["from"]
         if isinstance(st, email.header.Header):
-            text, encoding = EmailMessage.call_decode_header(st, is_email=True)
+            text, _ = EmailMessage.call_decode_header(st, is_email=True)
             if text is None:
                 raise MailException(
                     "unable to parse: " +
@@ -405,14 +403,14 @@ class EmailMessage(email.message.Message):
                 if not cp:
                     if text.startswith('"=?utf-8?'):
                         text = text.strip('"')
-                        text, encoding = EmailMessage.call_decode_header(
+                        text, _ = EmailMessage.call_decode_header(
                             text, is_email=True)
         gr = cp.groups()
         name, mail = gr[1], gr[2]
         if name is None:
             name = self.get_name(_fallback_get_from=False)
         elif name.startswith("=?"):
-            name, encoding = EmailMessage.call_decode_header(name)
+            name = EmailMessage.call_decode_header(name)[0]
             if name is None:
                 name = gr[1]
         return name, mail
@@ -426,7 +424,7 @@ class EmailMessage(email.message.Message):
         """
         st = self["from"]
         if isinstance(st, email.header.Header):
-            text, encoding = EmailMessage.call_decode_header(st, is_email=True)
+            text, _ = EmailMessage.call_decode_header(st, is_email=True)
             if text is None:
                 raise MailException(
                     "unable to parse: " +
@@ -434,7 +432,7 @@ class EmailMessage(email.message.Message):
                     "\n" +
                     str(st))
         elif st.startswith("=?"):
-            text, encoding = EmailMessage.call_decode_header(st)
+            text, _ = EmailMessage.call_decode_header(st)
         else:
             text = st
 
@@ -478,11 +476,12 @@ class EmailMessage(email.message.Message):
             st = self["Delivered-To"]
         if st is None:
             return None
-        text, encoding = EmailMessage.call_decode_header(st, is_email=True)
+        text, _ = EmailMessage.call_decode_header(st, is_email=True)
         if text is None:
             raise MailException("unable to parse: " + str(st))
 
         def find_unnone(ens):
+            "local function"
             for c in ens:
                 if c is not None:
                     return c
@@ -500,12 +499,12 @@ class EmailMessage(email.message.Message):
             add = find_unnone(values[1::2])
             if label is not None:
                 label = label.strip(" \r\n\t")
-                text, encoding = EmailMessage.call_decode_header(
+                text, _ = EmailMessage.call_decode_header(
                     label, is_email=True)
                 if text.startswith('"=?utf-8?'):
                     text = text.strip('"')
-                    text, encoding = EmailMessage.call_decode_header(
-                        text, is_email=True)
+                    text = EmailMessage.call_decode_header(
+                        text, is_email=True)[0]
                 cp.append((text, add))
             else:
                 cp.append((None, add))
@@ -517,7 +516,7 @@ class EmailMessage(email.message.Message):
         return a datetime object for the field Date
         """
         st = self["Date"]
-        res, encoding = EmailMessage.call_decode_header(st)
+        res, _ = EmailMessage.call_decode_header(st)
         if res is None:
             raise MailException("unable to parse: " + str(st))
 
@@ -532,7 +531,7 @@ class EmailMessage(email.message.Message):
                 return p
             else:
                 if "," in res:
-                    a, b = res.split(",")
+                    b = res.split(",")[1]
                     try:
                         p = dateutil.parser.parse(b)
                     except Exception as e:
@@ -569,7 +568,7 @@ class EmailMessage(email.message.Message):
 
         @return         str
         """
-        a, b = self.get_from()
+        b = self.get_from()[1]
         if len(b) == 0:
             raise MailException("from is unknown: " + self["from"])
         b = b.replace("@", "-at-").replace(".", "-")
@@ -631,13 +630,13 @@ class EmailMessage(email.message.Message):
                 pos = st.find("=?")
                 return st[:pos] + self.decode_header(field, st[pos:])
             else:
-                text, encoding = EmailMessage.call_decode_header(st)
+                text, _ = EmailMessage.call_decode_header(st)
                 return text if text is not None else ""
         elif isinstance(st, bytes):
-            text, encoding = EmailMessage.call_decode_header(st)
+            text, _ = EmailMessage.call_decode_header(st)
             return self.decode_header(field, text) if text is not None else ""
         elif isinstance(st, email.header.Header):
-            text, encoding = EmailMessage.call_decode_header(st)
+            text = EmailMessage.call_decode_header(st)[0]
             return self.decode_header(field, text) if text is not None else ""
         else:
             raise MailException(
@@ -697,12 +696,14 @@ class EmailMessage(email.message.Message):
         It is stored in a file with extension ``.metadata``.
         """
         def local_exists(name):
+            "local function"
             if buffer_write:
                 return buffer_write.exists(name)
             else:
                 return os.path.exists(name)
 
         def local_different(to, content):
+            "local function"
             if buffer_write:
                 c2 = buffer_write.read_binary_content(to)
             else:
