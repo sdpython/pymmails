@@ -3,6 +3,6 @@ jyquickhelper
 keyring
 Mako
 pycryptodomex
-pyquickhelper>=1.8
+pyquickhelper>=1.8.2602
 sphinx-better-theme
 wheel
