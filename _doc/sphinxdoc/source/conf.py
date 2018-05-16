@@ -1,22 +1,9 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
-import re
+from pyquickhelper.helpgen.default_conf import set_sphinx_variables
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.split(__file__)[0])))
-sys.path.insert(
-    0,
-    os.path.abspath(
-        os.path.join(
-            os.path.split(__file__)[0],
-            "..",
-            "..",
-            "..",
-            "..",
-            "pyquickhelper",
-            "src")))
-
-from pyquickhelper.helpgen.default_conf import set_sphinx_variables
 
 set_sphinx_variables(__file__, "pymmails", "Xavier Dupré", 2018,
                      "alabaster", None, locals(), add_extensions=None,
