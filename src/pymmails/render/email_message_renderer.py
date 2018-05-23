@@ -5,6 +5,8 @@
 """
 import os
 import re
+import pprint
+from jinja2.exceptions import UndefinedError
 from pyquickhelper.loghelper import noLOG
 from ..grabber.email_message import EmailMessage
 from ..helpers.buffer_files_writing import BufferFilesWriting
@@ -23,8 +25,8 @@ class EmailMessageRenderer(Renderer):
                  buffer_write=None,
                  fLOG=noLOG):
         """
-        constructor, defines a template based
-        on `Jinja2 <http://jinja.pocoo.org/docs/dev/>`_
+        Defines a template based
+        on `Jinja2 <http://jinja.pocoo.org/docs/dev/>`_.
 
         @param      tmpl                template (string or file)
         @param      css                 style
@@ -184,7 +186,7 @@ class EmailMessageRenderer(Renderer):
     def render(self, location, mail, attachments, file_css="mail_style.css",
                prev_mail=None, next_mail=None, **addition):
         """
-        render a mail
+        Renders a mail.
 
         @paramp     location        location where this mail should be saved
         @param      mail            instance of @see cl EmailMessage
@@ -206,17 +208,29 @@ class EmailMessageRenderer(Renderer):
         """
         file_css = os.path.relpath(file_css, location)
         css = self._css.render(message=mail)
-        html = self._template.render(message=mail, css=file_css, render=self,
-                                     location=location, EmailMessage=EmailMessage,
-                                     attachments=attachments, prev_mail=prev_mail,
-                                     next_mail=next_mail, **addition)
+        try:
+            html = self._template.render(message=mail, css=file_css, render=self,
+                                         location=location, EmailMessage=EmailMessage,
+                                         attachments=attachments, prev_mail=prev_mail,
+                                         next_mail=next_mail, **addition)
+        except UndefinedError as e:
+            empty = []
+            if 'groups' in addition:
+                for gr in addition['groups']:
+                    if 'emails' in gr and len(gr['emails']) == 0:
+                        empty.append(gr)
+            tmpl = self._raw_template
+            disp1 = pprint.pformat(empty)
+            mes = "This usually happens when the project was sent with a mail not retained in a the final list."
+            raise RuntimeError("Unable to apply pattern\n----\n{0}\n----\n{1}\n----\n{2}".format(
+                               mes, tmpl, disp1)) from e
         return html, css
 
     def write(self, location, mail, filename, attachments=None,
               overwrite=False, file_css="mail_style.css", encoding="utf8",
               prev_mail=None, next_mail=None, **addition):
         """
-        writes a mail, the function assumes the attachments were already dumped
+        Writes a mail, the function assumes the attachments were already dumped.
 
         @param      location        location
         @param      mail            instance of @see cl EmailMessage

@@ -32,6 +32,7 @@ class Renderer:
         self._style_highlight = style_highlight
         self._session = None
         self._buffer_write = buffer_write
+        self._raw_template = tmpl
         self.fLOG = fLOG
 
     def flush(self):
