@@ -661,14 +661,14 @@ class EmailMessage(email.message.Message):
         """
         @return  list of available fields
         """
-        return list(self.keys())
+        return list(sorted(self.keys()))
 
     def to_dict(self):
         """
-        returns all fields for an emails as a dictionary
+        Returns all fields for an emails as a dictionary
         @return     dictionary { key : value }
         """
-        res = {k: self.get_field(k) for k in self.Fields}
+        res = OrderedDict((k, self.get_field(k)) for k in self.Fields)
         res["attached"] = self.get_nb_attachements()
         return res
 
