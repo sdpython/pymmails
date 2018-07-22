@@ -2,6 +2,7 @@ coverage
 jyquickhelper
 keyring
 Mako
+Pillow
 pycryptodomex
 pyquickhelper>=1.8.2602
 sphinx-better-theme

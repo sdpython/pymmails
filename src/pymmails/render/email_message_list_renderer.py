@@ -5,7 +5,6 @@
 """
 import os
 import datetime
-import collections
 from jinja2 import Template
 from pyquickhelper.loghelper import noLOG
 from ..helpers import iterator_prev_next
@@ -155,7 +154,7 @@ class EmailMessageListRenderer(Renderer):
     def write(self, location, iter, filename, attachments=None,
               overwrite=False, file_css="mail_style.css", encoding="utf8"):
         """
-        writes a list of mails in a folder and writes a summary
+        Writes a list of mails in a folder and writes a summary.
 
         @param      location        location
         @param      mail            instance of @see cl EmailMessage
@@ -167,7 +166,7 @@ class EmailMessageListRenderer(Renderer):
 
         The method calls method :meth:`flush <pymmails.helpers.buffer_files_writing.BufferFilesWriting.flush>`.
         """
-        if not isinstance(iter, collections.Iterable):
+        if not hasattr(iter, '__iter__'):
             raise TypeError("class {0} is not iterable".format(type(iter)))
 
         full_css = os.path.join(location, file_css)
