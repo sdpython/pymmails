@@ -51,14 +51,8 @@ class TestMailBox(unittest.TestCase):
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', DeprecationWarning)
             import keyring
-        if sys.platform.startswith("win"):
-            user = keyring.get_password(
-                "gmail", os.environ["COMPUTERNAME"] + "user")
-            code = keyring.get_password(
-                "gmail", os.environ["COMPUTERNAME"] + "pwd")
-        else:
-            user = keyring.get_password("gmail", "pymmails,user")
-            code = keyring.get_password("gmail", "pymmails,pwd")
+        user = keyring.get_password("gmail", "pymmails,user")
+        code = keyring.get_password("gmail", "pymmails,pwd")
 
         box = MailBoxImap(user, code, "imap.gmail.com", ssl=True, fLOG=fLOG)
         box.login()

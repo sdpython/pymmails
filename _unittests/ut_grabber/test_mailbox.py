@@ -41,11 +41,7 @@ class TestMailBox(unittest.TestCase):
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', DeprecationWarning)
             import keyring
-        if sys.platform.startswith("win"):
-            code = keyring.get_password(
-                "sdut", os.environ["COMPUTERNAME"] + "pymmails")
-        else:
-            code = keyring.get_password("sdut", "pymmails")
+        code = keyring.get_password("sdut", "pymmails")
 
         box = MailBoxImap("unittest.sdpython", code,
                           "imap.gmail.com", ssl=True, fLOG=fLOG)
@@ -67,11 +63,7 @@ class TestMailBox(unittest.TestCase):
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', DeprecationWarning)
             import keyring
-        if sys.platform.startswith("win"):
-            code = keyring.get_password(
-                "sdut", os.environ["COMPUTERNAME"] + "pymmails")
-        else:
-            code = keyring.get_password("sdut", "pymmails")
+        code = keyring.get_password("sdut", "pymmails")
         temp = get_temp_folder(__file__, "temp_dump")
         box = MailBoxImap("unittest.sdpython", code,
                           "imap.gmail.com", ssl=True, fLOG=fLOG)
