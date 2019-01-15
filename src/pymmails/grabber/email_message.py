@@ -774,7 +774,7 @@ class EmailMessage(email.message.Message):
 
     def dump(self, render, location, attach_folder="attachments", fLOG=noLOG, **params):
         """
-        dump a message using a call such as @see cl EmailMessageRenderer
+        Dumps a message using a call such as @see cl EmailMessageRenderer.
 
         @param      render          instance of class @see cl EmailMessageRenderer
         @param      location        location of the file to store

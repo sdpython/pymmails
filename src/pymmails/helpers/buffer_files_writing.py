@@ -63,6 +63,8 @@ class BufferFilesWriting:
         @param      encoding    encoding
         @return                 a buffer
         """
+        if name is None or name == '':
+            raise ValueError("name cannot be empty.")
         if len(self._buffer) > self._flush_every:
             self.flush(None)
         if name in self._buffer:
@@ -84,6 +86,8 @@ class BufferFilesWriting:
         @param      local       check local existence too and read the content from it
         @return                 boolean
         """
+        if name is None or name == '':
+            raise ValueError("name cannot be empty.")
         if name in self._buffer:
             content = self._buffer[name][0].getvalue()
             if isinstance(content, str):
@@ -121,6 +125,8 @@ class BufferFilesWriting:
                 return size
             else:
                 fold = os.path.dirname(name)
+                if fold is None or fold == '':
+                    raise RuntimeError("Folder cannot be empty for file '{0}'".format(name))
                 if not os.path.exists(fold):
                     os.makedirs(fold)
                 buf = self._buffer[name][0]

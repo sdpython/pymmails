@@ -195,7 +195,7 @@ class EmailMessageRenderer(Renderer):
         @param      prev_mail       previous mail (or None if there is none)
         @param      next_mail       next mail (or None if there is none)
         @param      addition        sent to *Jinja*
-        @return                     html, css (content)
+        @return                     html, css (content), attachments
 
         The mail is stored in object ``message``, ``css`` means the style sheet,
         ``render`` means this object, ``location`` means *location*,
@@ -224,7 +224,7 @@ class EmailMessageRenderer(Renderer):
             mes = "This usually happens when the project was sent with a mail not retained in a the final list."
             raise RuntimeError("Unable to apply pattern\n----\n{0}\n----\n{1}\n----\n{2}".format(
                                mes, tmpl, disp1)) from e
-        return html, css
+        return html, css, attachments
 
     def write(self, location, mail, filename, attachments=None,
               overwrite=False, file_css="mail_style.css", encoding="utf8",
@@ -241,14 +241,14 @@ class EmailMessageRenderer(Renderer):
         @param      addition        additional parameter sent to Jinja2
         @param      prev_mail       previous mail (or None if there is none)
         @param      next_mail       next mail (or None if there is none)
-        @return                     list of written local files
+        @return                     list of written local files, attachements
         """
         full_css = os.path.join(location, file_css)
         full_mail = os.path.join(location, filename)
         if not overwrite and self.BufferWrite.exists(full_css) and \
                 self.BufferWrite.exists(full_mail):
             return [full_mail, full_css]
-        html, css = self.render(
+        html, css, attachments = self.render(
             location, mail, attachments, file_css=full_css,
             prev_mail=prev_mail, next_mail=next_mail, **addition)
         if not self.BufferWrite.exists(full_css, local=not overwrite):
@@ -257,7 +257,7 @@ class EmailMessageRenderer(Renderer):
         if not self.BufferWrite.exists(full_mail, local=not overwrite):
             f = self.BufferWrite.open(full_mail, text=True, encoding=encoding)
             f.write(html)
-        return [full_mail, full_css]
+        return [full_mail, full_css], attachments
 
     def produce_table_html(self, email, location, toshow, tohighlight=None, atts=None, avoid=None):
         """

@@ -162,6 +162,46 @@ template_email_list_html_begin = """<?xml version="1.0" encoding="utf-8"?>
 
 template_email_list_html_end = """
 </ul>
+
+<div id="idallatts"></div>
+
+<script>
+const url = "_summaryattachements.json";
+
+function createNode(element) {
+  return document.createElement(element);
+}
+
+function append(parent, el) {
+  return parent.appendChild(el);
+}
+
+fetch(url)
+  .then((resp) => resp.json())
+  .then(function(data) {
+    // Here you get the data to modify as you please
+    var div = document.getElementById('idallatts');
+    div.innerHTML = '<h2>Additional information</h2><ul id="idallattsul"></ul>';
+    var ul = document.getElementById('idallattsul');
+    var atts = data; // Get the results
+    return atts.map(function(att) { // Map through the results and for each run the code below
+      let li = createNode('li');
+      var msg = ""
+      for (k in att) {
+        if (k == "a" || k == 'name') continue;
+        msg += ', <b>' + k + ':</b> ' + att[k];
+      }
+      li.innerHTML = '<a href="' + att["a"] + '">' + att["name"] + '</a>' + msg;
+      append(ul, li);
+    })
+  })
+  .catch(function(error) {
+    // This is where you run code if the server returns any errors
+    var div = document.getElementById('idallatts');
+    div.innerHTML = "<p>No attachements</p>" + error;
+  });
+</script>
+
 </body>
 </html>
 """

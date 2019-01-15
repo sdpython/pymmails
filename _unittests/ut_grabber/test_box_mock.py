@@ -54,7 +54,7 @@ class TestMessageBoxMock(unittest.TestCase):
         self.assertEqual(d0["Subject"], d1["Subject"])
 
         render = EmailMessageRenderer()
-        html, _ = render.render(
+        html, _, __ = render.render(
             "__LOC__", mail0, file_css="example_css.css", attachments=None)
         if "example_css.css" not in html:
             raise Exception(html)

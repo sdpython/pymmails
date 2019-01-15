@@ -5,6 +5,7 @@
 """
 import os
 import datetime
+import json
 from jinja2 import Template
 from pyquickhelper.loghelper import noLOG
 from ..helpers import iterator_prev_next
@@ -15,37 +16,34 @@ from .email_message_style import template_email_list_html_end, template_email_cs
 
 class EmailMessageListRenderer(Renderer):
     """
-    defines a way to render a list of emails
+    Defines a way to render a list of emails with a template
+    template based on `Jinja2 <http://jinja.pocoo.org/docs/dev/>`_.
 
-    @example(Render a list of emails)
+    .. exref::
+        :title: Render a list of emails
 
-    The following example extracts all mails in a folder of a gmail inbox,
-    dumps them in a folder and produces a summary which connects to them.
+        The following example extracts all mails in a folder of a gmail inbox,
+        dumps them in a folder and produces a summary which connects to them.
 
-    ::
+        ::
 
-        from pymmails import EmailMessageRenderer, EmailMessageListRenderer, MailBoxImap
-        box = MailBoxImap(user, pwd, server)
-        box.login()
-        mails = box.enumerate_mails_in_folder("<your_folder)")
+            from pymmails import EmailMessageRenderer, EmailMessageListRenderer, MailBoxImap
+            box = MailBoxImap(user, pwd, server)
+            box.login()
+            mails = box.enumerate_mails_in_folder("<your_folder)")
 
-        email_render = EmailMessageRenderer()
+            email_render = EmailMessageRenderer()
 
-        render = EmailMessageListRenderer(title="list of mails", email_renderer=email_render)
-        render.write(iter=mails, location=temp, filename="summary.html")
-        box.logout())
-        render.flush()
-
-    @endexample
+            render = EmailMessageListRenderer(title="list of mails", email_renderer=email_render)
+            render.write(iter=mails, location=temp, filename="summary.html")
+            box.logout())
+            render.flush()
     """
 
     def __init__(self, title, email_renderer, tmpl_begin=None, tmpl_iter=None, tmpl_end=None,
                  css=None, style_table="dataframe100l", style_highlight="dataframe100l_hl",
                  buffer_write=None, fLOG=noLOG):
         """
-        constructor, defines a template based
-        on `Jinja2 <http://jinja.pocoo.org/docs/dev/>`_
-
         @param      title               title
         @param      email_renderer      email renderer (see @see cl EmailMessageRenderer)
         @param      tmpl_begin          template which begins the summary
@@ -102,13 +100,13 @@ class EmailMessageListRenderer(Renderer):
 
     def render(self, location, iter, attachments=None, file_css="mail_style.css"):
         """
-        render a mail
+        Renders a mail.
 
         @paramp     location        location where this mail should be saved
         @param      iter            iterator on tuple (object, function to call to render the object)
-        @param      attachments     unused
+        @param      attachments     used to produce a JSON list
         @param      file_css        css file (where it is supposed to be stored)
-        @return                     html, css (content)
+        @return                     html, css (content), attachements as JSON
 
         The method populate fields ``now``, ``message``, ``css``, ``render``, ``location``, ``title``.
         """
@@ -148,11 +146,17 @@ class EmailMessageListRenderer(Renderer):
         self.fLOG("[EmailMessageListRenderer.render] end")
         h = self._template_end.render(css=file_css, render=self,
                                       location=location, title=self._title, now=now)
+        json_attachments = []
+        if attachments is not None:
+            for att in attachments:
+                satt = att.replace("\\", "/")
+                json_attachments.append(dict(a=satt, name=satt))
         content.append(h)
-        return "\n".join(content), css
+        return "\n".join(content), css, json_attachments
 
     def write(self, location, iter, filename, attachments=None,
-              overwrite=False, file_css="mail_style.css", encoding="utf8"):
+              overwrite=False, file_css="mail_style.css",
+              file_jsatt="_summaryattachements.json", encoding="utf8"):
         """
         Writes a list of mails in a folder and writes a summary.
 
@@ -161,16 +165,20 @@ class EmailMessageListRenderer(Renderer):
         @param      attachments     list of attachments (see @see me dump_attachments)
         @param      overwrite       the function does not overwrite
         @param      file_css        css file (where it is supposed to be stored)
+        @param      file_jsatt      list of attachments in json format
+                                    ``[{'a': 'href', 'name': 'anchor', ...}, ...]``
         @param      encoding        encoding
         @return                     list of written local files
 
-        The method calls method :meth:`flush <pymmails.helpers.buffer_files_writing.BufferFilesWriting.flush>`.
+        The method calls method :meth:`flush
+        <pymmails.helpers.buffer_files_writing.BufferFilesWriting.flush>`.
         """
         if not hasattr(iter, '__iter__'):
             raise TypeError("class {0} is not iterable".format(type(iter)))
 
         full_css = os.path.join(location, file_css)
         full_mail = os.path.join(location, filename)
+        full_file_jsatt = os.path.join(location, file_jsatt)
         if self.BufferWrite.exists(full_css, local=not overwrite) and \
                 self.BufferWrite.exists(full_mail, local=not overwrite):
             self.fLOG("[EmailMessageListRenderer.write] already exist css='{0}' html='{1}']".format(
@@ -179,21 +187,32 @@ class EmailMessageListRenderer(Renderer):
 
         def fwrite(message, location, prev_mail, next_mail):
             "local function"
-            html, _ = message.dump(self._email_renderer, location=location,
-                                   prev_mail=prev_mail, next_mail=next_mail, fLOG=self.fLOG,
-                                   overwrite=overwrite)
-            return html
+            res = message.dump(self._email_renderer, location=location,
+                               prev_mail=prev_mail, next_mail=next_mail, fLOG=self.fLOG,
+                               overwrite=overwrite)
+            html, css = res[0]
+            atts = res[1]
+            return html, css, atts
 
         def walk_iter():
             "local function"
             for obj in iter:
                 yield obj, fwrite
 
-        html, css = self.render(location, walk_iter(), file_css=full_css)
+        html, css, json_att = self.render(
+            location, walk_iter(), file_css=full_css)
+        wrote = []
         if not self.BufferWrite.exists(full_css, local=not overwrite):
             f = self.BufferWrite.open(full_css, text=True, encoding=encoding)
             f.write(css)
+            wrote.append(full_css)
         if not self.BufferWrite.exists(full_mail, local=not overwrite):
             f = self.BufferWrite.open(full_mail, text=True, encoding=encoding)
             f.write(html)
-        return [full_mail, full_css]
+            wrote.append(full_mail)
+        if json_att and not self.BufferWrite.exists(full_file_jsatt, local=not overwrite):
+            f = self.BufferWrite.open(full_file_jsatt, text=True, encoding=encoding)
+            js = json.dumps(json_att)
+            f.write(js)
+            wrote.append(full_file_jsatt)
+        return wrote
