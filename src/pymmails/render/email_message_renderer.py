@@ -247,7 +247,7 @@ class EmailMessageRenderer(Renderer):
         full_mail = os.path.join(location, filename)
         if not overwrite and self.BufferWrite.exists(full_css) and \
                 self.BufferWrite.exists(full_mail):
-            return [full_mail, full_css]
+            return [full_mail, full_css], attachments
         html, css, attachments = self.render(
             location, mail, attachments, file_css=full_css,
             prev_mail=prev_mail, next_mail=next_mail, **addition)
