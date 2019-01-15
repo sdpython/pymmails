@@ -119,13 +119,13 @@ class TestEmail (unittest.TestCase):
         render = EmailMessageRenderer()
         ff = obj.dump(render, location=temp, fLOG=fLOG)
         render.flush()
-        fLOG(type(ff), ff)
-        with open(ff[0], "r", encoding="utf8") as f:
+        fLOG("ff=", type(ff), ff)
+        with open(ff[0][0], "r", encoding="utf8") as f:
             content = f.read()
         if '<link rel="stylesheet" type="text/css" href="mail_style.css">' not in content:
             raise Exception(content)
-        if "d_2014-12-15_p_yyyyy-matthieu-at-xxxxx-xxx_ii_48bdbc9f9fd180ab917cec5bed8ca529.html" not in ff[0]:
-            raise Exception(ff[0])
+        if "d_2014-12-15_p_yyyyy-matthieu-at-xxxxx-xxx_ii_48bdbc9f9fd180ab917cec5bed8ca529.html" not in ff[0][0]:
+            raise Exception(ff[0][0])
         if "<h1>2014/12/15 - projet 3A - élément logiciel</h1>" not in content:
             raise Exception(content)
 
