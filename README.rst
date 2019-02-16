@@ -1,9 +1,4 @@
 
-.. _l-README:
-
-README
-======
-
 .. only:: html
 
     .. image:: https://travis-ci.org/sdpython/pymmails.svg?branch=master
@@ -35,19 +30,16 @@ README
     .. image:: https://codecov.io/github/sdpython/pymmails/coverage.svg?branch=master
     :target: https://codecov.io/github/sdpython/pymmails?branch=master
 
-**Links:**
+.. _l-README:
 
-* `GitHub/pymmails <https://github.com/sdpython/pymmails/>`_
-* `documentation <http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html>`_
-* `Blog <http://www.xavierdupre.fr/app/pymmails/helpsphinx/blog/main_0000.html#ap-main-0>`_
-
-Description
------------
+pymmails
+========
 
 The module was started to grab emails using IMAP and to store them on a local disk.
-I now use it to download to material sent by my students before an oral presentation.
-I receive many of them and it is usually annoying to download them one by one.
-Here is the code I use::
+It is now used to download material sent by students before an oral presentation,
+which is quite annoying to do manually.
+
+::
 
     from pymmails import MailBoxImap, EmailMessageRenderer
 
@@ -75,13 +67,8 @@ Some examples of patterns::
     pattern='TO "student" FLAGGED'
     pattern='UNSEEN'
 
-Design
-------
+**Links:**
 
-This project contains various helper about logging functions, unit tests and help generation.
-
-* a source folder: ``src``
-* a unit test folder: ``_unittests``, go to this folder and run ``run_unittests.py``
-* a _doc folder: ``_doc``, it will contains the documentation
-* a file ``setup.py`` to build and to install the module
-* a file ``make_help.py`` to build the sphinx documentation
+* `GitHub/pymmails <https://github.com/sdpython/pymmails/>`_
+* `documentation <http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html>`_
+* `Blog <http://www.xavierdupre.fr/app/pymmails/helpsphinx/blog/main_0000.html#ap-main-0>`_
