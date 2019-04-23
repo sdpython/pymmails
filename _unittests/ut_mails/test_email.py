@@ -28,7 +28,8 @@ class TestEmail (unittest.TestCase):
 
         with open(mesf, "rb") as f:
             try:
-                import pymmails as skip__
+                import pymmails
+                assert pymmails is not None
                 obj = pickle.load(f)
             except ImportError:
                 path = os.path.normpath(
@@ -40,7 +41,8 @@ class TestEmail (unittest.TestCase):
                             "src")))
                 if path not in sys.path:
                     sys.path.append(path)
-                import pymmails as skip__
+                import pymmails
+                assert pymmails is not None
                 obj = pickle.load(f)
                 del sys.path[-1]
 
@@ -84,7 +86,8 @@ class TestEmail (unittest.TestCase):
 
         with open(mesf, "rb") as f:
             try:
-                import pymmails as skip__
+                import pymmails
+                assert pymmails is not None
                 obj = pickle.load(f)
             except ImportError:
                 path = os.path.normpath(
@@ -96,7 +99,8 @@ class TestEmail (unittest.TestCase):
                             "src")))
                 if path not in sys.path:
                     sys.path.append(path)
-                import pymmails as skip__
+                import pymmails
+                assert pymmails is not None
                 obj = pickle.load(f)
                 del sys.path[-1]
 
