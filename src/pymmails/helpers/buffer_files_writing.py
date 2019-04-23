@@ -126,7 +126,8 @@ class BufferFilesWriting:
             else:
                 fold = os.path.dirname(name)
                 if fold is None or fold == '':
-                    raise RuntimeError("Folder cannot be empty for file '{0}'".format(name))
+                    raise RuntimeError(
+                        "Folder cannot be empty for file '{0}'".format(name))
                 if not os.path.exists(fold):
                     os.makedirs(fold)
                 buf = self._buffer[name][0]

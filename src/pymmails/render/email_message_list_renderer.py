@@ -211,7 +211,8 @@ class EmailMessageListRenderer(Renderer):
             f.write(html)
             wrote.append(full_mail)
         if json_att and not self.BufferWrite.exists(full_file_jsatt, local=not overwrite):
-            f = self.BufferWrite.open(full_file_jsatt, text=True, encoding=encoding)
+            f = self.BufferWrite.open(
+                full_file_jsatt, text=True, encoding=encoding)
             js = json.dumps(json_att)
             f.write(js)
             wrote.append(full_file_jsatt)

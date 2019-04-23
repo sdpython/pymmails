@@ -1,36 +1,14 @@
 """
 @brief      test log(time=25s)
 """
-
-import sys
 import os
 import unittest
-from pyquickhelper.loghelper import fLOG
-
-try:
-    import src
-except ImportError:
-    path = os.path.normpath(
-        os.path.abspath(
-            os.path.join(
-                os.path.split(__file__)[0],
-                "..",
-                "..")))
-    if path not in sys.path:
-        sys.path.append(path)
-    import src
-
-
-from src.pymmails import EmailMessageRenderer
+from pymmails import EmailMessageRenderer
 
 
 class TestRegEx (unittest.TestCase):
 
     def test_regular_expression(self):
-        fLOG(
-            __file__,
-            self._testMethodName,
-            OutputPrint=__name__ == "__main__")
         fold = os.path.abspath(os.path.dirname(__file__))
 
         body = """
@@ -62,7 +40,6 @@ class TestRegEx (unittest.TestCase):
                 None,
                 "1146aa0a-244a-440e-8ea5-7b272c94f89a")]
         em = EmailMessageRenderer().process_body_html(fold, body, atts)
-        fLOG(em)
         assert "1146aa0a-244a-440e-8ea5-7b272c94f89a" not in em
         exp = 'src="attachements/image.png"'
         if exp not in em.replace("\\", "/"):

@@ -21,11 +21,11 @@ install:
   - "%PYTHON%\\Scripts\\pymy_install3 --set=pyquickhelper"
   - "%PYTHON%\\Scripts\\pip install pyquickhelper"
   - "%PYTHON%\\Scripts\\pip install pycryptodomex"
+  - set PYTHONPATH=src
 
 build: off
 
 test_script:
-  - "%PYTHON%\\python -u setup.py build_script"
   - "%PYTHON%\\python -u setup.py unittests"
 
 after_test:
