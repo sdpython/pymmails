@@ -1,6 +1,9 @@
 
-pymmails documentation
-======================
+.. image:: https://github.com/sdpython/pymmails/blob/master/_doc/sphinxdoc/source/phdoc_static/project_ico.png?raw=true
+    :target: https://github.com/sdpython/pymmails/
+
+pymmails: send and grab mails
+=============================
 
 .. only:: html
 

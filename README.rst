@@ -1,4 +1,12 @@
 
+.. image:: https://github.com/sdpython/pymmails/blob/master/_doc/sphinxdoc/source/phdoc_static/project_ico.png?raw=true
+    :target: https://github.com/sdpython/pymmails/
+
+.. _l-README:
+
+pymmails: send and grab mails
+=============================
+
 .. only:: html
 
     .. image:: https://travis-ci.org/sdpython/pymmails.svg?branch=master
@@ -29,11 +37,6 @@
 
     .. image:: https://codecov.io/github/sdpython/pymmails/coverage.svg?branch=master
     :target: https://codecov.io/github/sdpython/pymmails?branch=master
-
-.. _l-README:
-
-pymmails
-========
 
 The module was started to grab emails using IMAP and to store them on a local disk.
 It is now used to download material sent by students before an oral presentation,
