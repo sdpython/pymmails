@@ -15,38 +15,36 @@ from .email_message import EmailMessage
 class MailBoxImap:
 
     """
-    defines a mail box with IMAP interface
+    Defines a mail box with :epkg:`IMAP` interface.
 
-    @example(Fetch mails from a gmail account)
+    .. exref::
+        :title: Fetch mails from a gmail account
 
-    ::
+        ::
 
-        user = "address no domain"
-        pwd = "password"
-        server = "imap.gmail.com"
+            user = "address no domain"
+            pwd = "password"
+            server = "imap.gmail.com"
 
-        box = MailBoxImap(user, pwd, server, ssl=True)
-        box.login()
+            box = MailBoxImap(user, pwd, server, ssl=True)
+            box.login()
 
-        # ... fetch emails
+            # ... fetch emails
 
-        box.logout()
-
-    @endexample
+            box.logout()
     """
 
     expFolderName = re.compile('\\"(.*?)\\"')
 
     def __init__(self, user, pwd, server, ssl=False, fLOG=noLOG):
         """
-        constructor
         @param  user        user
         @param  pwd         password
         @param  server      server something like ``imap.domain.ext``
         @param  ssl         select ``IMPA_SSL`` or ``IMAP``
         @param  fLOG        logging function
 
-        For gmail, it is ``imap.gmail.com`` and ssl must be true
+        For gmail, it is ``imap.gmail.com`` and ssl must be true.
         """
         self.M = imaplib.IMAP4_SSL(server) if ssl else imaplib.IMAP4(server)
         self._user = user
@@ -67,7 +65,7 @@ class MailBoxImap:
 
     def folders(self):
         """
-        returns the list of folder of the mail box
+        Returns the list of folder of the mail box.
         """
         folders = self.M.list()
         if folders[0] != "OK":
@@ -88,7 +86,8 @@ class MailBoxImap:
     def enumerate_mails_in_folder(
             self, folder, skip_function=None, date=None, pattern="ALL", body=True):
         """
-        enumerates all mails in folder folder
+        Enumerates all mails in folder folder.
+
         @param      folder          folder name
         @param      skip_function   if not None, use this function on the header/body to avoid loading the entire message (and skip it)
         @param      pattern         search pattern (see below)
@@ -97,24 +96,25 @@ class MailBoxImap:
         @return                     iterator on (message)
 
         The search pattern can be used to look for a subset of email.
-        It follows these `specifications <http://tools.ietf.org/html/rfc3501#page-49>`_.
-        If a folder is a subfolder, the syntax should be ``folder/subfolder``.
+        It follows these `specifications
+        <http://tools.ietf.org/html/rfc3501#page-49>`_.
+        If a folder is a subfolder, the syntax should be
+        ``folder/subfolder``.
 
-        @example(Search pattern)
+        .. exref::
+            :title: Search pattern
 
-        ::
+            ::
 
-            pattern='FROM "xavier" SINCE 1-Feb-2013'
-            pattern='FROM "xavier" SINCE 1-Feb-2013 BEFORE 5-May-2013'
-            pattern='FROM "xavier" SINCE 1-Feb-2013 BEFORE 5-May-2013 (UNANSWERED)'
-            pattern='CC "jacques" FROM "xavier" (DELETED)'
-            pattern='TEXT "github"'
-            pattern='LARGER 10000 SMALLER 1000000'
-            pattern='SUBJECT "programmation"'
-            pattern='TO "student" (FLAGGED)'
-            pattern='(UNSEEN)'
-
-        @endexample
+                pattern='FROM "xavier" SINCE 1-Feb-2013'
+                pattern='FROM "xavier" SINCE 1-Feb-2013 BEFORE 5-May-2013'
+                pattern='FROM "xavier" SINCE 1-Feb-2013 BEFORE 5-May-2013 (UNANSWERED)'
+                pattern='CC "jacques" FROM "xavier" (DELETED)'
+                pattern='TEXT "github"'
+                pattern='LARGER 10000 SMALLER 1000000'
+                pattern='SUBJECT "programmation"'
+                pattern='TO "student" (FLAGGED)'
+                pattern='(UNSEEN)'
 
         If the function generates an error such as::
 
@@ -141,7 +141,20 @@ class MailBoxImap:
                     pattern += " " + pdat
 
             try:
-                _, data = self.M.search(None, pattern)
+                pattern.encode('ascii')
+                charset = None
+            except UnicodeEncodeError:
+                charset = 'UTF8'
+                pattern = pattern.encode('utf-8')
+                pattern = "".join(chr(b) for b in pattern)
+
+            try:
+                try:
+                    _, data = self.M.search(charset, pattern)
+                except UnicodeEncodeError as e:
+                    charset = None
+                    pattern = pattern.encode('ascii', errors='ignore').decode("ascii")
+                    _, data = self.M.search(None, pattern)
             except Exception as e:
                 if "SEARCH => got more " in str(e):
                     if pattern == "ALL":
@@ -149,13 +162,16 @@ class MailBoxImap:
                     else:
                         pattern += " RECENT"
                     pattern = pattern.strip()
-                    self.fLOG("[MailBoxImap.enumerate_mails_in_folder] limit email search for folder " +
-                              "'{0}' to recent emails with pattern '{1}'".format(folder, pattern))
-                    data = self.M.search(None, pattern)[1]
+                    self.fLOG("[MailBoxImap.enumerate_mails_in_folder] limit email "
+                              "search for folder '{0}' to recent emails with "
+                              "pattern '{1}'".format(folder, pattern))
+                    data = self.M.search(charset, pattern)[1]
                 else:
                     raise MailException(
-                        "unable to search for pattern: {0}\nin subfolder {1}\ncheck the folder you search for is right"
-                        .format(pattern, qfold)) from e
+                        "Unable to search for pattern: '{0}' "
+                        "(charset='{1}')\nin subfolder {2}\n"
+                        "check the folder you search for is right."
+                        .format(pattern, charset, qfold)) from e
 
             spl = data[0].split()
             self.fLOG("MailBoxImap.enumerate_mails_in_folder [folder={0} nbm={1} body={2} pattern={3}]".format(
@@ -186,7 +202,8 @@ class MailBoxImap:
     def enumerate_search_person(self, person, folder, skip_function=None,
                                 date=None, max_dest=5, body=True):
         """
-        Enumerates all mails in folder folder from a user or sent to a user.
+        Enumerates all mails in folder folder from a user
+        or sent to a user.
 
         @param      person          person to look for or persons to look for
         @param      folder          folder name
@@ -238,7 +255,8 @@ class MailBoxImap:
                                  date=None,
                                  max_dest=5):
         """
-        enumerates all mails in folder folder with a subject verifying a regular expression
+        Enumerates all mails in folder folder with a subject
+        verifying a regular expression.
 
         @param      subject         subject to look for
         @param      folder          folder name
