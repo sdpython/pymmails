@@ -36,6 +36,8 @@ class TestMailBox(unittest.TestCase):
             import keyring
         user = keyring.get_password("gmail", "pymmails,user")
         code = keyring.get_password("gmail", "pymmails,pwd")
+        if code is None:
+            raise ValueError("code cannot be None.")
 
         box = MailBoxImap(user, code, "imap.gmail.com", ssl=True, fLOG=fLOG)
         box.login()
