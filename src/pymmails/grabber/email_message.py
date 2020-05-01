@@ -455,7 +455,7 @@ class EmailMessage(email.message.Message):
         """
         to = self.get_to(cc=cc, field=field)
         res = []
-        for l, a in to:
+        for l, a in to:  # pylint: disable=E1133
             if l:
                 res.append(l)
             else:

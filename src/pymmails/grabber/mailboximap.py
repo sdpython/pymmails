@@ -153,7 +153,8 @@ class MailBoxImap:
                     _, data = self.M.search(charset, pattern)
                 except UnicodeEncodeError as e:
                     charset = None
-                    pattern = pattern.encode('ascii', errors='ignore').decode("ascii")
+                    pattern = pattern.encode(
+                        'ascii', errors='ignore').decode("ascii")
                     _, data = self.M.search(None, pattern)
             except Exception as e:
                 if "SEARCH => got more " in str(e):
