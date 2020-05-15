@@ -454,8 +454,10 @@ class EmailMessage(email.message.Message):
         @return             string
         """
         to = self.get_to(cc=cc, field=field)
+        if to is None:
+            return ""
         res = []
-        for li, a in to:
+        for li, a in to:  # pylint: disable=E1133
             if li:
                 res.append(li)
             else:
