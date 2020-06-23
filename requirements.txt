@@ -4,6 +4,7 @@ jyquickhelper
 keyring
 Mako
 matplotlib
+pandas
 Pillow
 pycodestyle
 pylint
