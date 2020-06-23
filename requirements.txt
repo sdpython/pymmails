@@ -10,4 +10,5 @@ pylint
 pycryptodomex
 pyquickhelper
 sphinx
+sphinxcontrib.imagesvg
 wheel
