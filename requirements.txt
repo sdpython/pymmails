@@ -1,5 +1,6 @@
 autopep8
 coverage
+jupyter_sphinx
 jyquickhelper
 keyring
 Mako
