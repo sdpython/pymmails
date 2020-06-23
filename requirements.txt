@@ -1,9 +1,13 @@
+autopep8
 coverage
 jyquickhelper
 keyring
 Mako
+matplotlib
 Pillow
+pycodestyle
+pylint
 pycryptodomex
-pyquickhelper>=1.8.2602
-sphinx-better-theme
+pyquickhelper
+sphinx
 wheel
