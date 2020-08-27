@@ -161,8 +161,8 @@ class EmailMessage(email.message.Message):
                                 try:
                                     ht = b.decode("latin-1")
                                 except UnicodeDecodeError:
-                                    raise Exception(
-                                        "unable to decode (" + str(chs[0]) + "):" + str(b))
+                                    raise Exception(  # pylint: disable=W0707
+                                        "unable to decode %r: %r" % (chs[0], b))
                     else:
                         try:
                             ht = b.decode("utf-8")
