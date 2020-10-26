@@ -35,9 +35,8 @@ class BufferFilesWriting:
         @param      local       check local existence too
         @return                 boolean
         """
-        return name in self._done or \
-            name in self._buffer or \
-            (local and os.path.exists(name))
+        return (name in self._done or name in self._buffer or
+                (local and os.path.exists(name)))
 
     def listfiles(self):
         """

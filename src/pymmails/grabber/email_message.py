@@ -720,6 +720,8 @@ class EmailMessage(email.message.Message):
             att_id = att[2]
             cont_id = att[3]
             to = os.path.split(att[0].replace(":", "_"))[-1]
+            if to == '':
+                to = 'empty_name'
             to = os.path.join(attach_folder, to)
 
             to = to.replace("\n", "_").replace("\r", "")

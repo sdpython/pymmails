@@ -156,7 +156,8 @@ class EmailMessageListRenderer(Renderer):
 
     def write(self, location, iter, filename, attachments=None,
               overwrite=False, file_css="mail_style.css",
-              file_jsatt="_summaryattachements.json", encoding="utf8"):
+              file_jsatt="_summaryattachements.json", encoding="utf8",
+              attach_folder="attachments"):
         """
         Writes a list of mails in a folder and writes a summary.
 
@@ -168,6 +169,7 @@ class EmailMessageListRenderer(Renderer):
         @param      file_jsatt      list of attachments in json format
                                     ``[{'a': 'href', 'name': 'anchor', ...}, ...]``
         @param      encoding        encoding
+        @param      attach_folder   attachments folder
         @return                     list of written local files
 
         The method calls method :meth:`flush
@@ -189,7 +191,7 @@ class EmailMessageListRenderer(Renderer):
             "local function"
             res = message.dump(self._email_renderer, location=location,
                                prev_mail=prev_mail, next_mail=next_mail, fLOG=self.fLOG,
-                               overwrite=overwrite)
+                               overwrite=overwrite, attach_folder=attach_folder)
             html, css = res[0]
             atts = res[1]
             return html, css, atts
