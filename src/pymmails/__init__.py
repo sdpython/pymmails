@@ -13,7 +13,7 @@ from .render.email_message_list_renderer import EmailMessageListRenderer
 from .sender.email_sender import create_smtp_server, send_email, compose_email
 
 
-__version__ = "0.3.318"
+__version__ = "0.3.319"
 __author__ = "Xavier Dupré"
 __github__ = "https://github.com/sdpython/pymmails"
 __url__ = "http://www.xavierdupre.fr/app/pymmails/helpsphinx/index.html"
