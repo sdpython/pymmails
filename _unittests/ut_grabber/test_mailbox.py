@@ -4,7 +4,7 @@
 """
 import unittest
 import warnings
-from pyquickhelper.loghelper import fLOG
+from pyquickhelper.loghelper import fLOG, get_password
 from pyquickhelper.pycode import get_temp_folder, is_travis_or_appveyor
 from pymmails import MailBoxImap, EmailMessageRenderer
 
@@ -20,11 +20,7 @@ class TestMailBox(unittest.TestCase):
         if is_travis_or_appveyor():
             warnings.warn("requires a password")
             return
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', DeprecationWarning)
-            import keyring
-        code = keyring.get_password("sdut", "pymmails")
-
+        code = get_password("sdut", "pymmails")
         box = MailBoxImap("unittest.sdpython", code,
                           "imap.gmail.com", ssl=True, fLOG=fLOG)
         box.login()
@@ -42,10 +38,7 @@ class TestMailBox(unittest.TestCase):
         if is_travis_or_appveyor():
             warnings.warn("requires a password")
             return
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', DeprecationWarning)
-            import keyring
-        code = keyring.get_password("sdut", "pymmails")
+        code = get_password("sdut", "pymmails")
         temp = get_temp_folder(__file__, "temp_dump")
         box = MailBoxImap("unittest.sdpython", code,
                           "imap.gmail.com", ssl=True, fLOG=fLOG)

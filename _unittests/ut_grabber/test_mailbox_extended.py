@@ -6,7 +6,7 @@ import os
 import unittest
 import warnings
 import datetime
-from pyquickhelper.loghelper import fLOG
+from pyquickhelper.loghelper import fLOG, get_password
 from pyquickhelper.pycode import is_travis_or_appveyor
 from pymmails import MailBoxImap
 
@@ -31,11 +31,8 @@ class TestMailBox(unittest.TestCase):
             # does not work on the remote build server
             return
 
-        with warnings.catch_warnings():
-            warnings.simplefilter('ignore', DeprecationWarning)
-            import keyring
-        user = keyring.get_password("gmail", "pymmails,user")
-        code = keyring.get_password("gmail", "pymmails,pwd")
+        user = get_password("gmail", "pymmails,user")
+        code = get_password("gmail", "pymmails,pwd")
         if code is None:
             raise ValueError("code cannot be None.")
 

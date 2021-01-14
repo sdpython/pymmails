@@ -3,6 +3,7 @@ coverage
 jupyter_sphinx
 jyquickhelper
 keyring
+keyrings.cryptfile
 Mako
 matplotlib
 pandas
