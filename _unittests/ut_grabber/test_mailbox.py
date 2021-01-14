@@ -4,6 +4,7 @@
 """
 import unittest
 import warnings
+import imaplib.IMAP4
 from pyquickhelper.loghelper import fLOG, get_password
 from pyquickhelper.pycode import get_temp_folder, is_travis_or_appveyor
 from pymmails import MailBoxImap, EmailMessageRenderer
@@ -23,7 +24,11 @@ class TestMailBox(unittest.TestCase):
         code = get_password("sdut", "pymmails")
         box = MailBoxImap("unittest.sdpython", code,
                           "imap.gmail.com", ssl=True, fLOG=fLOG)
-        box.login()
+        try:
+            box.login()
+        except imaplib.IMAP4.error as e:
+            warnings.warn("Unable to connect due to %r." % e)
+            return
         mails = box.enumerate_mails_in_folder("test4", date="1-Jan-2016")
         li = list(mails)
         self.assertEqual(len(li), 3)
@@ -43,7 +48,11 @@ class TestMailBox(unittest.TestCase):
         box = MailBoxImap("unittest.sdpython", code,
                           "imap.gmail.com", ssl=True, fLOG=fLOG)
         render = EmailMessageRenderer()
-        box.login()
+        try:
+            box.login()
+        except imaplib.IMAP4.error as e:
+            warnings.warn("Unable to connect due to %r." % e)
+            return
         mails = box.enumerate_mails_in_folder("test4", date="1-Jan-2016")
         for mail in mails:
             mail.dump(render, location=temp, fLOG=fLOG)
