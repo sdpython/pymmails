@@ -25,7 +25,7 @@ class TestMailBox(unittest.TestCase):
                           "imap.gmail.com", ssl=True, fLOG=fLOG)
         try:
             box.login()
-        except Exception as e:
+        except Exception as e:  # pylint: disable=W0703
             warnings.warn("Unable to connect due to %r." % e)
             return
         mails = box.enumerate_mails_in_folder("test4", date="1-Jan-2016")
@@ -49,7 +49,7 @@ class TestMailBox(unittest.TestCase):
         render = EmailMessageRenderer()
         try:
             box.login()
-        except Exception as e:
+        except Exception as e:  # pylint: disable=W0703
             warnings.warn("Unable to connect due to %r." % e)
             return
         mails = box.enumerate_mails_in_folder("test4", date="1-Jan-2016")

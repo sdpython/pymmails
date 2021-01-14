@@ -39,7 +39,7 @@ class TestMailBox(unittest.TestCase):
         box = MailBoxImap(user, code, "imap.gmail.com", ssl=True, fLOG=fLOG)
         try:
             box.login()
-        except Exception as e:
+        except Exception as e:  # pylint: disable=W0703
             warnings.warn("Unable to connect due to %r." % e)
             return
 
