@@ -4,7 +4,6 @@
 """
 import unittest
 import warnings
-import imaplib.IMAP4
 from pyquickhelper.loghelper import fLOG, get_password
 from pyquickhelper.pycode import get_temp_folder, is_travis_or_appveyor
 from pymmails import MailBoxImap, EmailMessageRenderer
@@ -26,7 +25,7 @@ class TestMailBox(unittest.TestCase):
                           "imap.gmail.com", ssl=True, fLOG=fLOG)
         try:
             box.login()
-        except imaplib.IMAP4.error as e:
+        except Exception as e:
             warnings.warn("Unable to connect due to %r." % e)
             return
         mails = box.enumerate_mails_in_folder("test4", date="1-Jan-2016")
@@ -50,7 +49,7 @@ class TestMailBox(unittest.TestCase):
         render = EmailMessageRenderer()
         try:
             box.login()
-        except imaplib.IMAP4.error as e:
+        except Exception as e:
             warnings.warn("Unable to connect due to %r." % e)
             return
         mails = box.enumerate_mails_in_folder("test4", date="1-Jan-2016")
