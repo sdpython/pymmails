@@ -37,7 +37,11 @@ class TestMailBox(unittest.TestCase):
             raise ValueError("code cannot be None.")
 
         box = MailBoxImap(user, code, "imap.gmail.com", ssl=True, fLOG=fLOG)
-        box.login()
+        try:
+            box.login()
+        except Exception as e:
+            warnings.warn("Unable to connect due to %r." % e)
+            return
 
         mails = box.enumerate_mails_in_folder("inbox", date=date)
         li = list(mails)
