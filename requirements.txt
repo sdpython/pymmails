@@ -12,6 +12,7 @@ pycodestyle
 pylint
 pycryptodomex
 pyquickhelper
+pyquicksetup
 sphinx
 sphinxcontrib.imagesvg
 wheel
