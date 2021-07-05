@@ -183,8 +183,8 @@ class EmailMessageRenderer(Renderer):
         Renderer.__init__(self, tmpl=_template, css=_css, style_table=style_table,
                           style_highlight=style_highlight, buffer_write=buffer_write, fLOG=fLOG)
 
-    def render(self, location, mail, attachments, file_css="mail_style.css",
-               prev_mail=None, next_mail=None, **addition):
+    def render(self, location, mail, attachments,  # pylint: disable=W0221
+               file_css="mail_style.css", prev_mail=None, next_mail=None, **addition):
         """
         Renders a mail.
 
@@ -226,7 +226,7 @@ class EmailMessageRenderer(Renderer):
                                mes, tmpl, disp1)) from e
         return html, css, attachments
 
-    def write(self, location, mail, filename, attachments=None,
+    def write(self, location, mail, filename, attachments=None,  # pylint: disable=W0221
               overwrite=False, file_css="mail_style.css", encoding="utf8",
               prev_mail=None, next_mail=None, **addition):
         """

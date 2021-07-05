@@ -47,7 +47,7 @@ class EmailMessage(email.message.Message):
     additionnalMimeType = additional_mime_type_ext_type
     _date_format = "%Y-%m-%dT%H:%M:%S.%fZ"
 
-    def as_bytes(self):
+    def as_bytes(self):  # pylint: disable=W0221
         """
         converts the mail into a binary string
 
@@ -202,7 +202,7 @@ class EmailMessage(email.message.Message):
 
             if fileName is not None and fileName.startswith(
                     "=?") and fileName.startswith("?="):
-                fileName = fileName.strip("=?").split("=")[-1]
+                fileName = fileName.strip("=?").split("=")[-1]  # pylint: disable=C0207
 
             if fileName is None or "?" in fileName:
                 fileName = "unknown_type"

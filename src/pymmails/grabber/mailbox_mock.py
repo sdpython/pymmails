@@ -68,7 +68,7 @@ class MailBoxMock(MailBoxImap):
             b = content
         return email.message_from_bytes(b, _class=EmailMessage)
 
-    def enumerate_mails_in_folder(
+    def enumerate_mails_in_folder(  # pylint: disable=W0221
             self, folder, skip_function=None, pattern="ALL"):
         """
         enumerate all mails in a folder

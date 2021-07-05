@@ -98,7 +98,8 @@ class EmailMessageListRenderer(Renderer):
         self._template_end = Template(_template_end)
         self._title = title
 
-    def render(self, location, iter, attachments=None, file_css="mail_style.css"):
+    def render(self, location, iter, attachments=None,  # pylint: disable=W0237
+               file_css="mail_style.css"):
         """
         Renders a mail.
 
@@ -154,7 +155,7 @@ class EmailMessageListRenderer(Renderer):
         content.append(h)
         return "\n".join(content), css, json_attachments
 
-    def write(self, location, iter, filename, attachments=None,
+    def write(self, location, iter, filename, attachments=None,  # pylint: disable=W0221
               overwrite=False, file_css="mail_style.css",
               file_jsatt="_summaryattachements.json", encoding="utf8",
               attach_folder="attachments"):
