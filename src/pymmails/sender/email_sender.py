@@ -179,7 +179,7 @@ def send_email(server, fr, to, subject, body_html=None, body_text=None,
         to.extend(bcc)
 
     if delay_sending:
-        def f(fr=fr, to=to, astring=astring):
+        def f(fr=fr, to=to, astring=astring):  # pylint: disable=W0102
             "local function"
             try:
                 server.sendmail(fr, to, astring)
