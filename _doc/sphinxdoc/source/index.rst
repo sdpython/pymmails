@@ -29,10 +29,6 @@ pymmails: send and grab mails
         :alt: MIT License
         :target: http://opensource.org/licenses/MIT
 
-    .. image:: https://requires.io/github/sdpython/pymmails/requirements.svg?branch=master
-         :target: https://requires.io/github/sdpython/pymmails/requirements/?branch=master
-         :alt: Requirements Status
-
     .. image:: https://codecov.io/github/sdpython/pymmails/coverage.svg?branch=master
         :target: https://codecov.io/github/sdpython/pymmails?branch=master
 
