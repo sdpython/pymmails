@@ -10,7 +10,7 @@ pymmails: send and grab mails
 .. only:: html
 
     .. image:: https://travis-ci.com/sdpython/pymmails.svg?branch=master
-        :target: https://travis-ci.com/sdpython/pymmails
+        :target: https://app.travis-ci.com/github/sdpython/pymmails
         :alt: Build status
 
     .. image:: https://ci.appveyor.com/api/projects/status/hqhhdndvayrx0r9k?svg=true
