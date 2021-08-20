@@ -151,7 +151,7 @@ class MailBoxImap:
             try:
                 try:
                     _, data = self.M.search(charset, pattern)
-                except UnicodeEncodeError as e:
+                except UnicodeEncodeError:
                     charset = None
                     pattern = pattern.encode(
                         'ascii', errors='ignore').decode("ascii")
