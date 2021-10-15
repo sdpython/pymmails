@@ -15,7 +15,7 @@ class TestCodeStyle(ExtTestCase):
         check_pep8(src_,
                    pylint_ignore=('C0103', 'C1801', 'R0201', 'R1705', 'W0108', 'W0613',
                                   'C0111', 'C0412', 'W0622', 'W0621', 'C0411',
-                                  'C0415', 'W0107'),
+                                  'C0415', 'W0107', 'C0209'),
                    fLOG=fLOG,
                    skip=["email_sender.py:45: W0603",
                          "Redefining built-in ",
@@ -33,7 +33,7 @@ class TestCodeStyle(ExtTestCase):
         check_pep8(test, fLOG=fLOG, neg_pattern="temp_.*",
                    pylint_ignore=('C0103', 'C1801', 'R0201', 'R1705', 'W0108', 'W0613',
                                   'C0111', 'C0412', 'W0622', 'W0621', 'C0411',
-                                  'C0415'),
+                                  'C0415', 'C0209'),
                    skip=[])
 
 
