@@ -42,7 +42,7 @@ def compose_email(fr, to, subject, body_html=None, body_text=None, attachements=
     if attachements is None:
         attachements = []
 
-    global COMMASPACE
+    global COMMASPACE  # pylint: disable=W0602
     outer = MIMEMultipart()
     outer['Subject'] = subject
     outer['To'] = COMMASPACE.join(to)
