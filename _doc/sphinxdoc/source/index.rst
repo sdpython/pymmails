@@ -100,7 +100,9 @@ Functionalities
 
 By default, IMAP functionalities are not enabled on gmail (if you have
 a gmail account), it can be enabled from the settings page
-(see `Enable POP and IMAP for Google Apps <https://support.google.com/a/answer/105694>`_).
+(see `Enable POP and IMAP for Google Apps <https://support.google.com/a/answer/105694>`_)
+and you need to allow less secure app to access your account from
+`Security page <https://myaccount.google.com/security>`_.
 
 Indices and tables
 ------------------
