@@ -15,7 +15,7 @@ readme = 'README.rst'
 history = "HISTORY.rst"
 
 
-KEYWORDS = project_var_name + ', synchronization, files, Xavier, Dupré'
+KEYWORDS = [project_var_name, 'mail', 'Xavier, Dupré']
 DESCRIPTION = """A module to download emails from an IMAP4 server"""
 CLASSIFIERS = [
     'Programming Language :: Python :: %d' % sys.version_info[0],
