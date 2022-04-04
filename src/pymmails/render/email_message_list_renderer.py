@@ -155,7 +155,7 @@ class EmailMessageListRenderer(Renderer):
         content.append(h)
         return "\n".join(content), css, json_attachments
 
-    def write(self, location, iter, filename, attachments=None,  # pylint: disable=W0221
+    def write(self, location, iter, filename, attachments=None,  # pylint: disable=W0221,W0237
               overwrite=False, file_css="mail_style.css",
               file_jsatt="_summaryattachements.json", encoding="utf8",
               attach_folder="attachments"):

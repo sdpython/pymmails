@@ -183,7 +183,7 @@ class EmailMessageRenderer(Renderer):
         Renderer.__init__(self, tmpl=_template, css=_css, style_table=style_table,
                           style_highlight=style_highlight, buffer_write=buffer_write, fLOG=fLOG)
 
-    def render(self, location, mail, attachments,  # pylint: disable=W0221
+    def render(self, location, mail, attachments,  # pylint: disable=W0221,W0237
                file_css="mail_style.css", prev_mail=None, next_mail=None, **addition):
         """
         Renders a mail.
