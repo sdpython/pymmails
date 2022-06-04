@@ -9,7 +9,7 @@ matplotlib
 pandas
 Pillow
 pycodestyle
-pylint
+pylint>=2.14.0
 pycryptodomex
 pyquickhelper
 pyquicksetup
