@@ -151,7 +151,7 @@ class EmailMessageListRenderer(Renderer):
         if attachments is not None:
             for att in attachments:
                 satt = att.replace("\\", "/")
-                json_attachments.append(dict(a=satt, name=satt))
+                json_attachments.append(dict(a=satt, name=satt))  # pylint: disable=R1735
         content.append(h)
         return "\n".join(content), css, json_attachments
 
