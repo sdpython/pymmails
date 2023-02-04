@@ -750,7 +750,7 @@ class EmailMessage(email.message.Message):
 
             if different:
                 if metadata:
-                    d2 = dict(index=ai, filename=os.path.split(to)[-1],
+                    d2 = dict(index=ai, filename=os.path.split(to)[-1],  # pylint: disable=R1735
                               mail=self.default_filename() + ".html",
                               from_=self.get_from(), to=self.get_to(),
                               date=self.get_date_str(), uid=self.UniqueID)
