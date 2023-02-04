@@ -161,7 +161,7 @@ class EmailMessage(email.message.Message):
                                 try:
                                     ht = b.decode("latin-1")
                                 except UnicodeDecodeError:
-                                    raise Exception(  # pylint: disable=W0707
+                                    raise AssertionError(  # pylint: disable=W0707
                                         "unable to decode %r: %r" % (chs[0], b))
                     else:
                         try:
@@ -266,7 +266,7 @@ class EmailMessage(email.message.Message):
         try:
             return self.__sortkey__() < at.__sortkey__()
         except TypeError as e:
-            raise Exception("issue with\n{0}\n{1}".format(
+            raise AssertionError("issue with\n{0}\n{1}".format(
                 self.__sortkey__(), at.__sortkey__())) from e
 
     #: use for method @see me call_decode_header

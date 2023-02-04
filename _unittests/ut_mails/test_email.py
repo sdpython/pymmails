@@ -63,7 +63,7 @@ class TestEmail (unittest.TestCase):
         assert fro[0] == "matthieuyyyyy ."
         assert fro[1] == "yyyyy.matthieu@xxxxx.xxx"
         if obj.get_field("subject") != "projet 3A - élément logiciel":
-            raise Exception(
+            raise AssertionError(
                 "{0} != {1}".format(
                     obj.get_field("subject"),
                     "projet 3A - élément logiciel"))
@@ -112,11 +112,11 @@ class TestEmail (unittest.TestCase):
         with open(ff[0][0], "r", encoding="utf8") as f:
             content = f.read()
         if '<link rel="stylesheet" type="text/css" href="mail_style.css">' not in content:
-            raise Exception(content)
+            raise AssertionError(content)
         if "d_2014-12-15_p_yyyyy-matthieu-at-xxxxx-xxx_ii_48bdbc9f9fd180ab917cec5bed8ca529.html" not in ff[0][0]:
-            raise Exception(ff[0][0])
+            raise AssertionError(ff[0][0])
         if "<h1>2014/12/15 - projet 3A - élément logiciel</h1>" not in content:
-            raise Exception(content)
+            raise AssertionError(content)
 
     def test_decode_header(self):
         fLOG(

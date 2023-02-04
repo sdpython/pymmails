@@ -40,13 +40,13 @@ class TestMessageBoxMock(unittest.TestCase):
         html, _, __ = render.render(
             "__LOC__", mail0, file_css="example_css.css", attachments=None)
         if "example_css.css" not in html:
-            raise Exception(html)
+            raise AssertionError(html)
         # fLOG(css)
         if "<tr><th>Date</th><td>Sat, 1 Aug 2015" not in html and \
                 "<tr><th>Date</th><td>Fri, 14 Aug 2015" not in html and \
                 "<tr><th>Date</th><td>Fri, 20 Aug 2015" not in html and \
                 "<tr><th>Date</th><td>Sun, 20 Dec 2015" not in html:
-            raise Exception(html)
+            raise AssertionError(html)
         fLOG(html)
 
 

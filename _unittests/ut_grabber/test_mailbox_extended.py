@@ -60,7 +60,7 @@ class TestMailBox(unittest.TestCase):
             if "@" not in fr[1]:
                 issues.append(name)
         if len(issues) > 0:
-            raise Exception("Issues with\n{0}".format(
+            raise AssertionError("Issues with\n{0}".format(
                 "\n".join(str(_) for _ in issues)))
 
 
